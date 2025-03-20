@@ -15,7 +15,7 @@ sudo apt update && sudo apt install libsdl2-dev
 ### Compilando o jogo
 
 ```sh
-g++ main.cpp -o jogo -lSDL2
+g++ -std=c++23  main.cpp -o jogo -lSDL2 -I../my-lib/include
 ```
 
 ### Executando o jogo

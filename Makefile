@@ -2,7 +2,7 @@ TARGET = jogo
 
 CXX = g++
 CXXFLAGS = -std=c++23 -Wall -I./src -I../my-lib/include
-LDFLAGS = -lSDL2
+LDFLAGS = -lSDL2 -lSDL2_image
 
 SRC = $(wildcard src/**/impl/*.cpp) main.cpp 
 OBJ = $(SRC:.cpp=.o)

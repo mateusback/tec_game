@@ -10,6 +10,7 @@ public:
 private:
     bool isRunning;
     Uint32 lastFrameTime;
+    SDL_Renderer* renderer;
 
     void ProcessInput();
     void Update(float deltaTime);

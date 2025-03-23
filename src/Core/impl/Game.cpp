@@ -1,4 +1,6 @@
 #include "../Interface/Game.h"
+#include "../Interface/SceneManager.h"
+#include "../../Scenes/Interface/GameplayScene.h"
 #include <iostream>
 
 Game::Game() : window(nullptr), renderer(nullptr), loop(nullptr) {}
@@ -10,6 +12,11 @@ Game::~Game() {
 bool Game::Init(const char* title, int width, int height) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cerr << "Erro ao inicializar SDL: " << SDL_GetError() << std::endl;
+        return false;
+    }
+
+    if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
+        std::cerr << "Erro ao iniciar SDL_image: " << IMG_GetError() << std::endl;
         return false;
     }
 
@@ -25,6 +32,8 @@ bool Game::Init(const char* title, int width, int height) {
         std::cerr << "Erro ao criar renderer: " << SDL_GetError() << std::endl;
         return false;
     }
+
+    SceneManager::SetScene(new GameplayScene(renderer));
 
     loop = new GameLoop(renderer);
     return true;

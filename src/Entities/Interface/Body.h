@@ -12,6 +12,7 @@ class Body {
 protected:
     //TODO - Possivel reaftoração para usar Vector
     SDL_FRect rect;
+    SDL_Texture* texture = nullptr;
     bool has_collision;
     bool is_visible;
 
@@ -44,10 +45,14 @@ public:
     }
 
     void Update(float deltaTime);
-    void Render(SDL_Renderer* renderer);
+    virtual void Render(SDL_Renderer* renderer);
 
     SDL_FRect GetCollider() const {
         return this->rect;
+    }
+
+    void SetTexture(SDL_Texture* tex) {
+        this->texture = tex;
     }
 };
 

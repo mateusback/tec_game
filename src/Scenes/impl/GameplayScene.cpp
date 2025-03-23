@@ -1,7 +1,15 @@
 #include "../Interface/GameplayScene.h"
+#include <SDL2/SDL_image.h>
 
-GameplayScene::GameplayScene() {
+GameplayScene::GameplayScene(SDL_Renderer* renderer) {
     player = new PlayerBody(100, 100, 32, 32, true, true);
+
+    SDL_Texture* tex = IMG_LoadTexture(renderer, "assets/player.png");
+    if (!tex) {
+        SDL_Log("Erro ao carregar textura do player: %s", IMG_GetError());
+    } else {
+        player->SetTexture(tex);
+    }
 }
 
 void GameplayScene::HandleEvent(const SDL_Event& event) {

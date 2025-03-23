@@ -5,6 +5,7 @@
 #include <my-lib/math-vector.h>
 
 using Vector = Mylib::Math::Vector<float, 2>;
+using Vector4 = Mylib::Math::Vector<float, 4>;
 using Point = Vector;
 
 class Body {
@@ -40,6 +41,13 @@ public:
         this->rect.h = size.y;
         this->has_collision = collision;
         this->is_visible = visible;
+    }
+
+    void Update(float deltaTime);
+    void Render(SDL_Renderer* renderer);
+
+    SDL_FRect GetCollider() const {
+        return this->rect;
     }
 };
 

@@ -1,25 +1,23 @@
 #include "../Interface/PlayerBody.h"
 
-void PlayerBody::HandleInput(const Uint8* keystates, float& moveX, float& moveY) {
-    moveX = 0;
-    moveY = 0;
+namespace Entites
+{
+    const float PLAYER_SPEED = 100;
+    void PlayerBody::HandleInput(const Uint8* keystates) 
+    {
+        Vector speed;
 
-    if (keystates[SDL_SCANCODE_W]) moveY -= 1;
-    if (keystates[SDL_SCANCODE_S]) moveY += 1;
-    if (keystates[SDL_SCANCODE_A]) moveX -= 1;
-    if (keystates[SDL_SCANCODE_D]) moveX += 1;
+        if (keystates[SDL_SCANCODE_W]) speed.y -= PLAYER_SPEED;
+        if (keystates[SDL_SCANCODE_S]) speed.y += PLAYER_SPEED;
+        if (keystates[SDL_SCANCODE_A]) speed.x -= PLAYER_SPEED;
+        if (keystates[SDL_SCANCODE_D]) speed.x += PLAYER_SPEED;
 
-
-    if (moveX != 0 && moveY != 0) {
-        float inv = 1.0f / sqrtf(2.0f);
-        moveX *= inv;
-        moveY *= inv;
+        if (speed.x != 0 && speed.y != 0) {
+            float invRaiz = 1.0f / sqrtf(2.0f);
+            speed.x *= invRaiz;
+            speed.y *= invRaiz;
+        }
+        std::printf("moveX: %.2f, moveY: %.2f\n", speed.x, speed.y);
+        this->setSpeed(speed);
     }
 }
-
-void PlayerBody::Update(float deltaTime, float moveX, float moveY) {
-    this->rect.x += moveX * this->velocity * deltaTime;
-    this->rect.y += moveY * this->velocity * deltaTime;
-}
-
-

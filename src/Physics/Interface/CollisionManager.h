@@ -10,7 +10,7 @@ class CollisionManager {
 public:
     static bool CheckCollision(const SDL_Rect& a, const SDL_Rect& b);
     static bool CheckCollision(const Vector4 &a, const Vector4 &b);
-    static bool CheckCollision(const Body &a, const Body &b);
+    static bool CheckCollision(const Entites::Body &a, const Entites::Body &b);
 };
 
 #endif

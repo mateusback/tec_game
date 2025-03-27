@@ -1,12 +1,18 @@
 #include "../Interface/SceneManager.h"
 
-Scene* SceneManager::currentScene = nullptr;
+namespace Core
+{
+    Scene* SceneManager::currentScene = nullptr;
 
-void SceneManager::SetScene(Scene* newScene) {
-    delete currentScene;
-    currentScene = newScene;
+    void SceneManager::SetScene(Scene* newScene) 
+    {
+        delete currentScene;
+        currentScene = newScene;
+    }
+
+    Scene* SceneManager::GetCurrentScene() 
+    {
+        return currentScene;
+    }
 }
 
-Scene* SceneManager::GetCurrentScene() {
-    return currentScene;
-}

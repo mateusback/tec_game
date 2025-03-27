@@ -2,27 +2,26 @@
 #define MOVING_BODY_H
 
 #include "Body.h"
+namespace Entites
+{
+	class MovingBody : public Body {
+	protected:
+		Vector speed;
 
-enum EDirection {UP, DOWN, LEFT, RIGHT};
+	public:
+		MovingBody(float x = 0, float y = 0, float w = 0, float h = 0, bool collision = false, bool visible = true, float velocity = 100.0f)
+			: Body(x, y, w, h, collision, visible), speed(speed) {}
 
-class MovingBody : public Body {
-protected:
-	float velocity;
-
-public:
-	MovingBody(float x = 0, float y = 0, float w = 0, float h = 0, bool collision = false, bool visible = true, float velocity = 100.0f)
-		: Body(x, y, w, h, collision, visible), velocity(velocity) {}
-
-	void setVelocity(float velocity) {
-		this->velocity = velocity;
-	}
-	
-	void move(EDirection direction, float delta) {
-		if (direction = EDirection::UP) this->rect.y -= velocity * delta;
-		if (direction = EDirection::DOWN) this->rect.y += velocity * delta;
-		if (direction = EDirection::LEFT) this->rect.x -= velocity * delta;
-		if (direction = EDirection::RIGHT) this->rect.x += velocity * delta;
-	}
-};
+		void setSpeed(Vector speed) {
+			this->speed = speed;
+		}
+		
+		void move(float delta) {
+			std::printf(">rect.x: %.2f, rect.y: %.2f\n", rect.x, rect.y);
+			this->rect.x += this->speed.x * delta;
+			this->rect.y += this->speed.y * delta;
+		}
+	};
+}
 
 #endif

@@ -2,19 +2,24 @@
 #define GAMELOOP_H
 #include <SDL2/SDL.h>
 
-class GameLoop {
-public:
-    GameLoop(SDL_Renderer* renderer);
-    void Run();
-
-private:
-    bool isRunning;
-    Uint32 lastFrameTime;
-    SDL_Renderer* renderer;
-
-    void ProcessInput();
-    void Update(float deltaTime);
-    void Render();
-};
+namespace Core
+{
+    class GameLoop 
+    {
+    public:
+        GameLoop(SDL_Renderer* renderer);
+        void Run();
+        
+    private:
+        bool isRunning;
+        Uint32 lastFrameTime;
+        SDL_Renderer* renderer;
+        
+        void ProcessInput();
+        void Update(float deltaTime);
+        void Render();
+    };
+    
+}
 
 #endif

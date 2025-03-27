@@ -6,22 +6,27 @@
 #include "CharacterBody.h"
 #include "Item.h"
 
-class PlayerBody : public CharacterBody {
-protected:
-	std::list<Item> inventory;
-	int money;
-	int key;
-	int bomb;
-	float experience;
-	float defense;
-	float life_steal;
-	
-public:
-	PlayerBody(float x = 0, float y = 0, float w = 50, float h = 50, bool collision = false, bool visible = true)
-	: CharacterBody(x, y, w, h, collision, visible), money(0), key(0), bomb(0), experience(0), defense(0), life_steal(0) {}
+namespace Entites
+{
+	class PlayerBody : public CharacterBody {
+	protected:
+		std::list<Item> inventory;
+		int money;
+		int key;
+		int bomb;
+		float experience;
+		float defense;
+		float life_steal;
+		
+	public:
+		PlayerBody(float x = 0, float y = 0, float w = 50, float h = 50, bool collision = false, bool visible = true)
+		: CharacterBody(x, y, w, h, collision, visible), money(0), key(0), bomb(0), experience(0), defense(0), life_steal(0) {}
 
-	void HandleInput(const Uint8* keystates, float& moveX, float& moveY);
-	void Update(float deltaTime, float moveX, float moveY);
-};
-
+		void HandleInput(const Uint8* keystates);
+		void Update(float deltaTime) override 
+		{
+			this->move(deltaTime);
+		};
+	};
+}
 #endif

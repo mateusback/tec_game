@@ -2,14 +2,13 @@
 #define ITEM_H
 
 #include <string>
+	enum class EItemType {
+		Passive, Active
+	};
 namespace Entites
 {
 
-	enum EItemType{
-		Passive = 1,
-		Active = 2
-	};
-
+	
 	class Item {
 	protected:
 		std::string name;
@@ -18,7 +17,7 @@ namespace Entites
 		EItemType type;
 		//TODO - list<ESala> salas;
 	public:
-		Item(std::string name = "", std::string description = "", int quality = 0, EItemType type = Passive)
+		Item(std::string name = "", std::string description = "", int quality = 0, EItemType type = EItemType::Passive)
 			: name(name), description(description), quality(quality), type(type) {}
 
 		 const std::string& getName() const {

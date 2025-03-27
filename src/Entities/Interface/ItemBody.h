@@ -2,9 +2,10 @@
 #define ITEM_BODY_H
 
 #include "Body.h"
+#include "Item.h"
 //usar enum classe 
 enum EItemPool {Boss, Floor, Chest};
-enum EItemType {Passive, Active};
+//enum EItemType {Passive, Active};
 
 
 class ItemBody : public Entites::Body {

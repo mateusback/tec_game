@@ -36,8 +36,14 @@ void GameplayScene::Update(float deltaTime) {
 }
 
 void GameplayScene::Render(SDL_Renderer* renderer) {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
     player->Render(renderer);
+    
     for (auto& item : items) {
         item->Render(renderer);
     }
+
+    SDL_RenderPresent(renderer);
 }

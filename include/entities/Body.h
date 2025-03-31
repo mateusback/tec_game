@@ -26,16 +26,10 @@ namespace Entites
             this->rect.y = y;
             this->rect.w = w;
             this->rect.h = h;
-            this->has_collision = collision;
-            this->is_visible = visible;
         }
 
         Body(SDL_FRect rect, bool collision = false, bool visible = true)
-        : has_collision(collision), is_visible(visible) {
-            this->rect = rect;
-            this->has_collision = collision;
-            this->is_visible = visible;
-        }
+        : rect(rect), has_collision(collision), is_visible(visible) {}
 
         Body(SDL_FPoint position, SDL_FPoint size, bool collision = false, bool visible = true)
         : has_collision(collision), is_visible(visible) {
@@ -43,24 +37,26 @@ namespace Entites
             this->rect.y = position.y;
             this->rect.w = size.x;
             this->rect.h = size.y;
-            this->has_collision = collision;
-            this->is_visible = visible;
         }
 
-
-        //trocar para virutal
         virtual void Update(float deltaTime);
-        //tirar do virutal
         virtual void Render(SDL_Renderer* renderer);
 
-        SDL_FRect GetCollider() const {
-            return this->rect;
+        SDL_FRect GetCollider() const { return this->rect; }
+
+        SDL_Rect GetIntRect() const {
+            return { 
+                static_cast<int>(rect.x), 
+                static_cast<int>(rect.y), 
+                static_cast<int>(rect.w), 
+                static_cast<int>(rect.h)
+            };
         }
 
         void SetTexture(SDL_Texture* tex) {
             this->texture = tex;
         }
-
     };
 }
+
 #endif

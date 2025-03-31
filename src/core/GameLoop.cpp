@@ -4,7 +4,7 @@
 
 namespace Core
 {
-    GameLoop::GameLoop(SDL_Renderer* renderer) : renderer(renderer), isRunning(true), lastFrameTime(0) {}
+    GameLoop::GameLoop(SDL_Renderer* renderer) : isRunning(true), lastFrameTime(0), renderer(renderer) {}
 
     void GameLoop::Run() {
         while (isRunning) {

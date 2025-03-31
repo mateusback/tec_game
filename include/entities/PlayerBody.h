@@ -23,10 +23,9 @@ namespace Entites
 		: CharacterBody(x, y, w, h, collision, visible), money(0), key(0), bomb(0), experience(0), defense(0), life_steal(0) {}
 
 		void HandleInput(const Uint8* keystates);
-		void Update(float deltaTime) override 
-		{
-			this->move(deltaTime);
-		};
+		void Update(float deltaTime) override;
+		void Attack(float x, float y, float vx, float vy);
+		void Render(SDL_Renderer* renderer);
 	};
 }
 #endif

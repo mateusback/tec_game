@@ -1,4 +1,21 @@
-#include "Body.h"
+#include "../Interface/Body.h"
 
-Body::Body(float x, float y, float w, float h, bool collision, bool visible)
-    : rect{x, y, w, h}, has_collision(collision), is_visible(visible) {}
+namespace Entites
+{
+    void Body::Update(float deltaTime)  {}
+
+    void Body::Render(SDL_Renderer* renderer) 
+    {
+        if (!is_visible) return;
+
+        if (this->texture) 
+        {
+            SDL_RenderCopyF(renderer, this->texture, NULL, &this->rect);
+        } 
+        else 
+        {
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderFillRectF(renderer, &this->rect);
+        }
+    }
+}

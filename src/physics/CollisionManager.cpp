@@ -1,4 +1,4 @@
-#include "../Interface/CollisionManager.h"
+#include "../../include/physics/CollisionManager.h"
 
 bool CollisionManager::CheckCollision(const SDL_Rect& a, const SDL_Rect& b) {
     return (

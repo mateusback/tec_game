@@ -3,9 +3,9 @@
 
 #include <list>
 
-#include "../../Core/Interface/Scene.h"
-#include "../../Entities/Interface/PlayerBody.h"
-#include "../../Entities/Interface/ItemBody.h"
+#include "../../include/core/Scene.h"
+#include "../../include/entities/PlayerBody.h"
+#include "../../include/entities/ItemBody.h"
 
 class GameplayScene : public Core::Scene {
 public:
@@ -17,7 +17,7 @@ public:
 private:
     Entites::PlayerBody* player;
     std::list<ItemBody*> items;
-    //unique_ptr
+    //TODO - TROCAR PARA unique_ptr
 };
 
 #endif

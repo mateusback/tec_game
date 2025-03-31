@@ -1,4 +1,4 @@
-#include "src/Core/Interface/Game.h"
+#include "include/core/Game.h"
 
 int main() {
     Core::Game game;

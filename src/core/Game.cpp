@@ -1,6 +1,8 @@
-#include "../Interface/Game.h"
-#include "../Interface/SceneManager.h"
-#include "../../Scenes/Interface/GameplayScene.h"
+#include "../../include/core/Game.h"
+#include "../../include/core/GameLoop.h"
+#include "../../include/core/SceneManager.h"
+#include "../../include/scenes/GameplayScene.h"
+
 #include <iostream>
 
 namespace Core

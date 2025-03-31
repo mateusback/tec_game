@@ -1,5 +1,5 @@
-#include "../Interface/GameLoop.h"
-#include "../Interface/SceneManager.h"
+#include "../../include/core/GameLoop.h"
+#include "../../include/core/SceneManager.h"
 #include <iostream>
 
 namespace Core

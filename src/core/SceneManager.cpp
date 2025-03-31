@@ -1,4 +1,4 @@
-#include "../Interface/SceneManager.h"
+#include "../../include/core/SceneManager.h"
 
 namespace Core
 {

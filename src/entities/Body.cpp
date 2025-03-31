@@ -1,4 +1,4 @@
-#include "../Interface/Body.h"
+#include "../../include/entities/Body.h"
 
 namespace Entites
 {
@@ -10,7 +10,7 @@ namespace Entites
 
         if (this->texture) 
         {
-            SDL_RenderCopyF(renderer, this->texture, NULL, &this->rect);
+            SDL_RenderCopyF(renderer, this->texture, nullptr, &this->rect);
         } 
         else 
         {

@@ -1,4 +1,4 @@
-#include "../Interface/PlayerBody.h"
+#include "../../include/entities/PlayerBody.h"
 
 namespace Entites
 {

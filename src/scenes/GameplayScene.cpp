@@ -1,4 +1,4 @@
-#include "../Interface/GameplayScene.h"
+#include "../../include/scenes/GameplayScene.h"
 #include <SDL2/SDL_image.h>
 
 GameplayScene::GameplayScene(SDL_Renderer* renderer) {

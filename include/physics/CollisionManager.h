@@ -3,7 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <my-lib/math-vector.h>
-#include "../../Entities/Interface/Body.h"
+#include "../../include/entities/Body.h"
 
 
 class CollisionManager {

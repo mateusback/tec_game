@@ -1,7 +1,6 @@
 #ifndef ATTACK_BODY_H
 #define ATTACK_BODY_H
 
-#include <string>
 #include "MovingBody.h"
 
 namespace Entites

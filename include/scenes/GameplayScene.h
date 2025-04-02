@@ -10,12 +10,12 @@
 class GameplayScene : public Core::Scene {
 public:
     GameplayScene(SDL_Renderer* renderer);
-    void Update(float deltaTime) override;
-    void HandleEvent(const SDL_Event& event) override;
-    void Render(SDL_Renderer* renderer) override;
+    void update(float deltaTime) override;
+    void handleEvent(const SDL_Event& event) override;
+    void render(SDL_Renderer* renderer) override;
 
 private:
-    Entites::PlayerBody* player;
+    Entities::PlayerBody* player;
     std::list<ItemBody*> items;
     //TODO - TROCAR PARA unique_ptr
 };

@@ -12,10 +12,10 @@ namespace Core
 
     Game::~Game() 
     {
-        Shutdown();
+        shutdown();
     }
 
-    bool Game::Init(const char* title, int width, int height) 
+    bool Game::init(const char* title, int width, int height) 
     {
         if (SDL_Init(SDL_INIT_VIDEO) < 0) 
         {
@@ -44,18 +44,18 @@ namespace Core
             return false;
         }
 
-        SceneManager::SetScene(new GameplayScene(renderer));
+        SceneManager::setScene(new GameplayScene(renderer));
 
         loop = new GameLoop(renderer);
         return true;
     }
 
-    void Game::Run() 
+    void Game::run() 
     {
-        if (loop) loop->Run();
+        if (loop) loop->run();
     }
 
-    void Game::Shutdown() 
+    void Game::shutdown() 
     {
         delete loop;
         SDL_DestroyRenderer(renderer);

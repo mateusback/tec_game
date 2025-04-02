@@ -8,16 +8,16 @@ namespace Core
     {
     public:
         GameLoop(SDL_Renderer* renderer);
-        void Run();
+        void run();
         
     private:
         bool isRunning;
         Uint32 lastFrameTime;
         SDL_Renderer* renderer;
         
-        void ProcessInput();
-        void Update(float deltaTime);
-        void Render();
+        void processInput();
+        void update(float deltaTime);
+        void render();
     };
     
 }

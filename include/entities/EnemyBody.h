@@ -4,7 +4,7 @@
 #include "CharacterBody.h"
 #include "PlayerBody.h"
 
-namespace Entites
+namespace Entities
 {
     class EnemyBody : public CharacterBody {
     protected:

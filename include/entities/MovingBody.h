@@ -2,7 +2,7 @@
 #define MOVING_BODY_H
 
 #include "Body.h"
-namespace Entites
+namespace Entities
 {
 	class MovingBody : public Body {
 	protected:

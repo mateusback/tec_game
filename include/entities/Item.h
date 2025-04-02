@@ -5,7 +5,7 @@
 	enum class EItemType {
 		Passive, Active
 	};
-namespace Entites
+namespace Entities
 {
 
 	

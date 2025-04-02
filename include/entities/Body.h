@@ -8,7 +8,7 @@ using Vector = Mylib::Math::Vector<float, 2>;
 using Vector4 = Mylib::Math::Vector<float, 4>;
 using Point = Vector;
 
-namespace Entites
+namespace Entities
 {
     class Body 
     {
@@ -39,12 +39,12 @@ namespace Entites
             this->rect.h = size.y;
         }
 
-        virtual void Update(float deltaTime);
-        virtual void Render(SDL_Renderer* renderer);
+        virtual void update(float deltaTime) = 0;
+        virtual void render(SDL_Renderer* renderer);
 
-        SDL_FRect GetCollider() const { return this->rect; }
+        SDL_FRect getCollider() const { return this->rect; }
 
-        SDL_Rect GetIntRect() const {
+        SDL_Rect getIntRect() const {
             return { 
                 static_cast<int>(rect.x), 
                 static_cast<int>(rect.y), 
@@ -53,8 +53,12 @@ namespace Entites
             };
         }
 
-        void SetTexture(SDL_Texture* tex) {
+        void setTexture(SDL_Texture* tex) {
             this->texture = tex;
+        }
+
+        Point getCenterPoint() const {
+            return Point(this->rect.x + this->rect.w / 2, this->rect.y + this->rect.h / 2);
         }
     };
 }

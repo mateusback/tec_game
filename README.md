@@ -10,6 +10,8 @@ Certifique-se de ter o SDL2 instalado.
 
 ```sh
 sudo apt update && sudo apt install libsdl2-dev
+sudo apt update && sudo apt install libsdl2-image-dev
+sudo apt update && sudo apt install libsdl2-ttf-dev
 ```
 
 ### Compilando o jogo

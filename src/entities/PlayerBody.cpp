@@ -11,6 +11,7 @@ namespace Entities
         Vector playerDirection(0.0f, 0.0f);
         Vector shootDirection(0.0f, 0.0f);
 
+        //TODO - ARMA.SHOOT 
         if (keystates[SDL_SCANCODE_W])
             playerDirection.y -= this->getAcceleration();
         if (keystates[SDL_SCANCODE_S])
@@ -106,6 +107,7 @@ namespace Entities
         other->onCollision(this);
     }
 
+    //TODO - COLOCAR ITENS EM UM JSON
     void PlayerBody::pickUpItem(ItemBody* item){
         this->setAcceleration(this->getAcceleration() + 20.0f);
         Core::TextureManager::Clear("player");

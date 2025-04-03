@@ -30,16 +30,17 @@ void GameplayScene::update(float deltaTime) {
     player->handleInput(keys);
     player->update(deltaTime);
 
-    for (auto it = items.begin(); it != items.end(); ) {
-        if (Physics::CollisionManager::checkCollision(player->getCollider(), (*it)->getCollider())) {
-            player->onCollision(*it);
-            if (!(*it)->hasCollision()) {
-                it = items.erase(it);
-                continue;
-            }
-        }
-        ++it;
-    }
+    //TODO - TÁ DANDO ERRO AQUI, DEPOIS VERIFICAR
+    // for (auto it = items.begin(); it != items.end(); ) {
+    //     if (Physics::CollisionManager::checkCollision(player->getCollider(), (*it)->getCollider())) {
+    //         player->onCollision(*it);
+    //         if (!(*it)->hasCollision()) {
+    //             it = items.erase(it);
+    //             continue;
+    //         }
+    //     }
+    //     ++it;
+    // }
 }
 
 void GameplayScene::render(SDL_Renderer* renderer) {

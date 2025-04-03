@@ -25,7 +25,7 @@ namespace Entities
 
 	public:
 		CharacterBody(float x = 0, float y = 0, float w = 50, float h = 50, bool collision = false, bool visible = true)
-			: MovingBody(x, y, w, h, collision, visible), health(100), max_health(100), attack_damage(10), attack_speed(200.0f), 
+			: MovingBody(x, y, w, h, collision, visible, acceleration = 100.0f), health(100), max_health(100), attack_damage(10), attack_speed(200.0f), 
 			attack_range(1.0f), attack_duration(3.0f), defense(0), fire_rate(0.3f), fire_timer(0.0f),  level(1) {}
 
 		float getAttackSpeed() const { return this->attack_speed; }

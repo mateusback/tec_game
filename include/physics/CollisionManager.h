@@ -10,9 +10,7 @@ namespace Physics
     class CollisionManager
     {
     public:
-        static bool checkCollision(const SDL_Rect& a, const SDL_Rect& b);
-        static bool checkCollision(const Vector4 &a, const Vector4 &b);
-        static bool checkCollision(const Entities::Body &a, const Entities::Body &b);
+        static bool checkCollision(const SDL_FRect& a, const SDL_FRect& b);
     };
 }
 

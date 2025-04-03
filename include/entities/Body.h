@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <my-lib/math-vector.h>
 
+enum class BodyType { Body, Player, Item, Enemy, Attack };
 using Vector = Mylib::Math::Vector<float, 2>;
 using Vector4 = Mylib::Math::Vector<float, 4>;
 using Point = Vector;
@@ -20,6 +21,12 @@ namespace Entities
         bool is_visible;
 
     public:
+        void setCollision(bool collision) { this->has_collision = collision; }
+        void setVisible(bool visible) { this->is_visible = visible; }
+
+        bool hasCollision() const { return this->has_collision; }
+        bool isVisible() const { return this->is_visible; }
+
         Body(float x = 0, float y = 0, float w = 0, float h = 0, bool collision = false, bool visible = true)
         : has_collision(collision), is_visible(visible) {
             this->rect.x = x;
@@ -60,6 +67,10 @@ namespace Entities
         Point getCenterPoint() const {
             return Point(this->rect.x + this->rect.w / 2, this->rect.y + this->rect.h / 2);
         }
+
+        virtual void onCollision(Body* other) {};
+        virtual BodyType getBodyType() const {return BodyType::Body;}
+
     };
 }
 

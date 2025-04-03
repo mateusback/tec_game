@@ -16,7 +16,7 @@ public:
 
 private:
     Entities::PlayerBody* player;
-    std::list<ItemBody*> items;
+    std::list<Entities::ItemBody*> items;
     //TODO - TROCAR PARA unique_ptr
 };
 

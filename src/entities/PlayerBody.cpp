@@ -1,24 +1,24 @@
 #include "../../include/entities/PlayerBody.h"
+#include "../../include/core/TextureManager.h"
 #include <SDL2/SDL.h>
 #include <cmath>
 
 namespace Entities
 {
-    const float PLAYER_SPEED = 100.0f;
 
     void PlayerBody::handleInput(const Uint8 *keystates)
     {
-        Vector playerSpeed(0.0f, 0.0f);
+        Vector playerDirection(0.0f, 0.0f);
         Vector shootDirection(0.0f, 0.0f);
 
         if (keystates[SDL_SCANCODE_W])
-            playerSpeed.y -= PLAYER_SPEED;
+            playerDirection.y -= this->getAcceleration();
         if (keystates[SDL_SCANCODE_S])
-            playerSpeed.y += PLAYER_SPEED;
+            playerDirection.y += this->getAcceleration();
         if (keystates[SDL_SCANCODE_A])
-            playerSpeed.x -= PLAYER_SPEED;
+            playerDirection.x -= this->getAcceleration();
         if (keystates[SDL_SCANCODE_D])
-            playerSpeed.x += PLAYER_SPEED;
+            playerDirection.x += this->getAcceleration();
 
         if (keystates[SDL_SCANCODE_UP])
             shootDirection.y = -1;
@@ -42,14 +42,14 @@ namespace Entities
             }
         }
 
-        if (playerSpeed.x != 0 && playerSpeed.y != 0)
+        if (playerDirection.x != 0 && playerDirection.y != 0)
         {
             float invRaiz = 1.0f / sqrtf(2.0f);
-            playerSpeed.x *= invRaiz;
-            playerSpeed.y *= invRaiz;
+            playerDirection.x *= invRaiz;
+            playerDirection.y *= invRaiz;
         }
 
-        this->setSpeed(playerSpeed);
+        this->setSpeed(playerDirection);
     }
 
     void PlayerBody::update(float deltaTime)
@@ -99,5 +99,16 @@ namespace Entities
             SDL_Rect attackRect = attack.getIntRect();
             SDL_RenderFillRect(renderer, &attackRect);
         }
+    }
+
+    void PlayerBody::onCollision(Body* other)
+    {
+        other->onCollision(this);
+    }
+
+    void PlayerBody::pickUpItem(ItemBody* item){
+        this->setAcceleration(this->getAcceleration() + 20.0f);
+        Core::TextureManager::Clear("player");
+        this->setTexture(Core::TextureManager::Get("player_with_item"));
     }
 }

@@ -1,26 +1,19 @@
 #include "../../include/scenes/GameplayScene.h"
+#include "../../include/physics/CollisionManager.h"
+#include "../../include/core/TextureManager.h"
 #include <SDL2/SDL_image.h>
 
 GameplayScene::GameplayScene(SDL_Renderer* renderer) {
+    Core::TextureManager::Load(renderer, "player", "assets/player.png");
+    Core::TextureManager::Load(renderer, "player_with_item", "assets/player_with_item.png");
+    Core::TextureManager::Load(renderer, "item", "assets/item.png");
+
     player = new Entities::PlayerBody(100, 100, 32, 32, true, true);
+    player->setTexture(Core::TextureManager::Get("player"));
 
-    SDL_Texture* tex = IMG_LoadTexture(renderer, "assets/player.png");
-    if (!tex) {
-        std::printf("Erro no psrite do player do item: %s", IMG_GetError());
-    } else {
-        player->setTexture(tex);
-    }
-
-    ItemBody* item = new ItemBody({200, 200, 32, 32}, true, true, EItemPool::Floor, EItemType::Passive);
-
-    SDL_Texture* itemTexture = IMG_LoadTexture(renderer, "assets/item.png");
-    if (!itemTexture) {
-        std::printf("Erro na sprite do item do item: %s", IMG_GetError());
-    } else {
-        item->setTexture(itemTexture);
-    }
+    Entities::ItemBody* item = new Entities::ItemBody({200, 200, 32, 32}, true, true, EItemPool::Floor, EItemType::Passive);
+    item->setTexture(Core::TextureManager::Get("item"));
     items.push_back(item);
-
 }
 
 void GameplayScene::handleEvent(const SDL_Event& event) {
@@ -34,6 +27,17 @@ void GameplayScene::update(float deltaTime) {
     const Uint8* keys = SDL_GetKeyboardState(nullptr);
     player->handleInput(keys);
     player->update(deltaTime);
+
+    for (auto it = items.begin(); it != items.end(); ) {
+        if (Physics::CollisionManager::checkCollision(player->getCollider(), (*it)->getCollider())) {
+            player->onCollision(*it);
+            if (!(*it)->hasCollision()) {
+                it = items.erase(it);
+                continue;
+            }
+        }
+        ++it;
+    }
 }
 
 void GameplayScene::render(SDL_Renderer* renderer) {

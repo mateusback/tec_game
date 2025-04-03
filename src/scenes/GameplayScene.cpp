@@ -13,9 +13,11 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer) {
     player = new Entities::PlayerBody(100, 100, 32, 32, true, true);
     player->setTexture(Core::TextureManager::Get("player"));
 
-    Entities::ItemBody* item = new Entities::ItemBody({200, 200, 32, 32}, true, true, EItemPool::Floor, EItemType::Passive);
+    auto item = std::make_unique<Entities::ItemBody>(
+        SDL_FRect{200, 200, 32, 32}, true, true, EItemPool::Floor, EItemType::Passive
+    );
     item->setTexture(Core::TextureManager::Get("item"));
-    items.push_back(item);
+    items.push_back(std::move(item));  
 }
 
 void GameplayScene::handleEvent(const SDL_Event& event) {
@@ -31,16 +33,19 @@ void GameplayScene::update(float deltaTime) {
     player->update(deltaTime);
 
     //TODO - TÁ DANDO ERRO AQUI, DEPOIS VERIFICAR
-    // for (auto it = items.begin(); it != items.end(); ) {
-    //     if (Physics::CollisionManager::checkCollision(player->getCollider(), (*it)->getCollider())) {
-    //         player->onCollision(*it);
-    //         if (!(*it)->hasCollision()) {
-    //             it = items.erase(it);
-    //             continue;
-    //         }
-    //     }
-    //     ++it;
-    // }
+    for (auto it = items.begin(); it != items.end(); ) {
+        auto& item = *it;
+    
+        if (Physics::CollisionManager::checkCollision(player->getCollider(), item->getCollider())) {
+            player->onCollision(item.get());
+    
+            if (!item->hasCollision()) {
+                it = items.erase(it);
+                continue;
+            }
+        }
+        ++it;
+    }
 }
 
 void GameplayScene::render(SDL_Renderer* renderer) {

@@ -2,7 +2,7 @@
 #define GAMEPLAY_SCENE_H
 
 #include <list>
-
+#include <memory>
 #include "../../include/core/Scene.h"
 #include "../../include/entities/PlayerBody.h"
 #include "../../include/entities/ItemBody.h"
@@ -16,8 +16,7 @@ public:
 
 private:
     Entities::PlayerBody* player;
-    std::list<Entities::ItemBody*> items;
-    //TODO - TROCAR PARA unique_ptr
+    std::list<std::unique_ptr<Entities::ItemBody>> items;
 };
 
 #endif

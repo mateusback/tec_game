@@ -2,6 +2,7 @@
 #include "../../include/core/GameLoop.h"
 #include "../../include/core/SceneManager.h"
 #include "../../include/scenes/GameplayScene.h"
+#include "../../include/core/TextRenderer.h"
 
 #include <iostream>
 
@@ -28,6 +29,11 @@ namespace Core
             std::cerr << "Erro ao iniciar SDL_image: " << IMG_GetError() << std::endl;
             return false;
         }
+
+        if (TTF_Init() < 0) {
+            std::cerr << "Erro SDL_ttf: " << TTF_GetError() << std::endl;
+            return 1;
+        }    
 
         window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                 width, height, SDL_WINDOW_SHOWN);
@@ -60,6 +66,8 @@ namespace Core
         delete loop;
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
+        TTF_Quit();
+        IMG_Quit();
         SDL_Quit();
     }
 }

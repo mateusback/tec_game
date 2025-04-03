@@ -1,6 +1,8 @@
 #include "../../include/scenes/GameplayScene.h"
 #include "../../include/physics/CollisionManager.h"
 #include "../../include/core/TextureManager.h"
+#include "../../include/core/TextRenderer.h"
+#include "../../include/core/FontManager.h"
 #include <SDL2/SDL_image.h>
 
 GameplayScene::GameplayScene(SDL_Renderer* renderer) {

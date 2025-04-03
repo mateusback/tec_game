@@ -1,5 +1,7 @@
 #include "../../include/core/GameLoop.h"
 #include "../../include/core/SceneManager.h"
+#include "../../include/core/FontManager.h"
+#include "../../include/core/TextRenderer.h"
 #include <iostream>
 
 namespace Core
@@ -11,9 +13,13 @@ namespace Core
             Uint32 currentTime = SDL_GetTicks();
             float deltaTime = (currentTime - lastFrameTime) / 1000.0f;
             lastFrameTime = currentTime;
+            this->setDeltaTime(deltaTime);
+            
+            
+            Core::FontManager::load("default", "assets/fonts/Montserrat-Bold.ttf", 16);
 
             processInput();
-            update(deltaTime);
+            update();
             render();
 
             SDL_Delay(1);
@@ -31,9 +37,9 @@ namespace Core
         }
     }
 
-    void GameLoop::update(float deltaTime) {
+    void GameLoop::update() {
         Scene* scene = SceneManager::getCurrentScene();
-        if (scene) scene->update(deltaTime);
+        if (scene) scene->update(this->getDeltaTime());
     }
 
     void GameLoop::render() {
@@ -42,6 +48,10 @@ namespace Core
 
         Scene* scene = SceneManager::getCurrentScene();
         if (scene) scene->render(renderer);
+        auto currentFPS = (deltaTime > 0.0f) ? static_cast<int>(1.0f / deltaTime) : 0;
+        TTF_Font* font = Core::FontManager::get("default");
+        std::string fpsText = "FPS: " + std::to_string(currentFPS);
+        Core::TextRenderer::render(renderer, font, fpsText, 10, 10);
 
         SDL_RenderPresent(renderer);
     }

@@ -9,14 +9,17 @@ namespace Core
     public:
         GameLoop(SDL_Renderer* renderer);
         void run();
+        float getDeltaTime() const { return this->deltaTime; }
+        void setDeltaTime(float deltaTime) { this->deltaTime = deltaTime; }
         
     private:
         bool isRunning;
         Uint32 lastFrameTime;
         SDL_Renderer* renderer;
+        float deltaTime;
         
         void processInput();
-        void update(float deltaTime);
+        void update();
         void render();
     };
     

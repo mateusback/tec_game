@@ -8,9 +8,9 @@ namespace Core
     {
     public:
         virtual ~Scene() = default;
-        virtual void HandleEvent(const SDL_Event& event) = 0;
-        virtual void Update(float deltaTime) = 0;
-        virtual void Render(SDL_Renderer* renderer) = 0;
+        virtual void handleEvent(const SDL_Event& event) = 0;
+        virtual void update(float deltaTime) = 0;
+        virtual void render(SDL_Renderer* renderer) = 0;
     };
     
 }

@@ -1,43 +1,62 @@
 #include "../../include/scenes/GameplayScene.h"
+#include "../../include/physics/CollisionManager.h"
+#include "../../include/core/TextureManager.h"
+#include "../../include/core/TextRenderer.h"
+#include "../../include/core/FontManager.h"
 #include <SDL2/SDL_image.h>
 
 GameplayScene::GameplayScene(SDL_Renderer* renderer) {
-    player = new Entites::PlayerBody(100, 100, 32, 32, true, true);
+    Core::TextureManager::Load(renderer, "player", "assets/player.png");
+    Core::TextureManager::Load(renderer, "player_with_item", "assets/player_with_item.png");
+    Core::TextureManager::Load(renderer, "item", "assets/item.png");
 
-    SDL_Texture* tex = IMG_LoadTexture(renderer, "assets/player.png");
-    if (!tex) {
-        std::printf("Erro no psrite do player do item: %s", IMG_GetError());
-    } else {
-        player->SetTexture(tex);
-    }
+    player = new Entities::PlayerBody(100, 100, 32, 32, true, true);
+    player->setTexture(Core::TextureManager::Get("player"));
 
-    ItemBody* item = new ItemBody({200, 200, 32, 32}, true, true, EItemPool::Floor, EItemType::Passive);
-
-    SDL_Texture* itemTexture = IMG_LoadTexture(renderer, "assets/item.png");
-    if (!itemTexture) {
-        std::printf("Erro na sprite do item do item: %s", IMG_GetError());
-    } else {
-        item->SetTexture(itemTexture);
-    }
-    items.push_back(item);
+    auto item = std::make_unique<Entities::ItemBody>(
+        SDL_FRect{200, 200, 32, 32}, true, true, EItemPool::Floor, EItemType::Passive
+    );
+    item->setTexture(Core::TextureManager::Get("item"));
+    items.push_back(std::move(item));  
 }
 
-void GameplayScene::HandleEvent(const SDL_Event& event) {
+void GameplayScene::handleEvent(const SDL_Event& event) {
     if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
         std::printf("TESTEEEEEEEE");
     }
 }
 
-void GameplayScene::Update(float deltaTime) {
+void GameplayScene::update(float deltaTime) {
 
     const Uint8* keys = SDL_GetKeyboardState(nullptr);
-    player->HandleInput(keys);
-    player->Update(deltaTime);
+    player->handleInput(keys);
+    player->update(deltaTime);
+
+    //TODO - TÁ DANDO ERRO AQUI, DEPOIS VERIFICAR
+    for (auto it = items.begin(); it != items.end(); ) {
+        auto& item = *it;
+    
+        if (Physics::CollisionManager::checkCollision(player->getCollider(), item->getCollider())) {
+            player->onCollision(item.get());
+    
+            if (!item->hasCollision()) {
+                it = items.erase(it);
+                continue;
+            }
+        }
+        ++it;
+    }
 }
 
-void GameplayScene::Render(SDL_Renderer* renderer) {
-    player->Render(renderer);
+void GameplayScene::render(SDL_Renderer* renderer) {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    player->render(renderer);
+    
     for (auto& item : items) {
-        item->Render(renderer);
+        item->render(renderer);
     }
+
+    SDL_RenderPresent(renderer);
 }

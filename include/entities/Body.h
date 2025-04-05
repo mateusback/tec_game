@@ -4,11 +4,12 @@
 #include <SDL2/SDL.h>
 #include <my-lib/math-vector.h>
 
+enum class BodyType { Body, Player, Item, Enemy, Attack };
 using Vector = Mylib::Math::Vector<float, 2>;
 using Vector4 = Mylib::Math::Vector<float, 4>;
 using Point = Vector;
 
-namespace Entites
+namespace Entities
 {
     class Body 
     {
@@ -20,22 +21,22 @@ namespace Entites
         bool is_visible;
 
     public:
+        void setCollision(bool collision) { this->has_collision = collision; }
+        void setVisible(bool visible) { this->is_visible = visible; }
+
+        bool hasCollision() const { return this->has_collision; }
+        bool isVisible() const { return this->is_visible; }
+
         Body(float x = 0, float y = 0, float w = 0, float h = 0, bool collision = false, bool visible = true)
         : has_collision(collision), is_visible(visible) {
             this->rect.x = x;
             this->rect.y = y;
             this->rect.w = w;
             this->rect.h = h;
-            this->has_collision = collision;
-            this->is_visible = visible;
         }
 
         Body(SDL_FRect rect, bool collision = false, bool visible = true)
-        : has_collision(collision), is_visible(visible) {
-            this->rect = rect;
-            this->has_collision = collision;
-            this->is_visible = visible;
-        }
+        : rect(rect), has_collision(collision), is_visible(visible) {}
 
         Body(SDL_FPoint position, SDL_FPoint size, bool collision = false, bool visible = true)
         : has_collision(collision), is_visible(visible) {
@@ -43,24 +44,34 @@ namespace Entites
             this->rect.y = position.y;
             this->rect.w = size.x;
             this->rect.h = size.y;
-            this->has_collision = collision;
-            this->is_visible = visible;
         }
 
+        virtual void update(float deltaTime) = 0;
+        virtual void render(SDL_Renderer* renderer);
 
-        //trocar para virutal
-        virtual void Update(float deltaTime);
-        //tirar do virutal
-        virtual void Render(SDL_Renderer* renderer);
+        SDL_FRect getCollider() const { return this->rect; }
 
-        SDL_FRect GetCollider() const {
-            return this->rect;
+        SDL_Rect getIntRect() const {
+            return { 
+                static_cast<int>(rect.x), 
+                static_cast<int>(rect.y), 
+                static_cast<int>(rect.w), 
+                static_cast<int>(rect.h)
+            };
         }
 
-        void SetTexture(SDL_Texture* tex) {
+        void setTexture(SDL_Texture* tex) {
             this->texture = tex;
         }
 
+        Point getCenterPoint() const {
+            return Point(this->rect.x + this->rect.w / 2, this->rect.y + this->rect.h / 2);
+        }
+
+        virtual void onCollision(Body* other) {};
+        virtual BodyType getBodyType() const {return BodyType::Body;}
+
     };
 }
+
 #endif

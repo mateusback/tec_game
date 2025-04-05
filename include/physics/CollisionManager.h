@@ -5,12 +5,14 @@
 #include <my-lib/math-vector.h>
 #include "../../include/entities/Body.h"
 
+namespace Physics
+{
+    class CollisionManager
+    {
+    public:
+        static bool checkCollision(const SDL_FRect& a, const SDL_FRect& b);
+    };
+}
 
-class CollisionManager {
-public:
-    static bool CheckCollision(const SDL_Rect& a, const SDL_Rect& b);
-    static bool CheckCollision(const Vector4 &a, const Vector4 &b);
-    static bool CheckCollision(const Entites::Body &a, const Entites::Body &b);
-};
 
 #endif

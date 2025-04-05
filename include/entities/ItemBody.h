@@ -6,35 +6,38 @@
 //usar enum classe 
 enum EItemPool {Boss, Floor, Chest};
 //enum EItemType {Passive, Active};
+namespace Entities
+{
+    class ItemBody : public Entities::Body 
+    {
+        protected:
+            EItemPool pool;
+            EItemType type;
+        
+        public:
+            ItemBody(SDL_FRect hitbox, bool collision = true, bool visible = true, EItemPool pool = EItemPool::Floor, EItemType type = EItemType::Passive)
+            : Entities::Body(hitbox, collision, visible), pool(pool), type(type) {};
+        
+            void setPool(EItemPool pool) {
+                this->pool = pool;
+            }
+        
+            EItemPool getPool() const {
+                return this->pool;
+            }
+        
+            void setType(EItemType type) {
+                this->type = type;
+            }
+        
+            EItemType getType() const {
+                return this->type;
+            }
+        
+            void update(float deltaTime) override {};
+            void onCollision(Body* other);
+    };
+}
 
-
-class ItemBody : public Entites::Body {
-protected:
-	EItemPool pool;
-    EItemType type;
-
-public:
-    ItemBody(SDL_FRect hitbox, bool collision = true, bool visible = true, EItemPool pool = EItemPool::Floor, EItemType type = EItemType::Passive)
-    : Entites::Body(hitbox, collision, visible), pool(pool), type(type) {};
-
-    void SetPool(EItemPool pool) {
-        this->pool = pool;
-    }
-
-    EItemPool GetPool() const {
-        return this->pool;
-    }
-
-    void SetType(EItemType type) {
-        this->type = type;
-    }
-
-    EItemType GetType() const {
-        return this->type;
-    }
-
-    void Update(float deltaTime) override {};
-
-};
 
 #endif

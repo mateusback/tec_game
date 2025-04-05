@@ -8,8 +8,8 @@ namespace Core
     class SceneManager 
     {
     public:
-        static void SetScene(Scene* newScene);
-        static Scene* GetCurrentScene();
+        static void setScene(Scene* newScene);
+        static Scene* getCurrentScene();
 
     private:
         static Scene* currentScene;

@@ -12,9 +12,9 @@ namespace Core
         Game();
         ~Game();
         
-        bool Init(const char* title, int width, int height);
-        void Run();
-        void Shutdown();
+        bool init(const char* title, int width, int height);
+        void run();
+        void shutdown();
         
     private:
         SDL_Window* window;

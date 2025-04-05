@@ -2,15 +2,16 @@
 
 ## Gameplay 
 - [ ] Implementar inimigos
-- [ ] Implementar lógica de ataques do jogador
+- [x] Implementar lógica de ataques do jogador - Gustavo Lopes (revisado)
 - [ ] Implementar lógica de salas (sala de inimigos, item, secreta, etc)
-- [ ] Implementar Items básicos
+- [ ] Implementar Items básicos - Mateus Back
 - [ ] Adicionar HUD (vida, itens, etc.)
 - [ ] Criar itens estáticos na tela (uma pedra, por exemplo)
+- [ ] Identificar o que está causando Segmentation fault - Mateus Back
 
 ## Sprites
-- [ ] Definir um tema artístico 
-- [ ] Desenvolver Sprites
+- [ ] Definir um tema artístico - Gustavo Lopes
+- [ ] Desenvolver Sprites - Gustavo Lopes
 - [ ] Iniciar lógica de animação
 
 ## Engine Base

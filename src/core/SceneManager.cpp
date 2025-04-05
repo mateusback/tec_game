@@ -4,13 +4,13 @@ namespace Core
 {
     Scene* SceneManager::currentScene = nullptr;
 
-    void SceneManager::SetScene(Scene* newScene) 
+    void SceneManager::setScene(Scene* newScene) 
     {
         delete currentScene;
         currentScene = newScene;
     }
 
-    Scene* SceneManager::GetCurrentScene() 
+    Scene* SceneManager::getCurrentScene() 
     {
         return currentScene;
     }

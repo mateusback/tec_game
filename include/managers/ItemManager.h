@@ -21,6 +21,9 @@ public:
     const std::unordered_map<std::string, Item>& getAllItems() const {
         return itemMap;
     }
+    
+    const Item* getItemById(int id) const;
+    const Item* getRandomItemFromPool(EItemPool pool) const;
 };
 
 #endif

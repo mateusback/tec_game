@@ -26,10 +26,20 @@ inline void from_json(const json& j, ItemEffect& e) {
 
 inline void from_json(const json& j, Item& item) {
     std::string typeStr = j.at("type").get<std::string>();
+    std::string poolStr = j.at("pool").get<std::string>();
+
     EItemType type = (typeStr == "Active") ? EItemType::Active : EItemType::Passive;
+
+    EItemPool pool;
+    if (poolStr == "Boss") pool = EItemPool::Boss;
+    else if (poolStr == "Chest") pool = EItemPool::Chest;
+    else pool = EItemPool::Room;
+
     std::string spritePath = j.contains("sprite") ? j.at("sprite").get<std::string>() : "";
 
     item = Item{
+        j.at("id").get<int>(),
+        pool,
         j.at("name").get<std::string>(),
         j.at("description").get<std::string>(),
         j.at("quality").get<int>(),

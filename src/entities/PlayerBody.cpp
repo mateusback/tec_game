@@ -107,22 +107,38 @@ namespace Entities
         other->onCollision(this);
     }
 
-    //TODO - COLOCAR ITENS EM UM JSON
+    //TODO - DÁ PRA COLOCAR NO ITEM MANAGER
     void PlayerBody::pickUpItem(ItemBody* item){
         for (const auto& effect : item->getItem().getEffects()) {
             switch (effect.target) {
                 case EEffectTarget::AttackDamage:
+                    std::cout << "Attack Damage Antigo: " << this->getAttackDamage() << std::endl;
                     this->setAttackDamage(this->getAttackDamage() + effect.value);
+                    std::cout << "Attack Damage Novo: " << this->getAttackDamage() << std::endl;
                     break;
                 case EEffectTarget::AttackSpeed:
                     this->setAttackSpeed(this->getAttackSpeed() + effect.value);
                     break;
+                case EEffectTarget::AttackRange:
+                    this->setAttackRange(this->getAttackRange() + effect.value);
+                    break;
+                case EEffectTarget::AttackDuration:
+                    this->setAttackDuration(this->getAttackDuration() + effect.value);
+                    break;
                 case EEffectTarget::FireRate:
-                this->setFireRate(this->getFireRate() + effect.value);
-                break;
-
+                    this->setFireRate(this->getFireRate() + effect.value);
+                    break;
+                case EEffectTarget::Defense:
+                    this->setDefense(this->getDefense() + effect.value);
+                    break;
+                case EEffectTarget::Health:
+                    this->setHealth(this->getHealth() + effect.value);
+                    break;
+                case EEffectTarget::MaxHealth:
+                    this->setMaxHealth(this->getMaxHealth() + effect.value);
+                    break;
             }
-        this->setAcceleration(this->getAcceleration() + 20.0f);
+        }
         Core::TextureManager::Clear("player");
         this->setTexture(Core::TextureManager::Get("player_with_item"));
     }

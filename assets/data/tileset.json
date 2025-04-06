@@ -1,0 +1,8 @@
+{
+    "tiles": {
+      "0": { "name": "Floor", "sprite": "assets/tiles/floor.png" },
+      "1": { "name": "Wall", "sprite": "assets/tiles/wall.png" },
+      "2": { "name": "Rock", "sprite": "assets/tiles/rock.png" },
+      "3": { "name": "Hole", "sprite": "assets/tiles/hole.png" }
+    }
+  }  

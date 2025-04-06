@@ -22,3 +22,27 @@ bool ItemManager::loadFromFile(const std::string& filePath) {
 
     return true;
 }
+
+const Item* ItemManager::getRandomItemFromPool(EItemPool pool) const {
+    std::vector<const Item*> poolItems;
+
+    for (const auto& [_, item] : itemMap) {
+        if (item.getPool() == pool) {
+            poolItems.push_back(&item);
+        }
+    }
+
+    if (poolItems.empty()) return nullptr;
+
+    int index = rand() % poolItems.size();
+    return poolItems[index];
+}
+
+const Item* ItemManager::getItemById(int id) const {
+    for (const auto& [_, item] : itemMap) {
+        if (item.getId() == id) {
+            return &item;
+        }
+    }
+    return nullptr;
+}

@@ -1,13 +1,27 @@
 [
     {
-        "name": "Espada Sagrada",
-        "description": "Aumenta o dano de ataque.",
-        "quality": 5,
-        "type": "Passive",
-        "sprite": "assets/espada_sagrada.png",
+      "id": 1,
+      "pool": "Boss",
+      "name": "Espada Sagrada",
+      "description": "Uma lâmina sagrada que brilha.",
+      "quality": 5,
+      "type": "Passive",
+      "sprite": "assets/espada_sagrada.png",
+      "effects": [
+        { "target": "AttackDamage", "value": 5.0 },
+        { "target": "AttackSpeed", "value": 0.1 }
+      ]
+    },
+    {
+        "id": 2,
+        "pool": "Chest",
+        "name": "Poção da Fúria",
+        "description": "Aumenta o ataque por 10 segundos.",
+        "quality": 3,
+        "type": "Active",
+        "sprite": "assets/pocao_furia.png",
         "effects": [
-            { "target": "AttackDamage", "value": 5.0 },
-            { "target": "AttackSpeed", "value": 0.1 }
+        { "target": "AttackDamage", "value": 8.0 }
         ]
     }
 ]

@@ -18,8 +18,6 @@ namespace Entities
 		}
 		
 		void move(float delta) {
-			std::printf(">rect.x: %.2f, rect.y: %.2f\n", rect.x, rect.y);
-			std::printf(">spidi: %.2f\n", acceleration);
 			this->rect.x += this->speed.x * delta;
 			this->rect.y += this->speed.y * delta;
 		}

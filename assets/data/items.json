@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Espada Sagrada",
+        "description": "Aumenta o dano de ataque.",
+        "quality": 5,
+        "type": "Passive",
+        "sprite": "assets/espada_sagrada.png",
+        "effects": [
+            { "target": "AttackDamage", "value": 5.0 },
+            { "target": "AttackSpeed", "value": 0.1 }
+        ]
+    }
+]
+  

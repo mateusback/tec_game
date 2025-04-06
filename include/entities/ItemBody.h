@@ -3,39 +3,33 @@
 
 #include "Body.h"
 #include "Item.h"
-//usar enum classe 
 enum EItemPool {Boss, Floor, Chest};
-//enum EItemType {Passive, Active};
+
 namespace Entities
 {
-    class ItemBody : public Entities::Body 
+    class ItemBody : public Body 
     {
-        protected:
-            EItemPool pool;
-            EItemType type;
+    protected:
+        EItemPool pool;
+        EItemType type;
+        Item item;
         
-        public:
-            ItemBody(SDL_FRect hitbox, bool collision = true, bool visible = true, EItemPool pool = EItemPool::Floor, EItemType type = EItemType::Passive)
-            : Entities::Body(hitbox, collision, visible), pool(pool), type(type) {};
-        
-            void setPool(EItemPool pool) {
-                this->pool = pool;
-            }
-        
-            EItemPool getPool() const {
-                return this->pool;
-            }
-        
-            void setType(EItemType type) {
-                this->type = type;
-            }
-        
-            EItemType getType() const {
-                return this->type;
-            }
-        
-            void update(float deltaTime) override {};
-            void onCollision(Body* other);
+    public:
+        ItemBody(SDL_FRect hitbox, const Item& item, bool collision = true, bool visible = true, EItemPool pool = EItemPool::Floor)
+        : Body(hitbox, collision, visible), pool(pool), type(item.getType()), item(item) {}
+    
+    
+        void setPool(EItemPool pool) { this->pool = pool; }
+    
+        EItemPool getPool() const { return this->pool; }
+    
+        void setType(EItemType type) { this->type = type;}
+    
+        EItemType getType() const { return this->type; }
+        const Item& getItem() const { return item; }
+    
+        void update(float deltaTime) override {};
+        void onCollision(Body* other);
     };
 }
 

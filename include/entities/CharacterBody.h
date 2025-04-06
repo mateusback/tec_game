@@ -32,9 +32,23 @@ namespace Entities
         float getAttackDuration() const { return this->attack_duration; }
 		float getFireRate() const { return this->fire_rate; }
 		float getFireTimer() const { return this->fire_timer; }
+		float getAttackDamage() const { return this->attack_damage; }
+		float getAttackRange() const { return this->attack_range; }
+		float getDefense() const { return this->defense; }
+		float getHealth() const { return this->health; }
+		float getMaxHealth() const { return this->max_health; }
+		int getLevel() const { return this->level; }
 		
 		void setFireRate(float fire_rate) { this->fire_rate = fire_rate; }
 		void setFireTimer(float fire_timer) { this->fire_timer = fire_timer; }
+		void setAttackSpeed(float attack_speed) { this->attack_speed = attack_speed; }
+		void setAttackDuration(float attack_duration) { this->attack_duration = attack_duration; }
+		void setAttackDamage(float attack_damage) { this->attack_damage = attack_damage; }
+		void setAttackRange(float attack_range) { this->attack_range = attack_range; }
+		void setDefense(float defense) { this->defense = defense; }
+		void setHealth(float health) { this->health = health; }
+		void setMaxHealth(float max_health) { this->max_health = max_health; }
+		void setLevel(int level) { this->level = level; }
 	};
 }
 

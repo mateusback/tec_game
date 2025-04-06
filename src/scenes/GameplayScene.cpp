@@ -13,11 +13,26 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer) {
     player = new Entities::PlayerBody(100, 100, 32, 32, true, true);
     player->setTexture(Core::TextureManager::Get("player"));
 
-    auto item = std::make_unique<Entities::ItemBody>(
-        SDL_FRect{200, 200, 32, 32}, true, true, EItemPool::Floor, EItemType::Passive
-    );
-    item->setTexture(Core::TextureManager::Get("item"));
-    items.push_back(std::move(item));  
+    std::filesystem::path base = std::filesystem::current_path();
+    std::cout << "Diretório atual: " << std::filesystem::current_path() << std::endl;
+    std::filesystem::path filePath = base / "assets" / "data" / "items.json";
+    std::cout << "Diretório: " << filePath << std::endl;
+    itemManager.loadFromFile(filePath.string());    
+
+    const Item* espada = itemManager.getItem("Espada Sagrada");
+    if (espada) {
+        Core::TextureManager::Load(renderer, espada->getSpritePath(), espada->getSpritePath());
+    
+        auto item = std::make_unique<Entities::ItemBody>(
+            SDL_FRect{200, 200, 32, 32}, *espada
+        );
+        std::printf(">rect.x: %c", espada->getSpritePath());
+    
+        item->setTexture(Core::TextureManager::Get(espada->getSpritePath()));
+    
+        std::unique_ptr<Entity> casted(static_cast<Entity*>(item.release()));
+        entityManager.add(std::move(casted));
+    }
 }
 
 void GameplayScene::handleEvent(const SDL_Event& event) {
@@ -32,20 +47,17 @@ void GameplayScene::update(float deltaTime) {
     player->handleInput(keys);
     player->update(deltaTime);
 
-    //TODO - TÁ DANDO ERRO AQUI, DEPOIS VERIFICAR
-    for (auto it = items.begin(); it != items.end(); ) {
-        auto& item = *it;
-    
-        if (Physics::CollisionManager::checkCollision(player->getCollider(), item->getCollider())) {
-            player->onCollision(item.get());
-    
-            if (!item->hasCollision()) {
-                it = items.erase(it);
-                continue;
-            }
+    entityManager.updateAll(deltaTime);
+
+    for (auto& e : entityManager.getEntities()) {
+        auto* item = dynamic_cast<Entities::ItemBody*>(e.get());
+        if (item && item->hasCollision() &&
+            Physics::CollisionManager::checkCollision(player->getCollider(), item->getCollider())) {
+            player->onCollision(item);
         }
-        ++it;
     }
+
+    entityManager.removeInactive();
 }
 
 void GameplayScene::render(SDL_Renderer* renderer) {
@@ -54,9 +66,7 @@ void GameplayScene::render(SDL_Renderer* renderer) {
 
     player->render(renderer);
     
-    for (auto& item : items) {
-        item->render(renderer);
-    }
+    entityManager.renderAll(renderer);
 
     SDL_RenderPresent(renderer);
 }

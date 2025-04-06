@@ -3,15 +3,20 @@
 
 #include <SDL2/SDL.h>
 #include <my-lib/math-vector.h>
+#include <nlohmann/json.hpp>
 
-enum class BodyType { Body, Player, Item, Enemy, Attack };
+#include "Entity.h"
+
 using Vector = Mylib::Math::Vector<float, 2>;
 using Vector4 = Mylib::Math::Vector<float, 4>;
 using Point = Vector;
+using json = nlohmann::json;
+
+enum class BodyType { Body, Player, Item, Enemy, Attack };
 
 namespace Entities
 {
-    class Body 
+    class Body : public Entity
     {
     protected:
         //TODO - Possivel reaftoração para usar Vector
@@ -70,7 +75,6 @@ namespace Entities
 
         virtual void onCollision(Body* other) {};
         virtual BodyType getBodyType() const {return BodyType::Body;}
-
     };
 }
 

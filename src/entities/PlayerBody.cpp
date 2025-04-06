@@ -109,6 +109,19 @@ namespace Entities
 
     //TODO - COLOCAR ITENS EM UM JSON
     void PlayerBody::pickUpItem(ItemBody* item){
+        for (const auto& effect : item->getItem().getEffects()) {
+            switch (effect.target) {
+                case EEffectTarget::AttackDamage:
+                    this->setAttackDamage(this->getAttackDamage() + effect.value);
+                    break;
+                case EEffectTarget::AttackSpeed:
+                    this->setAttackSpeed(this->getAttackSpeed() + effect.value);
+                    break;
+                case EEffectTarget::FireRate:
+                this->setFireRate(this->getFireRate() + effect.value);
+                break;
+
+            }
         this->setAcceleration(this->getAcceleration() + 20.0f);
         Core::TextureManager::Clear("player");
         this->setTexture(Core::TextureManager::Get("player_with_item"));

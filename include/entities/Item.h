@@ -2,39 +2,33 @@
 #define ITEM_H
 
 #include <string>
-	enum class EItemType {
-		Passive, Active
-	};
-namespace Entities
-{
+#include <vector>
+#include "../managers/ItemEffect.h"
 
-	
-	class Item {
-	protected:
-		std::string name;
-		std::string description;
-		int quality;
-		EItemType type;
-		//TODO - list<ESala> salas;
-	public:
-		Item(std::string name = "", std::string description = "", int quality = 0, EItemType type = EItemType::Passive)
-			: name(name), description(description), quality(quality), type(type) {}
+enum class EItemType {
+    Passive, Active
+};
 
-		 const std::string& getName() const {
-			return this->name;
-		}
+class Item {
+private:
+    std::string name;
+    std::string description;
+    int quality;
+    EItemType type;
+    std::vector<ItemEffect> effects;
+	std::string spritePath;
 
-		std::string getDescription() const {
-			return this->description;
-		}
+public:
+    Item(std::string name = "", std::string description = "", int quality = 0, EItemType type = EItemType::Passive,
+         std::vector<ItemEffect> effects = {}, std::string spritePath = "")
+        : name(name), description(description), quality(quality), type(type), effects(effects), spritePath(spritePath) {}
 
-		int getQuality() const {
-			return this->quality;
-		}
+    const std::string& getName() const { return name; }
+    const std::string& getDescription() const { return description; }
+    int getQuality() const { return quality; }
+    EItemType getType() const { return type; }
+    const std::vector<ItemEffect>& getEffects() const { return effects; }
+	const std::string& getSpritePath() const { return spritePath; }
+};
 
-		EItemType getType() const {
-			return this->type;
-		}
-	};
-} 
 #endif

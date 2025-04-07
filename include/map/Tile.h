@@ -7,6 +7,7 @@ struct Tile {
     int id;
     std::string name;
     std::string spritePath;
+    bool solid = false;
 };
 
 #endif

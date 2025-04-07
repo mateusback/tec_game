@@ -24,7 +24,11 @@ public:
 
     void renderAll(SDL_Renderer* renderer) {
         for (auto& e : entities) {
-            e->render(renderer);
+            // TODO - passar o visibilidade para o Entity e não para o Body
+            auto* body = dynamic_cast<Entities::Body*>(e.get());
+            if (body && body->isVisible()) {
+                e->render(renderer);
+            }
         }
     }
 
@@ -32,7 +36,7 @@ public:
         entities.erase(
             std::remove_if(entities.begin(), entities.end(), [](const std::unique_ptr<Entity>& e) {
                 auto* body = dynamic_cast<Entities::Body*>(e.get());
-                return body && !body->hasCollision();
+                return body && !body->isActive();
             }),
             entities.end()
         );

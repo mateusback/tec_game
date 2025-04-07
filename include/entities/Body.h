@@ -24,6 +24,7 @@ namespace Entities
         SDL_Texture* texture = nullptr;
         bool has_collision;
         bool is_visible;
+        bool is_active = true;
 
     public:
         void setCollision(bool collision) { this->has_collision = collision; }
@@ -31,6 +32,9 @@ namespace Entities
 
         bool hasCollision() const { return this->has_collision; }
         bool isVisible() const { return this->is_visible; }
+
+        bool isActive() const { return this->is_active; }
+        void setActive(bool active) { this->is_active = active; }
 
         Body(float x = 0, float y = 0, float w = 0, float h = 0, bool collision = false, bool visible = true)
         : has_collision(collision), is_visible(visible) {

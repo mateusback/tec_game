@@ -17,6 +17,7 @@ bool TileSet::loadFromFile(const std::string& path) {
         tile.id = id;
         tile.name = value["name"];
         tile.spritePath = value["sprite"];
+        tile.solid = value.contains("solid") && value["solid"].get<bool>();
         tileMap[id] = tile;
     }
 

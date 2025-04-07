@@ -54,34 +54,36 @@ void GameplayScene::update(float deltaTime) {
 void GameplayScene::render(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
-    renderRoomLayout(renderer);
-    player->render(renderer);
-    
+    //TODO - Isso foi um grande erro, lembrar de separar em camadas depois
     entityManager.renderAll(renderer);
+    player->render(renderer);
 
-    //Isso é para debug, pode tirar
-    // TTF_Font* font = Core::FontManager::get("default");
-
-    // int x = 10;
-    // int y = 100;
-    // int lineHeight = 18;
-
-    // auto drawStat = [&](const std::string& label, float value) {
-    //     std::string text = label + ": " + std::to_string(value);
-    //     Core::TextRenderer::render(renderer, font, text, x, y);
-    //     y += lineHeight;
-    // };
-
-    // drawStat("HP", player->getHealth());
-    // drawStat("Max HP", player->getMaxHealth());
-    // drawStat("Atk Dmg", player->getAttackDamage());
-    // drawStat("Atk Spd", player->getAttackSpeed());
-    // drawStat("Atk Range", player->getAttackRange());
-    // drawStat("Atk Duration", player->getAttackDuration());
-    // drawStat("Fire Rate", player->getFireRate());
-    // drawStat("Defense", player->getDefense());
-    // drawStat("Level", static_cast<float>(player->getLevel()));
-    
+    //Isso é para #DEBUG, pode tirar
+    if(false)
+    {
+        TTF_Font* font = Core::FontManager::get("default");
+        
+        int x = 10;
+        int y = 100;
+        int lineHeight = 18;
+        
+        auto drawStat = [&](const std::string& label, float value) {
+            std::string text = label + ": " + std::to_string(value);
+            Core::TextRenderer::render(renderer, font, text, x, y);
+            y += lineHeight;
+        };
+        
+        drawStat("HP", player->getHealth());
+        drawStat("Max HP", player->getMaxHealth());
+        drawStat("Atk Dmg", player->getAttackDamage());
+        drawStat("Atk Spd", player->getAttackSpeed());
+        drawStat("Atk Range", player->getAttackRange());
+        drawStat("Atk Duration", player->getAttackDuration());
+        drawStat("Fire Rate", player->getFireRate());
+        drawStat("Defense", player->getDefense());
+        drawStat("Level", static_cast<float>(player->getLevel()));
+    }
+        
     SDL_RenderPresent(renderer);
 }
 
@@ -112,23 +114,31 @@ void GameplayScene::loadFloor(int index) {
 void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
     if (!currentRoom) return;
 
-    // 1. Renderizar blocos visuais da sala
-    int tileSize = 32;
+    const int tileSize = 32;
+
+    // TODO - 1. Quero uma sala com 14x9, 12x7 jogavel e o resto paredes e portas.
     for (int row = 0; row < currentRoom->layout.size(); ++row) {
         for (int col = 0; col < currentRoom->layout[row].size(); ++col) {
             int tileId = currentRoom->layout[row][col];
             const Tile* tile = tileSet.getTile(tileId);
 
-            if (tile) {
-                Core::TextureManager::Load(renderer, tile->spritePath, tile->spritePath);
-                SDL_Texture* texture = Core::TextureManager::Get(tile->spritePath);
-                SDL_Rect dst = { col * tileSize, row * tileSize, tileSize, tileSize };
-                SDL_RenderCopy(renderer, texture, nullptr, &dst);
-            }
+            if (!tile) continue;
+
+            SDL_Texture* texture = Core::TextureManager::Get(tile->spritePath);
+            SDL_FRect rect = { col * tileSize, row * tileSize, tileSize, tileSize };
+
+            auto tileBody = std::make_unique<Entities::TileBody>(
+                rect,
+                texture,
+                tile->solid
+            );
+
+            entityManager.add(std::move(tileBody));
         }
     }
 
-    // 2. Instanciar entidades (ex: itens)
+
+    // TODO - 2. Separar em métodos depois, deixar mais organizado e legivel. 
     for (const auto& e : currentRoom->entities) {
         std::string type = e.at("type");
 
@@ -151,32 +161,4 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
             }
         }
     }
-}
-
-void GameplayScene::renderRoomLayout(SDL_Renderer* renderer) {
-    if (!currentRoom) return;
-
-    int tileSize = 32;
-    for (int row = 0; row < currentRoom->layout.size(); ++row) {
-        for (int col = 0; col < currentRoom->layout[row].size(); ++col) {
-            int tileId = currentRoom->layout[row][col];
-            const Tile* tile = tileSet.getTile(tileId);
-
-            if (tile) {
-                SDL_Texture* texture = Core::TextureManager::Get(tile->spritePath);
-                SDL_Rect dst = { col * tileSize, row * tileSize, tileSize, tileSize };
-                SDL_RenderCopy(renderer, texture, nullptr, &dst);
-            }
-        }
-    }
-}
-
-
-
-Room* GameplayScene::findRoomById(int id) {
-    for (auto& room : floor.rooms) {
-        if (room.id == id)
-            return &room;
-    }
-    return nullptr;
 }

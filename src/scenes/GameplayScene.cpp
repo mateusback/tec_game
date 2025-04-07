@@ -11,11 +11,18 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer) {
     Core::TextureManager::Load(renderer, "player", "assets/player.png");
     Core::TextureManager::Load(renderer, "player_with_item", "assets/player_with_item.png");
     Core::TextureManager::Load(renderer, "item", "assets/item.png");
+
     tileSet.loadFromFile("assets/data/tileset.json");
     itemManager.loadFromFile("assets/data/items.json");
+
+    for (const auto& [id, tile] : tileSet.getAllTiles()) {
+        Core::TextureManager::Load(renderer, tile.spritePath, tile.spritePath);
+    }
+
     loadFloor(1);
     loadCurrentRoom(renderer);
-    player = new Entities::PlayerBody(100, 100, 32, 32, true, true);
+
+    player = new Entities::PlayerBody(400, 400, 32, 32, true, true);
     player->setTexture(Core::TextureManager::Get("player"));  
 }
 
@@ -53,27 +60,27 @@ void GameplayScene::render(SDL_Renderer* renderer) {
     entityManager.renderAll(renderer);
 
     //Isso é para debug, pode tirar
-    TTF_Font* font = Core::FontManager::get("default");
+    // TTF_Font* font = Core::FontManager::get("default");
 
-    int x = 10;
-    int y = 100;
-    int lineHeight = 18;
+    // int x = 10;
+    // int y = 100;
+    // int lineHeight = 18;
 
-    auto drawStat = [&](const std::string& label, float value) {
-        std::string text = label + ": " + std::to_string(value);
-        Core::TextRenderer::render(renderer, font, text, x, y);
-        y += lineHeight;
-    };
+    // auto drawStat = [&](const std::string& label, float value) {
+    //     std::string text = label + ": " + std::to_string(value);
+    //     Core::TextRenderer::render(renderer, font, text, x, y);
+    //     y += lineHeight;
+    // };
 
-    drawStat("HP", player->getHealth());
-    drawStat("Max HP", player->getMaxHealth());
-    drawStat("Atk Dmg", player->getAttackDamage());
-    drawStat("Atk Spd", player->getAttackSpeed());
-    drawStat("Atk Range", player->getAttackRange());
-    drawStat("Atk Duration", player->getAttackDuration());
-    drawStat("Fire Rate", player->getFireRate());
-    drawStat("Defense", player->getDefense());
-    drawStat("Level", static_cast<float>(player->getLevel()));
+    // drawStat("HP", player->getHealth());
+    // drawStat("Max HP", player->getMaxHealth());
+    // drawStat("Atk Dmg", player->getAttackDamage());
+    // drawStat("Atk Spd", player->getAttackSpeed());
+    // drawStat("Atk Range", player->getAttackRange());
+    // drawStat("Atk Duration", player->getAttackDuration());
+    // drawStat("Fire Rate", player->getFireRate());
+    // drawStat("Defense", player->getDefense());
+    // drawStat("Level", static_cast<float>(player->getLevel()));
     
     SDL_RenderPresent(renderer);
 }
@@ -156,8 +163,6 @@ void GameplayScene::renderRoomLayout(SDL_Renderer* renderer) {
             const Tile* tile = tileSet.getTile(tileId);
 
             if (tile) {
-                //TROCAR PARA TILEBODY NO FUTURO
-                Core::TextureManager::Load(renderer, tile->spritePath, tile->spritePath); 
                 SDL_Texture* texture = Core::TextureManager::Get(tile->spritePath);
                 SDL_Rect dst = { col * tileSize, row * tileSize, tileSize, tileSize };
                 SDL_RenderCopy(renderer, texture, nullptr, &dst);
@@ -165,6 +170,7 @@ void GameplayScene::renderRoomLayout(SDL_Renderer* renderer) {
         }
     }
 }
+
 
 
 Room* GameplayScene::findRoomById(int id) {

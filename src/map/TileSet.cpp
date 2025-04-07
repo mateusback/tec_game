@@ -27,3 +27,7 @@ const Tile* TileSet::getTile(int id) const {
     auto it = tileMap.find(id);
     return it != tileMap.end() ? &it->second : nullptr;
 }
+
+const std::unordered_map<int, Tile>& TileSet::getAllTiles() const {
+    return tileMap;
+}

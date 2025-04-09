@@ -5,8 +5,8 @@
 - [x] Implementar lógica de ataques do jogador - Gustavo Lopes (revisado)
 - [ ] Implementar lógica de salas (sala de inimigos, item, secreta, etc)
 - [ ] Implementar Items básicos - Mateus Back
-- [ ] Adicionar HUD (vida, itens, etc.)
-- [ ] Criar itens estáticos na tela (uma pedra, por exemplo)
+- [ ] Adicionar HUD (vida, itens, etc.) - Luis
+- [ ] Criar itens estáticos na tela (uma pedra, por exemplo) - Luis
 - [ ] Identificar o que está causando Segmentation fault - Mateus Back
 
 ## Sprites

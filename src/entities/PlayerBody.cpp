@@ -1,12 +1,13 @@
 #include "../../include/entities/PlayerBody.h"
-#include "../../include/core/TextureManager.h"
+#include "../../include/managers/TextureManager.h"
+#include "../../include/items/ItemTypes.h"
 #include <SDL2/SDL.h>
 #include <cmath>
 
 namespace Entities
 {
 
-ççhandle input
+// TODO - fazer um inputmanager
     void PlayerBody::handleInput(const Uint8 *keystates)
     {
         Vector playerDirection(0.0f, 0.0f);
@@ -61,46 +62,12 @@ namespace Entities
         if (fire_timer > 0.0f)
             fire_timer -= deltaTime;
 
-        for (auto it = attacks.begin(); it != attacks.end();)
-        {
-            it->update(deltaTime);
-
-            if (it->getAttackDuration() <= 0)
-                it = attacks.erase(it);
-            else
-                ++it;
-        }
+        //TODO - REESTRUTURAR UMA LÓGICA BASEADA NO ATTACKSPEED E ATTACKRANGE
     }
 
     void PlayerBody::attack(Point characterCenter, Vector direction)
     {
-        this->attacks.emplace_back(characterCenter.x, characterCenter.y,
-                                   10, 10, true, true, 20.0f, 200.0f, this->getAttackDuration());
-
-        this->attacks.back().setSpeed(Vector(direction.x * this->getAttackSpeed(), direction.y * this->getAttackSpeed()));
-    }
-
-    //TODO REMOVER ISSO
-    void PlayerBody::render(SDL_Renderer *renderer)
-    {
-        if (this->texture)
-        {
-            SDL_RenderCopyF(renderer, this->texture, nullptr, &this->rect);
-        }
-        else
-        {
-            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-            SDL_Rect intRect = this->getIntRect();
-            SDL_RenderFillRect(renderer, &intRect);
-        }
-
-        // TODO - RENDER ATTACKS VAI ATTACK BODY TEM SEU RENDER
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        for (auto &attack : attacks)
-        {
-            SDL_Rect attackRect = attack.getIntRect();
-            SDL_RenderFillRect(renderer, &attackRect);
-        }
+        //TODO - IMPLEMENTAR O ATTACK BODY
     }
 
     void PlayerBody::onCollision(Body* other)
@@ -112,7 +79,7 @@ namespace Entities
     void PlayerBody::pickUpItem(ItemBody* item){
         for (const auto& effect : item->getItem().getEffects()) {
             switch (effect.target) {
-				using enum EEffectTarget;
+				using enum Items::EEffectTarget;
                 case AttackDamage:
                     std::cout << "Attack Damage Antigo: " << this->getAttackDamage() << std::endl;
                     this->setAttackDamage(this->getAttackDamage() + effect.value);
@@ -141,7 +108,7 @@ namespace Entities
                     break;
             }
         }
-        Core::TextureManager::Clear("player");
-        this->setTexture(Core::TextureManager::Get("player_with_item"));
+        Manager::TextureManager::Clear("player");
+        this->setTexture(Manager::TextureManager::Get("player_with_item"));
     }
 }

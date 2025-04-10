@@ -11,7 +11,7 @@ namespace Entities
 {
 	class PlayerBody : public CharacterBody {
 	protected:
-		std::list<Item> inventory;
+		std::list<Items::Item> inventory;
 		int money;
 		int key;
 		int bomb;
@@ -24,17 +24,17 @@ namespace Entities
 	
 		void handleCollision();
 		void handleInput(const Uint8* keystates);
-		void handleInput()
+		void handleInput();
 		void update(float deltaTime) override;
 		void attack(Point characterCenter, Vector direction);
 		void onCollision(Body* other) override;
 		void pickUpItem(Entities::ItemBody* item);
 
-		BodyType getBodyType() const override { return BodyType::Player; }
+		EBodyType getBodyType() const override { return EBodyType::Player; }
 
 
 		#pragma region Getters
-		std::list<Item> getInventory() { return this->inventory; }
+		std::list<Items::Item> getInventory() { return this->inventory; }
 		int getMoney() { return this->money; }
 		int getKeys() { return this->key; }
 		int getBombs() { return this->bomb; }

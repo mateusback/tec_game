@@ -9,15 +9,7 @@
 namespace Core
 {
 
-    Game::Game() : window(nullptr), renderer(nullptr), loop(nullptr) {}
-
-    Game::~Game() 
-    {
-        shutdown();
-    }
-
-    bool Game::init(const char* title, int width, int height) 
-    {
+    Game::Game() : window(nullptr), renderer(nullptr), loop(nullptr) {
         if (SDL_Init(SDL_INIT_VIDEO) < 0) 
         {
             std::cerr << "Erro ao inicializar SDL: " << SDL_GetError() << std::endl;
@@ -60,8 +52,8 @@ namespace Core
     {
         if (loop) loop->run();
     }
-
-    void Game::shutdown() 
+    
+    Game::~Game() 
     {
         delete loop;
         SDL_DestroyRenderer(renderer);
@@ -69,6 +61,6 @@ namespace Core
         TTF_Quit();
         IMG_Quit();
         SDL_Quit();
-		;;RAII
     }
+
 }

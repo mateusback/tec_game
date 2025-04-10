@@ -1,29 +1,29 @@
 #include "../../include/scenes/GameplayScene.h"
 #include "../../include/physics/CollisionManager.h"
-#include "../../include/core/TextureManager.h"
-#include "../../include/core/TextRenderer.h"
-#include "../../include/core/FontManager.h"
-#include "../../include/map/FloorSerialization.h"
+#include "../../include/managers/TextureManager.h"
+#include "../../include/renders/TextRenderer.h"
+#include "../../include/managers/FontManager.h"
+#include "../../include/serializers/FloorSerialization.h"
 #include <SDL2/SDL_image.h>
 #include <fstream>
 
 GameplayScene::GameplayScene(SDL_Renderer* renderer) {
-    Core::TextureManager::Load(renderer, "player", "assets/player.png");
-    Core::TextureManager::Load(renderer, "player_with_item", "assets/player_with_item.png");
-    Core::TextureManager::Load(renderer, "item", "assets/item.png");
-
+    Manager::TextureManager::Load(renderer, "player", "assets/player.png");
+    Manager::TextureManager::Load(renderer, "player_with_item", "assets/player_with_item.png");
+    
+    Manager::FontManager::load("default", "assets/fonts/Montserrat-Bold.ttf", 16);
     tileSet.loadFromFile("assets/data/tileset.json");
     itemManager.loadFromFile("assets/data/items.json");
 
     for (const auto& [id, tile] : tileSet.getAllTiles()) {
-        Core::TextureManager::Load(renderer, tile.spritePath, tile.spritePath);
+        Manager::TextureManager::Load(renderer, tile.spritePath, tile.spritePath);
     }
 
     loadFloor(1);
     loadCurrentRoom(renderer);
 
     player = new Entities::PlayerBody(400, 400, 32, 32, true, true);
-    player->setTexture(Core::TextureManager::Get("player"));
+    player->setTexture(Manager::TextureManager::Get("player"));
 }
 
 void GameplayScene::handleEvent(const SDL_Event& event) {
@@ -61,7 +61,7 @@ void GameplayScene::render(SDL_Renderer* renderer) {
     //Isso é para #DEBUG, pode tirar
     if(false)
     {
-        TTF_Font* font = Core::FontManager::get("default");
+        TTF_Font* font = Manager::FontManager::get("default");
         
         int x = 10;
         int y = 100;
@@ -100,7 +100,7 @@ void GameplayScene::loadFloor(int index) {
     from_json(j, floor);
 
     for (auto& room : floor.rooms) {
-        if (room.type == RoomType::Start) {
+        if (room.type == Map::RoomType::Start) {
             currentRoom = &room;
             break;
         }
@@ -124,7 +124,7 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
 
             if (!tile) continue;
 
-            SDL_Texture* texture = Core::TextureManager::Get(tile->spritePath);
+            SDL_Texture* texture = Manager::TextureManager::Get(tile->spritePath);
             SDL_FRect rect = { col * tileSize, row * tileSize, tileSize, tileSize };
 
             auto tileBody = std::make_unique<Entities::TileBody>(
@@ -147,16 +147,16 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
             float x = e.at("x");
             float y = e.at("y");
 
-            const Item* itemData = itemManager.getItemById(itemId);
+            const Items::Item* itemData = itemManager.getItemById(itemId);
             if (itemData) {
-                Core::TextureManager::Load(renderer, itemData->getSpritePath(), itemData->getSpritePath());
+                Manager::TextureManager::Load(renderer, itemData->getSpritePath(), itemData->getSpritePath());
 
                 auto item = std::make_unique<Entities::ItemBody>(
                     SDL_FRect{x, y, 32, 32}, *itemData
                 );
-                item->setTexture(Core::TextureManager::Get(itemData->getSpritePath()));
+                item->setTexture(Manager::TextureManager::Get(itemData->getSpritePath()));
 
-                std::unique_ptr<Entity> casted(static_cast<Entity*>(item.release()));
+                std::unique_ptr<Entities::Entity> casted(static_cast<Entities::Entity*>(item.release()));
                 entityManager.add(std::move(casted));
             }
         }

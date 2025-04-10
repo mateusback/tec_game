@@ -12,12 +12,10 @@ namespace Core {
         GameLoop* loop;
     };
     public:
-        Game();
+        Game(const char* title, int width, int height);
         ~Game();
         
-        bool init(const char* title, int width, int height);
         void run();
-        void shutdown();
 }
 
 #endif

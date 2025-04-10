@@ -26,11 +26,4 @@ namespace Entities
     {
         return attack_duration <= 0.0f;
     }
-
-    float AttackBody::getAttackDamage() const { return attack_damage; }
-    float AttackBody::getAttackRange() const { return attack_range; }
-    float AttackBody::getAttackDuration() const { return attack_duration; }
-    float AttackBody::getLifeSteal() const { return life_steal; }
-    float AttackBody::getCriticalChance() const { return critical_chance; }
-    float AttackBody::getCriticalDamage() const { return critical_damage; }
 }

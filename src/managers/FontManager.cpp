@@ -1,7 +1,7 @@
-#include "../../include/core/FontManager.h"
+#include "../../include/managers/FontManager.h"
 #include <iostream>
 
-namespace Core {
+namespace Manager {
     std::unordered_map<std::string, TTF_Font*> FontManager::fonts;
 
     void FontManager::load(const std::string& id, const std::string& path, int size) {

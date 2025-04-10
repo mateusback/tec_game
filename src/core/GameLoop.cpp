@@ -1,7 +1,7 @@
 #include "../../include/core/GameLoop.h"
-#include "../../include/core/SceneManager.h"
-#include "../../include/core/FontManager.h"
-#include "../../include/core/TextRenderer.h"
+#include "../../include/managers/SceneManager.h"
+#include "../../include/managers/FontManager.h"
+#include "../../include/renders/TextRenderer.h"
 #include <iostream>
 
 namespace Core
@@ -15,9 +15,6 @@ namespace Core
             lastFrameTime = currentTime;
             this->setDeltaTime(deltaTime);
             
-            ;;tirar daqui
-            Core::FontManager::load("default", "assets/fonts/Montserrat-Bold.ttf", 16);
-
             processInput();
             update();
             render();
@@ -32,13 +29,13 @@ namespace Core
             if (event.type == SDL_QUIT) {
                 isRunning = false;
             }
-            Scene* scene = SceneManager::getCurrentScene();
+            Scene* scene = Manager::SceneManager::getCurrentScene();
             if (scene) scene->handleEvent(event);
         }
     }
 
     void GameLoop::update() {
-        Scene* scene = SceneManager::getCurrentScene();
+        Scene* scene = Manager::SceneManager::getCurrentScene();
         if (scene) scene->update(this->getDeltaTime());
     }
 
@@ -46,10 +43,10 @@ namespace Core
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        Scene* scene = SceneManager::getCurrentScene();
+        Scene* scene = Manager::SceneManager::getCurrentScene();
         if (scene) scene->render(renderer);
         auto currentFPS = (deltaTime > 0.0f) ? static_cast<int>(1.0f / deltaTime) : 0;
-        TTF_Font* font = Core::FontManager::get("default");
+        TTF_Font* font = Manager::FontManager::get("default");
         std::string fpsText = "FPS: " + std::to_string(currentFPS);
         Core::TextRenderer::render(renderer, font, fpsText, 10, 10);
 

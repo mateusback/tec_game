@@ -23,7 +23,7 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer) {
     loadCurrentRoom(renderer);
 
     player = new Entities::PlayerBody(400, 400, 32, 32, true, true);
-    player->setTexture(Core::TextureManager::Get("player"));  
+    player->setTexture(Core::TextureManager::Get("player"));
 }
 
 void GameplayScene::handleEvent(const SDL_Event& event) {

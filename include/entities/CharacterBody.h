@@ -13,6 +13,8 @@ namespace Entities
 		std::string name;
 		float health;
 		float max_health;
+
+		//Jogar essa lista para a fase, não é responsábilidade do boneco
 		std::list<AttackBody> attacks;
 		float attack_damage;
 		float attack_speed;

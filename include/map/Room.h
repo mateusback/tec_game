@@ -3,13 +3,7 @@
 
 #include <vector>
 #include <nlohmann/json.hpp>
-
-enum class RoomType {
-    Start,
-    Normal,
-    Treasure,
-    Boss
-};
+#include "MapTypes.h"
 
 struct Room {
     int id;

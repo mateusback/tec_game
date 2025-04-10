@@ -2,7 +2,7 @@
 #define ITEM_BODY_H
 
 #include "Body.h"
-#include "Item.h"
+#include "../items/Item.h"
 namespace Entities
 {
     class ItemBody : public Body 

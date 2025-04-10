@@ -14,7 +14,7 @@
 class GameplayScene : public Core::Scene {
 private:
     Entities::PlayerBody* player;
-    ItemManager itemManager;
+    Manager::ItemManager itemManager;
 
     Map::Floor floor;
     Room* currentRoom = nullptr;

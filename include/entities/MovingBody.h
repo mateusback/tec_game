@@ -12,23 +12,20 @@ namespace Entities
 	public:
 		MovingBody(float x = 0, float y = 0, float w = 0, float h = 0, bool collision = false, bool visible = true, float acceleration = 100.0f)
 			: Body(x, y, w, h, collision, visible), speed(0.0f, 0.0f) {}
-
-		void setSpeed(Vector speed) {
-			this->speed = speed;
-		}
 		
 		void move(float delta) {
 			this->rect.x += this->speed.x * delta;
 			this->rect.y += this->speed.y * delta;
 		}
 
-		void setAcceleration(float acceleration) {
-			this->acceleration = acceleration;
-		}
+		#pragma region Getters
+		float getAcceleration() const {	return this->acceleration; }
+		#pragma endregion
 
-		float getAcceleration() const {
-			return this->acceleration;
-		}
+		#pragma region Setters
+		void setSpeed(Vector speed) { this->speed = speed; }
+		void setAcceleration(float acceleration) { this->acceleration = acceleration; }
+		#pragma endregion
 	};
 }
 

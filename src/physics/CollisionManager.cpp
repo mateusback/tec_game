@@ -1,6 +1,7 @@
 #include "../../include/physics/CollisionManager.h"
 
 namespace Physics {
+	;;resolver colisao junto
     bool CollisionManager::checkCollision(const SDL_FRect& a, const SDL_FRect& b) {
         return (
             a.x < b.x + b.w &&

@@ -15,7 +15,7 @@ namespace Core
             lastFrameTime = currentTime;
             this->setDeltaTime(deltaTime);
             
-            
+            ;;tirar daqui
             Core::FontManager::load("default", "assets/fonts/Montserrat-Bold.ttf", 16);
 
             processInput();

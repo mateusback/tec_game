@@ -6,6 +6,7 @@
 namespace Entities
 {
 
+ççhandle input
     void PlayerBody::handleInput(const Uint8 *keystates)
     {
         Vector playerDirection(0.0f, 0.0f);
@@ -111,30 +112,31 @@ namespace Entities
     void PlayerBody::pickUpItem(ItemBody* item){
         for (const auto& effect : item->getItem().getEffects()) {
             switch (effect.target) {
-                case EEffectTarget::AttackDamage:
+				using enum EEffectTarget;
+                case AttackDamage:
                     std::cout << "Attack Damage Antigo: " << this->getAttackDamage() << std::endl;
                     this->setAttackDamage(this->getAttackDamage() + effect.value);
                     std::cout << "Attack Damage Novo: " << this->getAttackDamage() << std::endl;
                     break;
-                case EEffectTarget::AttackSpeed:
+                case AttackSpeed:
                     this->setAttackSpeed(this->getAttackSpeed() + effect.value);
                     break;
-                case EEffectTarget::AttackRange:
+                case AttackRange:
                     this->setAttackRange(this->getAttackRange() + effect.value);
                     break;
-                case EEffectTarget::AttackDuration:
+                case AttackDuration:
                     this->setAttackDuration(this->getAttackDuration() + effect.value);
                     break;
-                case EEffectTarget::FireRate:
+                case FireRate:
                     this->setFireRate(this->getFireRate() + effect.value);
                     break;
-                case EEffectTarget::Defense:
+                case Defense:
                     this->setDefense(this->getDefense() + effect.value);
                     break;
-                case EEffectTarget::Health:
+                case Health:
                     this->setHealth(this->getHealth() + effect.value);
                     break;
-                case EEffectTarget::MaxHealth:
+                case MaxHealth:
                     this->setMaxHealth(this->getMaxHealth() + effect.value);
                     break;
             }

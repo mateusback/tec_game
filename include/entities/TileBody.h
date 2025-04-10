@@ -10,10 +10,11 @@ namespace Entities {
             : Body(rect, solid, true) {
             this->setTexture(texture);
         }
+		
+        BodyType getBodyType() const override { return BodyType::Body; }
 
         void update(float deltaTime) override {}
         void onCollision(Body* other) override {}
-        BodyType getBodyType() const override { return BodyType::Body; }
     };
 }
 

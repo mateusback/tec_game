@@ -7,44 +7,45 @@
 #include <memory>
 #include <algorithm>
 
-class EntityManager {
-private:
-    std::vector<std::unique_ptr<Entity>> entities;
+namespace Manager {
 
-public:
-    void add(std::unique_ptr<Entity> entity) {
-        entities.push_back(std::move(entity));
-    }
+	class EntityManager {
+	private:
+		std::vector<std::unique_ptr<Entities::Entity>> entities;
 
-    void updateAll(float deltaTime) {
-        for (auto& e : entities) {
-            e->update(deltaTime);
-        }
-    }
+	public:
+		void add(std::unique_ptr<Entity> entity) {
+			entities.push_back(std::move(entity));
+		}
 
-    void renderAll(SDL_Renderer* renderer) {
-        for (auto& e : entities) {
-            // TODO - passar o visibilidade para o Entity e não para o Body
-            auto* body = dynamic_cast<Entities::Body*>(e.get());
-            if (body && body->isVisible()) {
-                e->render(renderer);
-            }
-        }
-    }
+		void updateAll(float deltaTime) {
+			for (auto& e : entities) {
+				e->update(deltaTime);
+			}
+		}
 
-    void removeInactive() {
-        entities.erase(
-            std::remove_if(entities.begin(), entities.end(), [](const std::unique_ptr<Entity>& e) {
-                auto* body = dynamic_cast<Entities::Body*>(e.get());
-                return body && !body->isActive();
-            }),
-            entities.end()
-        );
-    }
+		void renderAll(SDL_Renderer* renderer) {
+			for (auto& e : entities) {
+				auto* body = dynamic_cast<Entities::Body*>(e.get());
+				if (body && body->isVisible()) {
+					e->render(renderer);
+				}
+			}
+		}
 
-    std::vector<std::unique_ptr<Entity>>& getEntities() {
-        return entities;
-    }
-};
+		void removeInactive() {
+			entities.erase(
+				std::remove_if(entities.begin(), entities.end(), [](const std::unique_ptr<Entity>& e) {
+					return e && !e->isActive();
+				}),
+				entities.end()
+			);
+		}
+
+		#pragma region Getters
+		std::vector<std::unique_ptr<Entity>>& getEntities() { this->entities; }
+		#pragma endregion
+	};
+}
 
 #endif

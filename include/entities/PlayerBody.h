@@ -4,8 +4,8 @@
 #include <list>
 
 #include "CharacterBody.h"
-#include "Item.h"
 #include "ItemBody.h"
+#include "../items/Item.h"
 
 namespace Entities
 {
@@ -17,21 +17,33 @@ namespace Entities
 		int bomb;
 		float experience;
 		float defense;
-		float life_steal;
 		
 	public:
 		PlayerBody(float x = 0, float y = 0, float w = 50, float h = 50, bool collision = false, bool visible = true)
-		: CharacterBody(x, y, w, h, collision, visible), money(0), key(0), bomb(0), experience(0), defense(0), life_steal(0) {}
+		: CharacterBody(x, y, w, h, collision, visible), money(0), key(0), bomb(0), experience(0), defense(0) {}
+	
 		void handleCollision();
-
 		void handleInput(const Uint8* keystates);
+		void handleInput()
 		void update(float deltaTime) override;
 		void attack(Point characterCenter, Vector direction);
-		void render(SDL_Renderer* renderer);
 		void onCollision(Body* other) override;
 		void pickUpItem(Entities::ItemBody* item);
 
 		BodyType getBodyType() const override { return BodyType::Player; }
+
+
+		#pragma region Getters
+		std::list<Item> getInventory() { return this->inventory; }
+		int getMoney() { return this->money; }
+		int getKeys() { return this->key; }
+		int getBombs() { return this->bomb; }
+		float getExperience() { return this->experience; }
+		float getDefense() { return this->defense; }
+		#pragma endregion
+
+		#pragma region Setters
+		#pragma endregion
 	};
 }
 #endif

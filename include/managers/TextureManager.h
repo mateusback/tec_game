@@ -6,10 +6,8 @@
 #include <unordered_map>
 #include <string>
 
-namespace Core 
-{
-    class TextureManager 
-    {
+namespace Manager {
+    class TextureManager {
     public:
         static void Load(SDL_Renderer* renderer, const std::string& id, const std::string& path);
         static SDL_Texture* Get(const std::string& id);
@@ -17,6 +15,7 @@ namespace Core
         static void Clear(std::string id);
         
     private:
+		//https://github.com/ehmcruz/my-game-lib/blob/main/include/my-game-lib/audio.h
         static std::unordered_map<std::string, SDL_Texture*> textures;
     };
 }

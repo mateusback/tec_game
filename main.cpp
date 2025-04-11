@@ -1,4 +1,5 @@
 #include "include/core/Game.h"
+#include <iostream>
 
 int main() {
     Core::Game game("TEC_GAME", 640, 480);

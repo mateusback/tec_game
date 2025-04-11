@@ -3,15 +3,14 @@
 
 #include <SDL2/SDL_ttf.h>
 #include <my-lib/utils.h>
-#include "../utils/Utils.h"
 #include <string_view>
 
 namespace Manager {
     class FontManager {
     public:
-        static void load(std::string_view fname, std::string_view path, int size);
-        static TTF_Font* get(const Utils::Descriptor& font);
-        static void unload(const Utils::Descriptor& font);
+        static void load(std::string_view id, std::string_view path, int size);
+        static TTF_Font* get(std::string_view id);
+        static void unload(std::string_view id);
         static void clear();
 
     private:

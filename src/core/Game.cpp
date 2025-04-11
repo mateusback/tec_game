@@ -8,7 +8,6 @@
 
 namespace Core
 {
-
     Game::Game(const char* title, int width, int height) : window(nullptr), renderer(nullptr), loop(nullptr) {
         if (SDL_Init(SDL_INIT_VIDEO) < 0) 
         {
@@ -49,6 +48,11 @@ namespace Core
 
     void Game::run() 
     {
+        if (!this->loop) 
+        {
+            std::cerr << "Game loop not initialized." << std::endl;
+            return;
+        }
         if (this->loop) 
             this->loop->run();
     }

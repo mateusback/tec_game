@@ -6,12 +6,14 @@
 #include "../../include/serializers/FloorSerialization.h"
 #include <SDL2/SDL_image.h>
 #include <fstream>
+#include <iostream>
 
 GameplayScene::GameplayScene(SDL_Renderer* renderer) {
     Manager::TextureManager::Load(renderer, "player", "assets/player.png");
     Manager::TextureManager::Load(renderer, "player_with_item", "assets/player_with_item.png");
-    
+
     Manager::FontManager::load("default", "assets/fonts/Montserrat-Bold.ttf", 16);
+
     tileSet.loadFromFile("assets/data/tileset.json");
     itemManager.loadFromFile("assets/data/items.json");
 
@@ -33,20 +35,21 @@ void GameplayScene::handleEvent(const SDL_Event& event) {
 }
 
 void GameplayScene::update(float deltaTime) {
-
+    //TODO - CRIAR UM INPUTMANAGER
     const Uint8* keys = SDL_GetKeyboardState(nullptr);
     player->handleInput(keys);
     player->update(deltaTime);
 
     entityManager.updateAll(deltaTime);
 
-    for (auto& e : entityManager.getEntities()) {
-        auto* item = dynamic_cast<Entities::ItemBody*>(e.get());
-        if (item && item->hasCollision() &&
-            Physics::CollisionManager::checkCollision(player->getCollider(), item->getCollider())) {
-            player->onCollision(item);
-        }
-    }
+    //TODO - ISSO AQUI TÁ QUEBRANDO TOTALMENTE O JOGO, AJUSTAR
+    // for (auto& e : entityManager.getEntities()) {
+    //     auto* item = dynamic_cast<Entities::ItemBody*>(e.get());
+    //     if (item && item->hasCollision() &&
+    //         Physics::CollisionManager::checkCollision(player->getCollider(), item->getCollider())) {
+    //         player->onCollision(item);
+    //     }
+    // }
 
     entityManager.removeInactive();
 }
@@ -57,7 +60,7 @@ void GameplayScene::render(SDL_Renderer* renderer) {
     //TODO - Isso foi um grande erro, lembrar de separar em camadas depois
     entityManager.renderAll(renderer);
     player->render(renderer);
-        
+
     SDL_RenderPresent(renderer);
 }
 

@@ -6,12 +6,12 @@
 namespace Entities {
     class TileBody : public Body {
     public:
-        TileBody(SDL_FRect rect, SDL_Texture* texture, bool solid = false)
+        TileBody(Vector4 rect, SDL_Texture* texture, bool solid = false)
             : Body(rect, solid, true) {
             this->setTexture(texture);
         }
 		
-        BodyType getBodyType() const override { return BodyType::Body; }
+        EBodyType getBodyType() const override { return EBodyType::Body; }
 
         void update(float deltaTime) override {}
         void onCollision(Body* other) override {}

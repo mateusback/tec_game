@@ -2,7 +2,7 @@
 #define MAP_TYPES_H
 namespace Map
 {
-	enum class RoomType {
+	enum class ERoomType {
 		Start,
 		Normal,
 		Treasure,

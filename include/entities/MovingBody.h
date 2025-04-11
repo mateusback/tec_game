@@ -14,8 +14,7 @@ namespace Entities
 			: Body(x, y, w, h, collision, visible), speed(0.0f, 0.0f) {}
 		
 		void move(float delta) {
-			this->rect.x += this->speed.x * delta;
-			this->rect.y += this->speed.y * delta;
+			this->position += this->speed * delta;
 		}
 
 		#pragma region Getters

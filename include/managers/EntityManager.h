@@ -14,13 +14,16 @@ namespace Manager {
 		std::vector<std::unique_ptr<Entities::Entity>> entities;
 
 	public:
-		void add(std::unique_ptr<Entity> entity) {
+		void add(std::unique_ptr<Entities::Entity> entity) {
 			entities.push_back(std::move(entity));
 		}
 
 		void updateAll(float deltaTime) {
 			for (auto& e : entities) {
-				e->update(deltaTime);
+				auto* body = dynamic_cast<Entities::Body*>(e.get());
+				if (body) {
+					body->update(deltaTime);
+				}
 			}
 		}
 
@@ -28,14 +31,14 @@ namespace Manager {
 			for (auto& e : entities) {
 				auto* body = dynamic_cast<Entities::Body*>(e.get());
 				if (body && body->isVisible()) {
-					e->render(renderer);
+					body->render(renderer);
 				}
 			}
 		}
 
 		void removeInactive() {
 			entities.erase(
-				std::remove_if(entities.begin(), entities.end(), [](const std::unique_ptr<Entity>& e) {
+				std::remove_if(entities.begin(), entities.end(), [](const std::unique_ptr<Entities::Entity>& e) {
 					return e && !e->isActive();
 				}),
 				entities.end()
@@ -43,7 +46,7 @@ namespace Manager {
 		}
 
 		#pragma region Getters
-		std::vector<std::unique_ptr<Entity>>& getEntities() { this->entities; }
+		std::vector<std::unique_ptr<Entities::Entity>>& getEntities() { this->entities; }
 		#pragma endregion
 	};
 }

@@ -3,6 +3,9 @@
 
 #include "Body.h"
 #include "../items/Item.h"
+
+using namespace Items;
+
 namespace Entities
 {
     class ItemBody : public Body 
@@ -12,7 +15,7 @@ namespace Entities
         Item item;
         
     public:
-        ItemBody(SDL_FRect hitbox, const Item& item, bool collision = true, bool visible = true)
+        ItemBody(Vector4 hitbox, const Item& item, bool collision = true, bool visible = true)
         : Body(hitbox, collision, visible), type(item.getType()), item(item) {}
     
         void setType(EItemType type) { this->type = type;}

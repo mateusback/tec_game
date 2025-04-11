@@ -1,25 +1,47 @@
-#include "../../include/managers/FontManager.h"
-#include <iostream>
+#include "../include/managers/FontManager.h"
+#include <stdexcept>
+#include <format>
+
+using namespace Manager;
+using namespace Mylib;
+using namespace Utils;
 
 namespace Manager {
-    std::unordered_map<std::string, TTF_Font*> FontManager::fonts;
+    Mylib::unordered_map_string_key<TTF_Font*> FontManager::fonts;
 
-    void FontManager::load(const std::string& id, const std::string& path, int size) {
-        TTF_Font* font = TTF_OpenFont(path.c_str(), size);
+    void FontManager::load(std::string_view fname, std::string_view path, int size) {
+        std::string id = std::format("{}_{}", fname, size);
+    
+        if (fonts.contains(id)) return;
+    
+        TTF_Font* font = TTF_OpenFont(std::string(path).c_str(), size);
         if (!font) {
-            std::cerr << "Erro ao carregar fonte '" << path << "': " << TTF_GetError() << std::endl;
-        } else {
-            fonts[id] = font;
+            throw std::runtime_error(std::format("Erro ao carregar fonte '{}': {}", id, TTF_GetError()));
+        }
+    
+        fonts[std::move(id)] = font;
+    }
+
+    TTF_Font* FontManager::get(const Descriptor& font) {
+        return font.data.get_value<TTF_Font*>();
+    }    
+
+    void FontManager::unload(const Descriptor& font) {
+        TTF_Font* ptr = font.data.get_value<TTF_Font*>();
+        if (!ptr) return;
+    
+        for (auto it = fonts.begin(); it != fonts.end(); ++it) {
+            if (it->second == ptr) {
+                TTF_CloseFont(ptr);
+                fonts.erase(it);
+                return;
+            }
         }
     }
-
-    TTF_Font* FontManager::get(const std::string& id) {
-        return fonts[id];
-    }
-
+    
     void FontManager::clear() {
-        for (auto& pair : fonts) {
-            TTF_CloseFont(pair.second);
+        for (auto& [key, font] : fonts) {
+            TTF_CloseFont(font);
         }
         fonts.clear();
     }

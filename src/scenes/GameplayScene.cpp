@@ -57,32 +57,6 @@ void GameplayScene::render(SDL_Renderer* renderer) {
     //TODO - Isso foi um grande erro, lembrar de separar em camadas depois
     entityManager.renderAll(renderer);
     player->render(renderer);
-
-    //Isso é para #DEBUG, pode tirar
-    if(false)
-    {
-        TTF_Font* font = Manager::FontManager::get("default");
-        
-        int x = 10;
-        int y = 100;
-        int lineHeight = 18;
-        
-        auto drawStat = [&](const std::string& label, float value) {
-            std::string text = label + ": " + std::to_string(value);
-            Core::TextRenderer::render(renderer, font, text, x, y);
-            y += lineHeight;
-        };
-        
-        drawStat("HP", player->getHealth());
-        drawStat("Max HP", player->getMaxHealth());
-        drawStat("Atk Dmg", player->getAttackDamage());
-        drawStat("Atk Spd", player->getAttackSpeed());
-        drawStat("Atk Range", player->getAttackRange());
-        drawStat("Atk Duration", player->getAttackDuration());
-        drawStat("Fire Rate", player->getFireRate());
-        drawStat("Defense", player->getDefense());
-        drawStat("Level", static_cast<float>(player->getLevel()));
-    }
         
     SDL_RenderPresent(renderer);
 }
@@ -100,7 +74,7 @@ void GameplayScene::loadFloor(int index) {
     from_json(j, floor);
 
     for (auto& room : floor.rooms) {
-        if (room.type == Map::RoomType::Start) {
+        if (room.type == Map::ERoomType::Start) {
             currentRoom = &room;
             break;
         }
@@ -125,7 +99,7 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
             if (!tile) continue;
 
             SDL_Texture* texture = Manager::TextureManager::Get(tile->spritePath);
-            SDL_FRect rect = { col * tileSize, row * tileSize, tileSize, tileSize };
+            Vector4 rect = { col * tileSize, row * tileSize, tileSize, tileSize };
 
             auto tileBody = std::make_unique<Entities::TileBody>(
                 rect,
@@ -152,7 +126,7 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
                 Manager::TextureManager::Load(renderer, itemData->getSpritePath(), itemData->getSpritePath());
 
                 auto item = std::make_unique<Entities::ItemBody>(
-                    SDL_FRect{x, y, 32, 32}, *itemData
+                    Vector4{x, y, 32, 32}, *itemData
                 );
                 item->setTexture(Manager::TextureManager::Get(itemData->getSpritePath()));
 

@@ -35,14 +35,14 @@ namespace Items {
 		#pragma endregion
 
 		#pragma region Setters
-		void setId(int id){ this->id = id }
-		void setPool(EItemPool pool) { this->pool = pool }
-		void setName(std::string name) { this->name = name }
-		void setDescription(std::string description) { this->description = description}
-		void setQuality(int quality) { this->quality = quality }
-		void setType(EItemType type) {this->type = type }
-		void setEffects(std::vector<ItemEffect> effects) { this->effects = effects}
-		void setSpritePath(std::string spritePath) { this->spritePath = spritePath }
+		void setId(int id){ this->id = id; }
+		void setPool(EItemPool pool) { this->pool = pool; }
+		void setName(std::string name) { this->name = name; }
+		void setDescription(std::string description) { this->description = description; }
+		void setQuality(int quality) { this->quality = quality; }
+		void setType(EItemType type) {this->type = type; }
+		void setEffects(std::vector<ItemEffect> effects) { this->effects = effects; }
+		void setSpritePath(std::string spritePath) { this->spritePath = spritePath; }
 		#pragma endregion
 	};
 }

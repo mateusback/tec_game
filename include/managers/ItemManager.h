@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <string>
 
+using namespace Items;
+
 namespace Manager {
 	class ItemManager {
 	private:

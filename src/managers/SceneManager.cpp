@@ -1,16 +1,16 @@
-#include "../../include/core/SceneManager.h"
+#include "../../include/managers/SceneManager.h"
 
-namespace Core
+namespace Manager
 {
-    Scene* SceneManager::currentScene = nullptr;
+    Core::Scene* SceneManager::currentScene = nullptr;
 
-    void SceneManager::setScene(Scene* newScene) 
+    void SceneManager::setScene(Core::Scene* newScene) 
     {
         delete currentScene;
         currentScene = newScene;
     }
 
-    Scene* SceneManager::getCurrentScene() 
+    Core::Scene* SceneManager::getCurrentScene() 
     {
         return currentScene;
     }

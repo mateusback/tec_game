@@ -14,16 +14,8 @@ namespace Entities
         attack_duration -= deltaTime;
     }
 
-    void AttackBody::render(SDL_Renderer* renderer)
-    {
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-
-        SDL_Rect intRect = this->getIntRect();
-        SDL_RenderFillRect(renderer, &intRect);
-    }
-
-    bool AttackBody::isExpired() const
-    {
-        return attack_duration <= 0.0f;
-    }
+    // bool AttackBody::isExpired() const
+    // {
+    //     return attack_duration <= 0.0f;
+    // }
 }

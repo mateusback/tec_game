@@ -5,15 +5,17 @@
 #include <nlohmann/json.hpp>
 #include "MapTypes.h"
 
-struct Room {
-    int id;
-    int x, y;
-    RoomType type;
-    std::vector<nlohmann::json> entities;
-    std::vector<std::vector<int>> layout;
-
-    Room(int id = -1, int x = 0, int y = 0, RoomType type = RoomType::Normal)
-        : id(id), x(x), y(y), type(type) {}
-};
+namespace Map {
+    struct Room {
+        int id;
+        int x, y;
+        ERoomType type;
+        std::vector<nlohmann::json> entities;
+        std::vector<std::vector<int>> layout;
+    
+        Room(int id = -1, int x = 0, int y = 0, ERoomType type = ERoomType::Normal)
+            : id(id), x(x), y(y), type(type) {}
+    };
+}
 
 #endif

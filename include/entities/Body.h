@@ -19,50 +19,36 @@ namespace Entities
     protected:
 		Vector position;
 		Vector scale;
-        Vector4 rect;
         SDL_Texture* texture = nullptr;
         bool has_collision;
         bool is_visible;
 
     public:
-        Body(float x = 0, float y = 0, float w = 0, float h = 0, bool collision = false, bool visible = true)
-        : has_collision(collision), is_visible(visible) {
-            this->rect.x = x;
-            this->rect.y = y;
-            this->rect.w = w;
-            this->rect.h = h;
-        }
+        #pragma region Constructors
+        Body() : position(0, 0), scale(50, 50), has_collision(false), is_visible(true) {}
 
-        Body(SDL_FRect rect, bool collision = false, bool visible = true)
-        : rect(rect), has_collision(collision), is_visible(visible) {}
+        Body(float x = 0, float y = 0, float w = 50, float h = 50, bool collision = false, bool visible = true)
+            : position(x, y), scale(w, h), has_collision(collision), is_visible(visible) {}
+        
+        Body(Vector pos, Vector scl, bool collision = false, bool visible = true)
+            : position(pos), scale(scl), has_collision(collision), is_visible(visible) {}
+        
+        Body(Vector4 collider, bool collision = false, bool visible = true)
+            : position(collider.x, collider.y), scale(collider.z, collider.w), has_collision(collision), is_visible(visible) {}
+        #pragma endregion
+		
+        virtual void update(float deltaTime) = 0;
+		virtual void render(SDL_Renderer* renderer);
 
-        Body(SDL_FPoint position, SDL_FPoint size, bool collision = false, bool visible = true)
-        : has_collision(collision), is_visible(visible) {
-            this->rect.x = position.x;
-            this->rect.y = position.y;
-            this->rect.w = size.x;
-            this->rect.h = size.y;
-        }
-
-        SDL_Rect getIntRect() const {
-            return { 
-                static_cast<int>(rect.x), 
-                static_cast<int>(rect.y), 
-                static_cast<int>(rect.w), 
-                static_cast<int>(rect.h)
-            };
-        }
-
+        Vector4 getCollider() const { return Vector4(this->position.x, this->position.y, this->scale.x, this->scale.y); }
+        Point getCenterPoint() const { return Point(this->position.x + this->scale.x / 2, this->position.y + this->scale.y / 2); }
+        virtual EBodyType getBodyType() const {return EBodyType::Body;}
+        
         virtual void onCollision(Body* other) {};
-        virtual BodyType getBodyType() const {return BodyType::Body;}
 
 		#pragma region Getters
         bool hasCollision() const { return this->has_collision; }
         bool isVisible() const { return this->is_visible; }
-        bool isActive() const { return this->is_active; }
-		Vector4 getCollider() const { return this->rect; }
-		Vector4 getRect() const { return this->rect; }
-        Point getCenterPoint() const { return Point(this->rect.x + this->rect.w / 2, this->rect.y + this->rect.h / 2); }
 		#pragma endregion
 
 		#pragma region Setters

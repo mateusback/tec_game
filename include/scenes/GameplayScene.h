@@ -17,7 +17,7 @@ private:
     Manager::ItemManager itemManager;
 
     Map::Floor floor;
-    Room* currentRoom = nullptr;
+    Map::Room* currentRoom = nullptr;
 
     TileSet tileSet;
 
@@ -29,8 +29,8 @@ public:
     void update(float deltaTime) override;
     void handleEvent(const SDL_Event& event) override;
     void render(SDL_Renderer* renderer) override;
-    ItemManager getItemManager() { return itemManager; }
-    void setItemManager(const ItemManager& itemManager) { this->itemManager = itemManager; }
+    Manager::ItemManager getItemManager() { return itemManager; }
+    void setItemManager(const Manager::ItemManager& itemManager) { this->itemManager = itemManager; }
 };
 
 #endif

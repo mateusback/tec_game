@@ -1,4 +1,4 @@
-#include "../../include/core/TextRenderer.h"
+#include "../../include/renders/TextRenderer.h"
 #include <iostream>
 
 namespace Core {

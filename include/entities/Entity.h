@@ -10,8 +10,6 @@ namespace Entities {
 		bool active = true;
 	public:
 		virtual ~Entity() = default;
-		virtual void update(float deltaTime) = 0;
-		virtual void render(SDL_Renderer* renderer);
 
 		#pragma region Getters
 		bool isActive() { return this->active; }
@@ -21,7 +19,7 @@ namespace Entities {
 		void setActive(bool active) {this->active = active;}
 		#pragma endregion
 	
-	}
-};
+	};
+}
 
 #endif

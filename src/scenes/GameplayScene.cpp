@@ -34,10 +34,8 @@ void GameplayScene::handleEvent(const SDL_Event& event) {
     }
 }
 
-void GameplayScene::update(float deltaTime) {
-    //TODO - CRIAR UM INPUTMANAGER
-    const Uint8* keys = SDL_GetKeyboardState(nullptr);
-    player->handleInput(keys);
+void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
+    player->handleInput(input);
     player->update(deltaTime);
 
     entityManager.updateAll(deltaTime);

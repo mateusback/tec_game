@@ -1,6 +1,7 @@
 #ifndef GAMELOOP_H
 #define GAMELOOP_H
 #include <SDL2/SDL.h>
+#include "../managers/InputManager.h"
 
 namespace Core {
     class GameLoop {
@@ -10,6 +11,8 @@ namespace Core {
         SDL_Renderer* renderer;
         float deltaTime;
         
+        Manager::InputManager inputManager;
+
         void processInput();
         void update();
         void render();

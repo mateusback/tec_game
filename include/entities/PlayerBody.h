@@ -6,6 +6,7 @@
 #include "CharacterBody.h"
 #include "ItemBody.h"
 #include "../items/Item.h"
+#include "../managers/InputManager.h"
 
 namespace Entities
 {
@@ -23,7 +24,7 @@ namespace Entities
 		: CharacterBody(x, y, w, h, collision, visible), money(0), key(0), bomb(0), experience(0), defense(0) {}
 	
 		void handleCollision();
-		void handleInput(const Uint8* keystates);
+		void handleInput(const Manager::PlayerInput& input);
 		void handleInput();
 		void update(float deltaTime) override;
 		void attack(Point characterCenter, Vector direction);

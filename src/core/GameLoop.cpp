@@ -6,7 +6,9 @@
 
 namespace Core
 {
-    GameLoop::GameLoop(SDL_Renderer* renderer) : isRunning(true), lastFrameTime(0), renderer(renderer) {}
+    GameLoop::GameLoop(SDL_Renderer* renderer) : isRunning(true), lastFrameTime(0), renderer(renderer) {
+        this->inputManager = Manager::InputManager();
+    }
 
     void GameLoop::run() {
         while (this->isRunning) {
@@ -35,10 +37,12 @@ namespace Core
     }
 
     void GameLoop::update() {
-        //talvez seja legal colocar ela como entidade do gameloop
+        this->inputManager.updateKeyboardState();
+        this->inputManager.updateControllerState();
+    
         Scene* scene = Manager::SceneManager::getCurrentScene();
-        if (scene) 
-            scene->update(this->getDeltaTime());
+        if (scene)
+            scene->update(this->getDeltaTime(), this->inputManager.getState());
     }
 
     void GameLoop::render() {

@@ -7,52 +7,19 @@
 namespace Entities
 {
 
-// TODO - fazer um inputmanager
-    void PlayerBody::handleInput(const Uint8 *keystates)
+    void PlayerBody::handleInput(const Manager::PlayerInput& input)
     {
-        Vector playerDirection(0.0f, 0.0f);
-        Vector shootDirection(0.0f, 0.0f);
-
-        //TODO - ARMA.SHOOT 
-        if (keystates[SDL_SCANCODE_W])
-            playerDirection.y -= this->getAcceleration();
-        if (keystates[SDL_SCANCODE_S])
-            playerDirection.y += this->getAcceleration();
-        if (keystates[SDL_SCANCODE_A])
-            playerDirection.x -= this->getAcceleration();
-        if (keystates[SDL_SCANCODE_D])
-            playerDirection.x += this->getAcceleration();
-
-        if (keystates[SDL_SCANCODE_UP])
-            shootDirection.y = -1;
-        if (keystates[SDL_SCANCODE_DOWN])
-            shootDirection.y = 1;
-        if (keystates[SDL_SCANCODE_LEFT])
-            shootDirection.x = -1;
-        if (keystates[SDL_SCANCODE_RIGHT])
-            shootDirection.x = 1;
-
-        if (shootDirection.x != 0 || shootDirection.y != 0)
-        {
-            float length = sqrtf(shootDirection.x * shootDirection.x + shootDirection.y * shootDirection.y);
-            shootDirection.x /= length;
-            shootDirection.y /= length;
-            
-            if(this->getFireTimer() <= 0.0f)
-            {
-                this->attack(this->getCenterPoint(), shootDirection);
-                this->setFireTimer(this->getFireRate());
-            }
-        }
-
-        if (playerDirection.x != 0 && playerDirection.y != 0)
-        {
-            float invRaiz = 1.0f / sqrtf(2.0f);
-            playerDirection.x *= invRaiz;
-            playerDirection.y *= invRaiz;
-        }
-
+        Vector playerDirection = input.moveDirection;
+        Vector shootDirection = input.shootDirection;
+    
+        playerDirection *= this->getAcceleration();
         this->setSpeed(playerDirection);
+    
+        if ((shootDirection.x != 0 || shootDirection.y != 0) && this->getFireTimer() <= 0.0f)
+        {
+            this->attack(this->getCenterPoint(), shootDirection);
+            this->setFireTimer(this->getFireRate());
+        }
     }
 
     void PlayerBody::update(float deltaTime)

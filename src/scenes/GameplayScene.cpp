@@ -42,14 +42,25 @@ void GameplayScene::update(float deltaTime) {
 
     entityManager.updateAll(deltaTime);
 
+    std::cout << "Iniciando busca de entidades" << std::endl;
+    for (auto& e : entityManager.getEntities()) {
+        auto* tile = dynamic_cast<Entities::TileBody*>(e.get());
+        std::cout << "Tile: " << tile << std::endl;
+        if (tile && tile->hasCollision() &&
+            Physics::CollisionManager::checkCollision(player->getCollider(), tile->getCollider())) {
+            std::cout << "Colidiu com o tile: " << tile->getCenterPoint() << std::endl;
+            player->onCollision(tile);
+        }
+    }
+
     //TODO - ISSO AQUI TÁ QUEBRANDO TOTALMENTE O JOGO, AJUSTAR
-    // for (auto& e : entityManager.getEntities()) {
-    //     auto* item = dynamic_cast<Entities::ItemBody*>(e.get());
-    //     if (item && item->hasCollision() &&
-    //         Physics::CollisionManager::checkCollision(player->getCollider(), item->getCollider())) {
-    //         player->onCollision(item);
-    //     }
-    // }
+    for (auto& e : entityManager.getEntities()) {
+        auto* item = dynamic_cast<Entities::ItemBody*>(e.get());
+        if (item && item->hasCollision() &&
+            Physics::CollisionManager::checkCollision(player->getCollider(), item->getCollider())) {
+            player->onCollision(item);
+        }
+    }
 
     entityManager.removeInactive();
 }
@@ -60,6 +71,20 @@ void GameplayScene::render(SDL_Renderer* renderer) {
     //TODO - Isso foi um grande erro, lembrar de separar em camadas depois
     entityManager.renderAll(renderer);
     player->render(renderer);
+
+    if (debugMode) {
+        for (auto& e : entityManager.getEntities()) {
+            auto* body = dynamic_cast<Entities::Body*>(e.get());
+            if (body->isActive()) {
+                SDL_FRect rect = { body->getCollider().x, body->getCollider().y, body->getCollider().w, body->getCollider().z };
+                drawCollider(renderer, rect);
+            }
+        }
+        if (player->hasCollision()) {
+            SDL_FRect rectp = { player->getCollider().x, player->getCollider().y, player->getCollider().w, player->getCollider().z };
+            drawCollider(renderer, rectp);
+        }
+    }
 
     SDL_RenderPresent(renderer);
 }
@@ -139,3 +164,10 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
         }
     }
 }
+
+void GameplayScene::drawCollider(SDL_Renderer* renderer, const SDL_FRect& rect) {
+    SDL_Color color = {255, 0, 0, 255};
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    SDL_RenderDrawRectF(renderer, &rect);
+}
+

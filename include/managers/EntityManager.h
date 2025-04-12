@@ -46,7 +46,7 @@ namespace Manager {
 		}
 
 		#pragma region Getters
-		std::vector<std::unique_ptr<Entities::Entity>>& getEntities() { this->entities; }
+		std::vector<std::unique_ptr<Entities::Entity>>& getEntities() { return this->entities; }
 		#pragma endregion
 	};
 }

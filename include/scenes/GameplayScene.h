@@ -18,6 +18,8 @@ private:
     Map::Floor floor;
     Map::Room* currentRoom = nullptr;
 
+    bool debugMode = true;
+
     TileSet tileSet;
 
     void loadFloor(int index);
@@ -30,6 +32,7 @@ public:
     void render(SDL_Renderer* renderer) override;
     Manager::ItemManager getItemManager() { return itemManager; }
     void setItemManager(const Manager::ItemManager& itemManager) { this->itemManager = itemManager; }
+    void drawCollider(SDL_Renderer* renderer, const SDL_FRect& rect);
 };
 
 #endif

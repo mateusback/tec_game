@@ -63,7 +63,7 @@ namespace Entities
 		float getExperience() { return this->experience; }
 		float getDefense() { return this->defense; }
 		Vector getPosition() const { return this->position; }
-		EBodyType getBodyType() const override { this->bodyType; }
+		EBodyType getBodyType() const override { return this->bodyType; }
 		#pragma endregion
 
 		#pragma region Setters

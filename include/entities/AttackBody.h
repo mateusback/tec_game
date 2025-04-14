@@ -17,13 +17,43 @@ namespace Entities
         float critical_chance;
         float critical_damage;
 
+		AttackBody(EBodyType type, float x = 0, float y = 0, float w = 0, float h = 0, bool collision = false, bool visible = true, 
+			float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0) {}
+
     public:
-        AttackBody(float x = 0, float y = 0, float w = 0, float h = 0, bool collision = false, bool visible = true, 
-                   float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0);
+		#pragma region Constructors
+		AttackBody(Vector position, Vector scale, bool collision = false, bool visible = true, 
+			float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
+			: MovingBody(EBodyType::Attack, position.x, position.y, scale.x, scale.y, collision, visible, 0.0f),
+			attack_damage(dmg),
+			attack_range(range),
+			attack_duration(duration),
+			life_steal(lifesteal),
+			critical_chance(crit_chance),
+			critical_damage(crit_dmg) {}
+
+		AttackBody(float x, float y, float w, float h, bool collision = false, bool visible = true, 
+			float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
+			: MovingBody(EBodyType::Attack, x, y, w, h, collision, visible, 0.0f),
+			attack_damage(dmg),
+			attack_range(range),
+			attack_duration(duration),
+			life_steal(lifesteal),
+			critical_chance(crit_chance),
+			critical_damage(crit_dmg) {}
+
+		AttackBody(Vector4 collider, bool collision = false, bool visible = true, 
+			float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
+			: MovingBody(EBodyType::Attack, collider.x, collider.y, collider.w, collider.z, collision, visible, 0.0f),
+			attack_damage(dmg),
+			attack_range(range),
+			attack_duration(duration),
+			life_steal(lifesteal),
+			critical_chance(crit_chance),
+			critical_damage(crit_dmg) {}
+		#pragma endregion
 
         void update(float deltaTime);
-
-		EBodyType getBodyType() const override { return EBodyType::Attack; }
 
 		#pragma region Getters
 		float getAttackDamage() { return this->attack_damage; }
@@ -32,6 +62,7 @@ namespace Entities
 		float getLifeSteal() { return this->life_steal; }
 		float getCriticalChance() { return this->critical_chance; }
 		float getCriticalDamage() { return this->critical_damage; }
+		EBodyType getBodyType() const override { return this->bodyType; }
 		#pragma endregion
 
 		#pragma region Setters

@@ -3,14 +3,14 @@
 
 namespace Entities{
 	enum class EBodyType { 
-		Body, 
-		Player, 
-		Item, 
-		Enemy, 
-		Attack, 
-		Tile, 
+		Body,
 		Moving, 
-		Character
+		Character,
+		Player,
+		Tile,
+		Item,
+		Attack,
+		Enemy
 	};
 }
 

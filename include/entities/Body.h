@@ -28,16 +28,32 @@ namespace Entities
 
     public:
         #pragma region Constructors
-        Body() : Entity(EBodyType::Body), position(0, 0), scale(50, 50), has_collision(false), is_visible(true) {}
+        Body() 
+            : Entity(EBodyType::Body), 
+            position(0, 0), 
+            scale(50, 50), 
+            has_collision(false), 
+            is_visible(true) {}
 
         Body(float x = 0, float y = 0, float w = 50, float h = 50, bool collision = false, bool visible = true)
-            : Entity(EBodyType::Body), position(x, y), scale(w, h), has_collision(collision), is_visible(visible) {}
+            : Entity(EBodyType::Body), 
+            position(x, y), 
+            scale(w, h), 
+            has_collision(collision), 
+            is_visible(visible) {}
         
         Body(Vector pos, Vector scl, bool collision = false, bool visible = true)
-            : Entity(EBodyType::Body), position(pos), scale(scl), has_collision(collision), is_visible(visible) {}
+            : Entity(EBodyType::Body), 
+            position(pos), scale(scl), 
+            has_collision(collision), 
+            is_visible(visible) {}
         
         Body(Vector4 collider, bool collision = false, bool visible = true)
-            : Entity(EBodyType::Body), position(collider.x, collider.y), scale(collider.z, collider.w), has_collision(collision), is_visible(visible) {}
+            : Entity(EBodyType::Body), 
+            position(collider.x, collider.y), 
+            scale(collider.z, collider.w), 
+            has_collision(collision), 
+            is_visible(visible) {}
         #pragma endregion
 		
         virtual void update(float deltaTime) = 0;

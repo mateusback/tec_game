@@ -22,10 +22,51 @@ namespace Entities
         float fire_timer;
 		int level;
 
+		CharacterBody(EBodyType type, float x = 0, float y = 0, float w = 50, float h = 50, bool collision = false, bool visible = true, float acceleration = 100.0f)
+		: MovingBody(type, x, y, w, h, collision, visible, acceleration), health(100.0f), max_health(100.0f), attack_damage(10.0f), 
+		attack_speed(200.0f), attack_range(1.0f), attack_duration(3.0f), defense(0.0f), fire_rate(0.3f), fire_timer(0.0f), level(1) {}
+
 	public:
-		CharacterBody(float x = 0, float y = 0, float w = 50, float h = 50, bool collision = false, bool visible = true)
-			: MovingBody(x, y, w, h, collision, visible, acceleration = 100.0f), health(100), max_health(100), attack_damage(10), attack_speed(200.0f), 
-			attack_range(1.0f), attack_duration(3.0f), defense(0), fire_rate(0.3f), fire_timer(0.0f),  level(1) {}
+		#pragma region Constructors
+		CharacterBody(float x = 0, float y = 0, float w = 50, float h = 50, bool collision = false, bool visible = true, float acceleration = 100.0f)
+			: MovingBody(EBodyType::Character, x, y, w, h, collision, visible, acceleration),
+			health(100.0f), 
+			max_health(100.0f), 
+			attack_damage(10.0f), 
+			attack_speed(200.0f),
+			attack_range(1.0f), 
+			attack_duration(3.0f), 
+			defense(0.0f),
+			fire_rate(0.3f), 
+			fire_timer(0.0f), 
+			level(1) {}
+
+		CharacterBody(Vector pos, Vector scl, bool collision = false, bool visible = true, float acceleration = 100.0f)
+			: MovingBody(EBodyType::Character, pos.x, pos.y, scl.x, scl.y, collision, visible, acceleration),
+			health(100.0f), 
+			max_health(100.0f), 
+			attack_damage(10.0f), 
+			attack_speed(200.0f),
+			attack_range(1.0f), 
+			attack_duration(3.0f), 
+			defense(0.0f),
+			fire_rate(0.3f), 
+			fire_timer(0.0f), 
+			level(1) {}
+
+		CharacterBody(Vector4 collider, bool collision = false, bool visible = true, float acceleration = 100.0f)
+			: MovingBody(EBodyType::Character, collider.x, collider.y, collider.z, collider.w, collision, visible, acceleration),
+			health(100.0f), 
+			max_health(100.0f), 
+			attack_damage(10.0f), 
+			attack_speed(200.0f),
+			attack_range(1.0f), 
+			attack_duration(3.0f), 
+			defense(0.0f),
+			fire_rate(0.3f), 
+			fire_timer(0.0f), 
+			level(1) {}
+		#pragma endregion
 
 		#pragma region Getters
 		std::string getName() const { return this->name; }

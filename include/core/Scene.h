@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include "../managers/EntityManager.h"
+#include "../managers/InputManager.h"
 
 namespace Core {
     

@@ -10,6 +10,9 @@ namespace Core {
         SDL_Window* window;
         SDL_Renderer* renderer;
         GameLoop* loop;
+        int screenWidth;
+        int screenHeight;
+        
     public:
         Game(const char* title, int width, int height);
         ~Game();

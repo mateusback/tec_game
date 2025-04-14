@@ -1,6 +1,7 @@
 #include "../../include/entities/PlayerBody.h"
 #include "../../include/managers/TextureManager.h"
 #include "../../include/items/ItemTypes.h"
+#include "../../include/physics/CollisionManager.h"
 #include <SDL2/SDL.h>
 #include <cmath>
 
@@ -39,7 +40,10 @@ namespace Entities
 
     void PlayerBody::onCollision(Body* other)
     {
+        Vector4 collider = this->getCollider();
         other->onCollision(this);
+        Physics::CollisionManager::resolveCollision(collider, other->getCollider());
+        this->setPosition(Vector(collider.x, collider.y));
     }
 
     //TODO - DÁ PRA COLOCAR NO ITEM MANAGER

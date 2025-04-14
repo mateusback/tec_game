@@ -10,6 +10,7 @@
 #include "../../include/managers/ItemManager.h"
 #include "../../include/map/Floor.h"
 #include "../../include/map/TileSet.h"
+#include "../../include/renders/VirtualRenderer.h"
 
 class GameplayScene : public Core::Scene {
 private:
@@ -22,17 +23,21 @@ private:
 
     TileSet tileSet;
 
+    Renderer::VirtualRenderer virtualRenderer;
+
     void loadFloor(int index);
     void loadCurrentRoom(SDL_Renderer* renderer);
 
 public:
-    GameplayScene(SDL_Renderer* renderer);
+    GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight);
+
     void update(float deltaTime, const Manager::PlayerInput& input);
     void handleEvent(const SDL_Event& event) override;
     void render(SDL_Renderer* renderer) override;
-    Manager::ItemManager getItemManager() { return itemManager; }
-    void setItemManager(const Manager::ItemManager& itemManager) { this->itemManager = itemManager; }
     void drawCollider(SDL_Renderer* renderer, const SDL_FRect& rect);
+    
+    void setItemManager(const Manager::ItemManager& itemManager) { this->itemManager = itemManager; }
+    Manager::ItemManager getItemManager() { return itemManager; }
 };
 
 #endif

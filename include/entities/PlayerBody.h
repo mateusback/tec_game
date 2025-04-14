@@ -41,9 +41,11 @@ namespace Entities
 		int getBombs() { return this->bomb; }
 		float getExperience() { return this->experience; }
 		float getDefense() { return this->defense; }
+		Vector getPosition() const { return this->position; }
 		#pragma endregion
 
 		#pragma region Setters
+		void setPosition(Vector position) { this->position = position; }
 		#pragma endregion
 	};
 }

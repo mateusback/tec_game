@@ -41,7 +41,7 @@ namespace Core
             return;
         }
 
-        Manager::SceneManager::setScene(new GameplayScene(renderer));
+        Manager::SceneManager::setScene(new GameplayScene(renderer, width, height));
 
         this->loop = new GameLoop(renderer);
     }

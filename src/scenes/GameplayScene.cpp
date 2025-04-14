@@ -8,7 +8,8 @@
 #include <fstream>
 #include <iostream>
 
-GameplayScene::GameplayScene(SDL_Renderer* renderer) {
+GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight)
+    : virtualRenderer(screenWidth, screenHeight, /*dummy*/1, 1) {
     Manager::TextureManager::Load(renderer, "player", "assets/player.png");
     Manager::TextureManager::Load(renderer, "player_with_item", "assets/player_with_item.png");
 
@@ -24,8 +25,8 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer) {
     loadFloor(1);
     loadCurrentRoom(renderer);
 
-    player = new Entities::PlayerBody(400, 400, 32, 32, true, true);
-    player->setTexture(Manager::TextureManager::Get("player"));
+    // player = new Entities::PlayerBody(400, 400, 32, 32, true, true);
+    // player->setTexture(Manager::TextureManager::Get("player"));
 }
 
 void GameplayScene::handleEvent(const SDL_Event& event) {
@@ -35,24 +36,21 @@ void GameplayScene::handleEvent(const SDL_Event& event) {
 }
 
 void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
-    player->handleInput(input);
-    player->update(deltaTime);
+    this->player->handleInput(input);
+    this->player->update(deltaTime);
 
-    entityManager.updateAll(deltaTime);
+    this->entityManager.updateAll(deltaTime);
 
-    std::cout << "Iniciando busca de entidades" << std::endl;
-    for (auto& e : entityManager.getEntities()) {
+    for (auto& e : this->entityManager.getEntities()) {
         auto* tile = dynamic_cast<Entities::TileBody*>(e.get());
-        std::cout << "Tile: " << tile << std::endl;
         if (tile && tile->hasCollision() &&
             Physics::CollisionManager::checkCollision(player->getCollider(), tile->getCollider())) {
-            std::cout << "Colidiu com o tile: " << tile->getCenterPoint() << std::endl;
             player->onCollision(tile);
+            break;
         }
     }
 
-    //TODO - ISSO AQUI TÁ QUEBRANDO TOTALMENTE O JOGO, AJUSTAR
-    for (auto& e : entityManager.getEntities()) {
+    for (auto& e : this->entityManager.getEntities()) {
         auto* item = dynamic_cast<Entities::ItemBody*>(e.get());
         if (item && item->hasCollision() &&
             Physics::CollisionManager::checkCollision(player->getCollider(), item->getCollider())) {
@@ -60,15 +58,15 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
         }
     }
 
-    entityManager.removeInactive();
+    this->entityManager.removeInactive();
 }
 
 void GameplayScene::render(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
     //TODO - Isso foi um grande erro, lembrar de separar em camadas depois
-    entityManager.renderAll(renderer);
-    player->render(renderer);
+    this->entityManager.renderAll(renderer);
+    this->player->render(renderer);
 
     if (debugMode) {
         for (auto& e : entityManager.getEntities()) {
@@ -114,53 +112,77 @@ void GameplayScene::loadFloor(int index) {
 void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
     if (!currentRoom) return;
 
-    const int tileSize = 32;
+    int tileCols = currentRoom->layout[0].size();
+    int tileRows = currentRoom->layout.size();
 
-    // TODO - 1. Quero uma sala com 14x9, 12x7 jogavel e o resto paredes e portas.
-    for (int row = 0; row < currentRoom->layout.size(); ++row) {
-        for (int col = 0; col < currentRoom->layout[row].size(); ++col) {
+    this->virtualRenderer.updateLayout(tileCols, tileRows);
+
+    for (int row = 0; row < tileRows; ++row) {
+        for (int col = 0; col < tileCols; ++col) {
             int tileId = currentRoom->layout[row][col];
             const Tile* tile = tileSet.getTile(tileId);
-
             if (!tile) continue;
 
             SDL_Texture* texture = Manager::TextureManager::Get(tile->spritePath);
-            Vector4 rect = { col * tileSize, row * tileSize, tileSize, tileSize };
+            SDL_Rect screenRect = virtualRenderer.tileToScreenRect(col, row);
 
             auto tileBody = std::make_unique<Entities::TileBody>(
-                rect,
+                Vector4{
+                    static_cast<float>(screenRect.x),
+                    static_cast<float>(screenRect.y),
+                    static_cast<float>(screenRect.w),
+                    static_cast<float>(screenRect.h)
+                },
                 texture,
                 tile->solid
             );
 
-            entityManager.add(std::move(tileBody));
+            this->entityManager.add(std::move(tileBody));
         }
     }
 
-
-    // TODO - 2. Separar em métodos depois, deixar mais organizado e legivel. 
     for (const auto& e : currentRoom->entities) {
         std::string type = e.at("type");
 
         if (type == "Item") {
             int itemId = e.at("item_id");
-            float x = e.at("x");
-            float y = e.at("y");
+            int x = e.at("x");
+            int y = e.at("y");
 
             const Items::Item* itemData = itemManager.getItemById(itemId);
             if (itemData) {
                 Manager::TextureManager::Load(renderer, itemData->getSpritePath(), itemData->getSpritePath());
 
+                SDL_Rect screenRect = virtualRenderer.tileToScreenRect(x, y);
+
                 auto item = std::make_unique<Entities::ItemBody>(
-                    Vector4{x, y, 32, 32}, *itemData
+                    Vector4{
+                        static_cast<float>(screenRect.x),
+                        static_cast<float>(screenRect.y),
+                        static_cast<float>(screenRect.w),
+                        static_cast<float>(screenRect.h)
+                    },
+                    *itemData
                 );
                 item->setTexture(Manager::TextureManager::Get(itemData->getSpritePath()));
 
                 std::unique_ptr<Entities::Entity> casted(static_cast<Entities::Entity*>(item.release()));
-                entityManager.add(std::move(casted));
+                this->entityManager.add(std::move(casted));
             }
         }
     }
+    
+    SDL_Rect playerRect = virtualRenderer.tileToScreenRect(4, 4);
+    player = new Entities::PlayerBody(
+        static_cast<float>(playerRect.x),
+        static_cast<float>(playerRect.y),
+        static_cast<float>(playerRect.w),
+        static_cast<float>(playerRect.h),
+        true,
+        true
+    );
+    player->setTexture(Manager::TextureManager::Get("player"));
+    this->player = player;
 }
 
 void GameplayScene::drawCollider(SDL_Renderer* renderer, const SDL_FRect& rect) {

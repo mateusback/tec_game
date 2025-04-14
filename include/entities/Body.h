@@ -22,19 +22,22 @@ namespace Entities
         SDL_Texture* texture = nullptr;
         bool has_collision;
         bool is_visible;
+        
+        Body(EBodyType type, float x, float y, float w, float h, bool collision = false, bool visible = true)
+        : Entity(type), position(x, y), scale(w, h), has_collision(collision), is_visible(visible) {}
 
     public:
         #pragma region Constructors
-        Body() : position(0, 0), scale(50, 50), has_collision(false), is_visible(true) {}
+        Body() : Entity(EBodyType::Body), position(0, 0), scale(50, 50), has_collision(false), is_visible(true) {}
 
         Body(float x = 0, float y = 0, float w = 50, float h = 50, bool collision = false, bool visible = true)
-            : position(x, y), scale(w, h), has_collision(collision), is_visible(visible) {}
+            : Entity(EBodyType::Body), position(x, y), scale(w, h), has_collision(collision), is_visible(visible) {}
         
         Body(Vector pos, Vector scl, bool collision = false, bool visible = true)
-            : position(pos), scale(scl), has_collision(collision), is_visible(visible) {}
+            : Entity(EBodyType::Body), position(pos), scale(scl), has_collision(collision), is_visible(visible) {}
         
         Body(Vector4 collider, bool collision = false, bool visible = true)
-            : position(collider.x, collider.y), scale(collider.z, collider.w), has_collision(collision), is_visible(visible) {}
+            : Entity(EBodyType::Body), position(collider.x, collider.y), scale(collider.z, collider.w), has_collision(collision), is_visible(visible) {}
         #pragma endregion
 		
         virtual void update(float deltaTime) = 0;
@@ -55,6 +58,10 @@ namespace Entities
         void setCollision(bool collision) { this->has_collision = collision; }
         void setVisible(bool visible) { this->is_visible = visible; }
 		void setTexture(SDL_Texture* tex) { this->texture = tex; }
+        void setPosition(float x, float y) { this->position.x = x; this->position.y = y; }
+        void setPosition(Vector pos) { this->position = pos; }
+        void setScale(float w, float h) { this->scale.x = w; this->scale.y = h; }
+        void setScale(Vector scl) { this->scale = scl; }
 		#pragma endregion
     };
 }

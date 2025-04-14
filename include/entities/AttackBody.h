@@ -9,6 +9,7 @@ namespace Entities
     class AttackBody : public MovingBody 
     {
     protected:
+		Entity* origin = nullptr;
         float attack_damage;
         float attack_range;
         float attack_duration;
@@ -21,6 +22,8 @@ namespace Entities
                    float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0);
 
         void update(float deltaTime);
+
+		EBodyType getBodyType() const override { return EBodyType::Attack; }
 
 		#pragma region Getters
 		float getAttackDamage() { return this->attack_damage; }

@@ -33,9 +33,37 @@ namespace Entities
         //TODO - REESTRUTURAR UMA LÓGICA BASEADA NO ATTACKSPEED E ATTACKRANGE
     }
 
-    void PlayerBody::attack(Point characterCenter, Vector direction)
+    std::unique_ptr<Entities::AttackBody> PlayerBody::attack(Point characterCenter, Vector direction)
     {
-        //TODO - IMPLEMENTAR O ATTACK BODY
+        float width = 16.f;
+        float height = 16.f;
+        float speed = 350.f;
+    
+        if (direction.x != 0 || direction.y != 0) {
+            float len = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+            direction.x /= len;
+            direction.y /= len;
+        }
+        
+        std::cout << "Attack Direction: " << direction.x << ", " << direction.y << std::endl;
+
+        auto attack = std::make_unique<Entities::AttackBody>(
+            characterCenter.x - width / 2,
+            characterCenter.y - height / 2,
+            width,
+            height,
+            true,
+            true,
+            10.f,
+            200.f,
+            1.2f,
+            0.f,
+            0.1f,
+            1.5f 
+        );
+    
+        attack->setSpeed(direction * speed);
+        return attack;
     }
 
     void PlayerBody::onCollision(Body* other)

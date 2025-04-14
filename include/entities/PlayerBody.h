@@ -25,9 +25,8 @@ namespace Entities
 	
 		void handleCollision();
 		void handleInput(const Manager::PlayerInput& input);
-		void handleInput();
 		void update(float deltaTime) override;
-		void attack(Point characterCenter, Vector direction);
+		std::unique_ptr<Entities::AttackBody> attack(Point characterCenter, Vector direction);
 		void onCollision(Body* other) override;
 		void pickUpItem(Entities::ItemBody* item);
 

@@ -9,9 +9,10 @@
 #include <iostream>
 
 GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight)
-    : virtualRenderer(screenWidth, screenHeight, /*dummy*/1, 1) {
+    : virtualRenderer(screenWidth, screenHeight, 1, 1) {
     Manager::TextureManager::Load(renderer, "player", "assets/player.png");
     Manager::TextureManager::Load(renderer, "player_with_item", "assets/player_with_item.png");
+    Manager::TextureManager::Load(renderer, "attack", "assets/attack.png");
 
     Manager::FontManager::load("default", "assets/fonts/Montserrat-Bold.ttf", 16);
 
@@ -37,6 +38,18 @@ void GameplayScene::handleEvent(const SDL_Event& event) {
 
 void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     this->player->handleInput(input);
+
+    if ((input.shootDirection.x != 0 || input.shootDirection.y != 0) && player->getFireTimer() <= 0.0f)
+    {
+        auto attack = player->attack(player->getCenterPoint(), input.shootDirection);
+        attack->setTexture(Manager::TextureManager::Get("attack"));
+        attack->setScale(virtualRenderer.getTileSize() + 16, virtualRenderer.getTileSize() + 16);
+        if (attack)
+            entityManager.add(std::move(attack));
+    
+        player->setFireTimer(player->getFireRate());
+    }
+    
     this->player->update(deltaTime);
 
     this->entityManager.updateAll(deltaTime);
@@ -57,6 +70,10 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
             player->onCollision(item);
         }
     }
+    for (auto& e : this->entityManager.getEntitiesByType(Entities::EBodyType::Attack)) {
+        std::cout << "Attack Count: " << this->entityManager.getEntitiesByType(Entities::EBodyType::Attack).size() << std::endl;
+        e->update(deltaTime);
+    }
 
     this->entityManager.removeInactive();
 }
@@ -72,13 +89,15 @@ void GameplayScene::render(SDL_Renderer* renderer) {
         for (auto& e : entityManager.getEntities()) {
             auto* body = dynamic_cast<Entities::Body*>(e.get());
             if (body->isActive()) {
+                SDL_Color color = {255, 255, 0, 255};
                 SDL_FRect rect = { body->getCollider().x, body->getCollider().y, body->getCollider().w, body->getCollider().z };
-                drawCollider(renderer, rect);
+                drawCollider(renderer, rect, color);
             }
         }
         if (player->hasCollision()) {
             SDL_FRect rectp = { player->getCollider().x, player->getCollider().y, player->getCollider().w, player->getCollider().z };
-            drawCollider(renderer, rectp);
+            SDL_Color colorp = {255, 0, 0, 255};
+            drawCollider(renderer, rectp, colorp);
         }
     }
 
@@ -182,11 +201,11 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
         true
     );
     player->setTexture(Manager::TextureManager::Get("player"));
+    player->setAcceleration(100.0f + virtualRenderer.getTileSize());
     this->player = player;
 }
 
-void GameplayScene::drawCollider(SDL_Renderer* renderer, const SDL_FRect& rect) {
-    SDL_Color color = {255, 0, 0, 255};
+void GameplayScene::drawCollider(SDL_Renderer* renderer, const SDL_FRect& rect, SDL_Color color) {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
     SDL_RenderDrawRectF(renderer, &rect);
 }

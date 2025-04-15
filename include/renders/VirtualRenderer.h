@@ -2,6 +2,7 @@
 #define VIRTUAL_RENDERER_H
 
 #include <SDL2/SDL.h>
+#include <algorithm>
 
 namespace Renderer {
     class VirtualRenderer {

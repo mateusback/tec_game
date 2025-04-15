@@ -39,11 +39,11 @@ void GameplayScene::handleEvent(const SDL_Event& event) {
 void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     this->player->handleInput(input);
 
-    if ((input.shootDirection.x != 0 || input.shootDirection.y != 0) && player->getFireTimer() <= 0.0f)
+    if (input.shootDirection.x != 0 || input.shootDirection.y != 0)
     {
         auto attack = player->attack(player->getCenterPoint(), input.shootDirection);
         attack->setTexture(Manager::TextureManager::Get("attack"));
-        attack->setScale(virtualRenderer.getTileSize() + 16, virtualRenderer.getTileSize() + 16);
+        attack->setScale(virtualRenderer.getTileSize() /3 , virtualRenderer.getTileSize() /3);
         if (attack)
             entityManager.add(std::move(attack));
     

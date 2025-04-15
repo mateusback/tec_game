@@ -1,9 +1,8 @@
 #include "include/core/Game.h"
+#include <iostream>
 
 int main() {
-    Core::Game game;
-    if (game.init("TEC_GAME", 640, 480)) {
-        game.run();
-    }
+    Core::Game game("TEC_GAME", 1280, 720);
+    game.run();
     return 0;
 }

@@ -10,27 +10,37 @@
 #include "../../include/managers/ItemManager.h"
 #include "../../include/map/Floor.h"
 #include "../../include/map/TileSet.h"
+#include "../../include/renders/VirtualRenderer.h"
 
 class GameplayScene : public Core::Scene {
 private:
     Entities::PlayerBody* player;
-    ItemManager itemManager;
-
+    Manager::ItemManager itemManager;
     Map::Floor floor;
-    Room* currentRoom = nullptr;
+    Map::Room* currentRoom = nullptr;
+    Manager::EntityManager entityManager;
+    bool debugMode = true;
 
     TileSet tileSet;
+
+    Renderer::VirtualRenderer virtualRenderer;
 
     void loadFloor(int index);
     void loadCurrentRoom(SDL_Renderer* renderer);
 
 public:
-    GameplayScene(SDL_Renderer* renderer);
-    void update(float deltaTime) override;
+    GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight);
+
+    void update(float deltaTime, const Manager::PlayerInput& input);
     void handleEvent(const SDL_Event& event) override;
     void render(SDL_Renderer* renderer) override;
-    ItemManager getItemManager() { return itemManager; }
-    void setItemManager(const ItemManager& itemManager) { this->itemManager = itemManager; }
+
+    #pragma region Debug
+        void drawCollider(SDL_Renderer* renderer, const SDL_FRect& rect, SDL_Color color);
+    #pragma endregion 
+    
+    void setItemManager(const Manager::ItemManager& itemManager) { this->itemManager = itemManager; }
+    Manager::ItemManager getItemManager() { return itemManager; }
 };
 
 #endif

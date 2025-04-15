@@ -1,73 +1,70 @@
 #include "../../include/core/Game.h"
 #include "../../include/core/GameLoop.h"
-#include "../../include/core/SceneManager.h"
+#include "../../include/managers/SceneManager.h"
 #include "../../include/scenes/GameplayScene.h"
-#include "../../include/core/TextRenderer.h"
+#include "../../include/renders/TextRenderer.h"
 
 #include <iostream>
 
 namespace Core
 {
-
-    Game::Game() : window(nullptr), renderer(nullptr), loop(nullptr) {}
-
-    Game::~Game() 
-    {
-        shutdown();
-    }
-
-    bool Game::init(const char* title, int width, int height) 
-    {
+    Game::Game(const char* title, int width, int height) : window(nullptr), renderer(nullptr), loop(nullptr) {
         if (SDL_Init(SDL_INIT_VIDEO) < 0) 
         {
             std::cerr << "Erro ao inicializar SDL: " << SDL_GetError() << std::endl;
-            return false;
+            return;
         }
 
         if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) 
         {
             std::cerr << "Erro ao iniciar SDL_image: " << IMG_GetError() << std::endl;
-            return false;
+            return;
         }
 
         if (TTF_Init() < 0) {
             std::cerr << "Erro SDL_ttf: " << TTF_GetError() << std::endl;
-            return 1;
+            return;
         }    
 
-        window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        this->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                 width, height, SDL_WINDOW_SHOWN);
-        if (!window) 
+        if (!this->window) 
         {
             std::cerr << "Erro ao criar janela: " << SDL_GetError() << std::endl;
-            return false;
+            return;
         }
 
-        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-        if (!renderer) 
+        this->renderer = SDL_CreateRenderer(this->window, -1, SDL_RENDERER_ACCELERATED);
+        if (!this->renderer) 
         {
             std::cerr << "Erro ao criar renderer: " << SDL_GetError() << std::endl;
-            return false;
+            return;
         }
 
-        SceneManager::setScene(new GameplayScene(renderer));
+        Manager::SceneManager::setScene(new GameplayScene(renderer, width, height));
 
-        loop = new GameLoop(renderer);
-        return true;
+        this->loop = new GameLoop(renderer);
     }
 
     void Game::run() 
     {
-        if (loop) loop->run();
+        if (!this->loop) 
+        {
+            std::cerr << "Game loop not initialized." << std::endl;
+            return;
+        }
+        if (this->loop) 
+            this->loop->run();
     }
-
-    void Game::shutdown() 
+    
+    Game::~Game() 
     {
-        delete loop;
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
+        delete this->loop;
+        SDL_DestroyRenderer(this->renderer);
+        SDL_DestroyWindow(this->window);
         TTF_Quit();
         IMG_Quit();
         SDL_Quit();
     }
+
 }

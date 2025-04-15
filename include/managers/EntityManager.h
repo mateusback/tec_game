@@ -7,44 +7,24 @@
 #include <memory>
 #include <algorithm>
 
-class EntityManager {
-private:
-    std::vector<std::unique_ptr<Entity>> entities;
+namespace Manager {
 
-public:
-    void add(std::unique_ptr<Entity> entity) {
-        entities.push_back(std::move(entity));
-    }
+	class EntityManager {
+	private:
+		std::vector<std::unique_ptr<Entities::Entity>> entities;
 
-    void updateAll(float deltaTime) {
-        for (auto& e : entities) {
-            e->update(deltaTime);
-        }
-    }
+	public:
 
-    void renderAll(SDL_Renderer* renderer) {
-        for (auto& e : entities) {
-            // TODO - passar o visibilidade para o Entity e não para o Body
-            auto* body = dynamic_cast<Entities::Body*>(e.get());
-            if (body && body->isVisible()) {
-                e->render(renderer);
-            }
-        }
-    }
+		std::vector<Entities::Body*> getEntitiesByType(Entities::EBodyType type);
+		void add(std::unique_ptr<Entities::Entity> entity);
+		void updateAll(float deltaTime);
+		void renderAll(SDL_Renderer* renderer);
+		void removeInactive();
 
-    void removeInactive() {
-        entities.erase(
-            std::remove_if(entities.begin(), entities.end(), [](const std::unique_ptr<Entity>& e) {
-                auto* body = dynamic_cast<Entities::Body*>(e.get());
-                return body && !body->isActive();
-            }),
-            entities.end()
-        );
-    }
-
-    std::vector<std::unique_ptr<Entity>>& getEntities() {
-        return entities;
-    }
-};
+		#pragma region Getters
+		std::vector<std::unique_ptr<Entities::Entity>>& getEntities() { return this->entities; }
+		#pragma endregion
+	};
+}
 
 #endif

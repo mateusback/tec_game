@@ -1,7 +1,8 @@
-#include "../../include/core/TextureManager.h"
+#include "../../include/managers/TextureManager.h"
 
-namespace Core
+namespace Manager
 {
+	//Trocar a forma de organizar essas coisas, uma vez carregadas, não buscar novamente, pegar um ponteiro e com isso sair dai
     std::unordered_map<std::string, SDL_Texture*> TextureManager::textures;
     
     void TextureManager::Load(SDL_Renderer* renderer, const std::string& id, const std::string& path) {

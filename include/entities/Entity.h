@@ -2,12 +2,28 @@
 #define ENTITY_H
 
 #include <SDL2/SDL.h>
+#include "EntitiesTypes.h"
 
-class Entity {
-public:
-    virtual ~Entity() = default;
-    virtual void update(float deltaTime) = 0;
-    virtual void render(SDL_Renderer* renderer) = 0;
-};
+namespace Entities {
+	class Entity {
+	protected:
+		bool active = true;
+		const EBodyType bodyType;
+	public:
+		explicit Entity(EBodyType type) : bodyType(type) {}
+
+		virtual ~Entity() = default;
+
+		#pragma region Getters
+		bool isActive() { return this->active; }
+		EBodyType getBodyType() const { return this->bodyType; }
+		#pragma endregion
+
+		#pragma region Setters
+		void setActive(bool active) {this->active = active;}
+		#pragma endregion
+	
+	};
+}
 
 #endif

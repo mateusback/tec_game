@@ -10,12 +10,14 @@ namespace Entities
 
         if (this->texture) 
         {
-            SDL_RenderCopyF(renderer, this->texture, nullptr, &this->rect);
+            SDL_FRect rect = { this->getCollider().x, this->getCollider().y, this->getCollider().w, this->getCollider().z };
+            SDL_RenderCopyF(renderer, this->texture, nullptr, &rect);
         } 
         else 
         {
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-            SDL_RenderFillRectF(renderer, &this->rect);
+            SDL_FRect rect = { this->getCollider().x, this->getCollider().y, this->getCollider().w, this->getCollider().z };
+            SDL_RenderFillRectF(renderer, &rect);
         }
     }
 }

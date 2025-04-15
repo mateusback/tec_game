@@ -1,8 +1,12 @@
 {
   "tiles": {
     "0": { "name": "Floor", "sprite": "assets/tiles/floor.png", "solid": false },
-    "1": { "name": "Wall",  "sprite": "assets/tiles/wall.png",  "solid": true  },
-    "2": { "name": "Rock",  "sprite": "assets/tiles/rock.png",  "solid": true  },
-    "3": { "name": "Hole",  "sprite": "assets/tiles/hole.png",  "solid": false }
+    "1": { "name": "Rock",  "sprite": "assets/tiles/rock.png",  "solid": true  },
+    "2": { "name": "Hole",  "sprite": "assets/tiles/hole.png",  "solid": false },
+    "3": { "name": "Wall-Top",  "sprite": "assets/tiles/wall-top.png",  "solid": true  },
+    "4": { "name": "Wall-Bottom",  "sprite": "assets/tiles/wall-bot.png",  "solid": true  },
+    "5": { "name": "Wall-Left",  "sprite": "assets/tiles/wall-left.png",  "solid": true  },
+    "6": { "name": "Wall-Right",  "sprite": "assets/tiles/wall-right.png",  "solid": true  },
+    "7": { "name": "Dorr-PlacheHolder",  "sprite": "assets/tiles/wall.png",  "solid": true  }
   }
 }  

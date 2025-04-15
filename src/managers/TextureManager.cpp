@@ -2,8 +2,7 @@
 
 namespace Manager
 {
-	//Trocar a forma de organizar essas coisas, uma vez carregadas, não buscar novamente, pegar um ponteiro e com isso sair dai
-    std::unordered_map<std::string, SDL_Texture*> TextureManager::textures;
+    Mylib::unordered_map_string_key<SDL_Texture*> TextureManager::textures;
     
     void TextureManager::Load(SDL_Renderer* renderer, const std::string& id, const std::string& path) {
         SDL_Texture* tex = IMG_LoadTexture(renderer, path.c_str());

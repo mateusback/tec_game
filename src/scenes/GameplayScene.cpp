@@ -25,9 +25,6 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screen
 
     loadFloor(1);
     loadCurrentRoom(renderer);
-
-    // player = new Entities::PlayerBody(400, 400, 32, 32, true, true);
-    // player->setTexture(Manager::TextureManager::Get("player"));
 }
 
 void GameplayScene::handleEvent(const SDL_Event& event) {
@@ -51,28 +48,29 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     }
     
     this->player->update(deltaTime);
-
     this->entityManager.updateAll(deltaTime);
 
-    for (auto& e : this->entityManager.getEntities()) {
-        auto* tile = dynamic_cast<Entities::TileBody*>(e.get());
-        if (tile && tile->hasCollision() &&
+    //TODO - melhorar esse templete, se eu estou passando o T com o tipo, não preciso do parametro de tipo
+    auto tiles = entityManager.getEntitiesByType<Entities::TileBody>(Entities::EBodyType::Tile);
+    for (auto* tile : tiles) {
+        if (tile->hasCollision() &&
             Physics::CollisionManager::checkCollision(player->getCollider(), tile->getCollider())) {
             player->onCollision(tile);
             break;
         }
     }
-
-    for (auto& e : this->entityManager.getEntities()) {
-        auto* item = dynamic_cast<Entities::ItemBody*>(e.get());
-        if (item && item->hasCollision() &&
+    
+    auto items = entityManager.getEntitiesByType<Entities::ItemBody>(Entities::EBodyType::Item);
+    for (auto* item : items) {
+        if (item->hasCollision() &&
             Physics::CollisionManager::checkCollision(player->getCollider(), item->getCollider())) {
             player->onCollision(item);
         }
     }
-    for (auto& e : this->entityManager.getEntitiesByType(Entities::EBodyType::Attack)) {
-        std::cout << "Attack Count: " << this->entityManager.getEntitiesByType(Entities::EBodyType::Attack).size() << std::endl;
-        e->update(deltaTime);
+    
+    auto attacks = entityManager.getEntitiesByType<Entities::AttackBody>(Entities::EBodyType::Attack);
+    for (auto* attack : attacks) {
+        attack->update(deltaTime);
     }
 
     this->entityManager.removeInactive();

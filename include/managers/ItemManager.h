@@ -3,7 +3,7 @@
 
 #include "../items/Item.h"
 #include <vector>
-#include <unordered_map>
+#include <my-lib/utils.h>
 #include <string>
 
 using namespace Items;
@@ -11,8 +11,7 @@ using namespace Items;
 namespace Manager {
 	class ItemManager {
 	private:
-		//https://github.com/ehmcruz/my-game-lib/blob/main/include/my-game-lib/audio.h
-		std::unordered_map<std::string, Item> itemMap;
+		Mylib::unordered_map_string_key<Item> itemMap;
 
 	public:
 		bool loadFromFile(const std::string& filePath);
@@ -26,7 +25,7 @@ namespace Manager {
 		const Item* getRandomItemFromPool(EItemPool pool) const;
 
 		#pragma region Getters
-		const std::unordered_map<std::string, Item>& getAllItems() const { return itemMap; }
+		const Mylib::unordered_map_string_key<Item>& getAllItems() const { return itemMap; }
 		#pragma endregion
 	};
 }

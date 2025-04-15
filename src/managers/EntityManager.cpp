@@ -2,18 +2,6 @@
 
 namespace Manager
 {
-    std::vector<Entities::Body*> EntityManager::getEntitiesByType(Entities::EBodyType type) {
-        std::vector<Entities::Body*> filtered;
-    
-        for (auto& e : entities) {
-            auto* body = dynamic_cast<Entities::Body*>(e.get());
-            if (body && body->getBodyType() == type) {
-                filtered.push_back(body);
-            }
-        }
-        return filtered;
-    }
-
     void EntityManager::add(std::unique_ptr<Entities::Entity> entity) {
         entities.push_back(std::move(entity));
     }

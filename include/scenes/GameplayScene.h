@@ -19,7 +19,7 @@ private:
     Map::Floor floor;
     Map::Room* currentRoom = nullptr;
     Manager::EntityManager entityManager;
-    bool debugMode = true;
+    bool debugMode = false;
 
     TileSet tileSet;
 

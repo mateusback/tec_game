@@ -34,10 +34,6 @@ public:
     void update(float deltaTime, const Manager::PlayerInput& input);
     void handleEvent(const SDL_Event& event) override;
     void render(SDL_Renderer* renderer) override;
-
-    #pragma region Debug
-        void drawCollider(SDL_Renderer* renderer, const SDL_FRect& rect, SDL_Color color);
-    #pragma endregion 
     
     void setItemManager(const Manager::ItemManager& itemManager) { this->itemManager = itemManager; }
     Manager::ItemManager getItemManager() { return itemManager; }

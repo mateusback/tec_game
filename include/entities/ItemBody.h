@@ -17,12 +17,12 @@ namespace Entities
     public:
         #pragma region Constructors
         ItemBody(Vector4 collider, const Item& item,
-            bool collision = false, bool visible = true)
+            bool collision = true, bool visible = true)
         : Body(EBodyType::Item, collider.x, collider.y, collider.z, collider.w, collision, visible),
             type(item.getType()), item(item) {}
 
         ItemBody(Vector pos, Vector scl, const Item& item,
-            bool collision = false, bool visible = true)
+            bool collision = true, bool visible = true)
         : Body(EBodyType::Item, pos.x, pos.y, scl.x, scl.y, collision, visible),
             type(item.getType()), item(item) {}
         #pragma endregion

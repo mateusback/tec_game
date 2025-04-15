@@ -3,7 +3,6 @@
 namespace Physics {
 	//resolver colisao junto
     bool CollisionManager::checkCollision(const Vector4& a, const Vector4& b) {
-        //TODO - TROCAR 100 POR TITLESIZEDEPOIS
         if (std::abs(a.x - b.x) > 100 * 2) return false;
         bool colided = (
             a.x < b.x + b.z &&

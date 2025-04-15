@@ -4,6 +4,7 @@
 #include "../../include/renders/TextRenderer.h"
 #include "../../include/managers/FontManager.h"
 #include "../../include/serializers/FloorSerialization.h"
+#include "../../include/utils/DebugUtils.h"
 #include <SDL2/SDL_image.h>
 #include <fstream>
 #include <iostream>
@@ -51,7 +52,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     this->entityManager.updateAll(deltaTime);
 
     //TODO - melhorar esse templete, se eu estou passando o T com o tipo, não preciso do parametro de tipo
-    auto tiles = entityManager.getEntitiesByType<Entities::TileBody>(Entities::EBodyType::Tile);
+    auto tiles = entityManager.getEntitiesByType<Entities::TileBody>();
     for (auto* tile : tiles) {
         if (tile->hasCollision() &&
             Physics::CollisionManager::checkCollision(player->getCollider(), tile->getCollider())) {
@@ -60,15 +61,16 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
         }
     }
     
-    auto items = entityManager.getEntitiesByType<Entities::ItemBody>(Entities::EBodyType::Item);
+    auto items = entityManager.getEntitiesByType<Entities::ItemBody>();
     for (auto* item : items) {
         if (item->hasCollision() &&
             Physics::CollisionManager::checkCollision(player->getCollider(), item->getCollider())) {
+                std::cout << "ItemBody count: " << items.size() << std::endl;
             player->onCollision(item);
         }
     }
     
-    auto attacks = entityManager.getEntitiesByType<Entities::AttackBody>(Entities::EBodyType::Attack);
+    auto attacks = entityManager.getEntitiesByType<Entities::AttackBody>();
     for (auto* attack : attacks) {
         attack->update(deltaTime);
     }
@@ -83,19 +85,17 @@ void GameplayScene::render(SDL_Renderer* renderer) {
     this->entityManager.renderAll(renderer);
     this->player->render(renderer);
 
-    if (debugMode) {
-        for (auto& e : entityManager.getEntities()) {
-            auto* body = dynamic_cast<Entities::Body*>(e.get());
-            if (body->isActive()) {
-                SDL_Color color = {255, 255, 0, 255};
-                SDL_FRect rect = { body->getCollider().x, body->getCollider().y, body->getCollider().w, body->getCollider().z };
-                drawCollider(renderer, rect, color);
-            }
-        }
+    if (true) {
+        Utils::DebugUtils::drawCollidersOfType<Entities::ItemBody>(renderer, entityManager, {0, 0, 255, 255});
+        Utils::DebugUtils::drawCollidersOfType<Entities::TileBody>(renderer, entityManager, {0, 255, 0, 255});
+        Utils::DebugUtils::drawCollidersOfType<Entities::AttackBody>(renderer, entityManager, {255, 0, 255, 255});
+    
         if (player->hasCollision()) {
-            SDL_FRect rectp = { player->getCollider().x, player->getCollider().y, player->getCollider().w, player->getCollider().z };
-            SDL_Color colorp = {255, 0, 0, 255};
-            drawCollider(renderer, rectp, colorp);
+            SDL_FRect rect = {
+                player->getCollider().x, player->getCollider().y,
+                player->getCollider().w, player->getCollider().z
+            };
+            Utils::DebugUtils::drawCollider(renderer, rect, {255, 0, 0, 255});
         }
     }
 
@@ -165,13 +165,13 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
             int itemId = e.at("item_id");
             int x = e.at("x");
             int y = e.at("y");
-
+        
             const Items::Item* itemData = itemManager.getItemById(itemId);
             if (itemData) {
                 Manager::TextureManager::Load(renderer, itemData->getSpritePath(), itemData->getSpritePath());
-
+        
                 SDL_Rect screenRect = virtualRenderer.tileToScreenRect(x, y);
-
+        
                 auto item = std::make_unique<Entities::ItemBody>(
                     Vector4{
                         static_cast<float>(screenRect.x),
@@ -182,9 +182,8 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
                     *itemData
                 );
                 item->setTexture(Manager::TextureManager::Get(itemData->getSpritePath()));
-
-                std::unique_ptr<Entities::Entity> casted(static_cast<Entities::Entity*>(item.release()));
-                this->entityManager.add(std::move(casted));
+        
+                this->entityManager.add(std::move(item));
             }
         }
     }
@@ -193,8 +192,8 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
     player = new Entities::PlayerBody(
         static_cast<float>(playerRect.x),
         static_cast<float>(playerRect.y),
-        static_cast<float>(playerRect.w),
-        static_cast<float>(playerRect.h),
+        static_cast<float>(playerRect.w * 1.5),
+        static_cast<float>(playerRect.h * 1.5),
         true,
         true
     );
@@ -202,9 +201,3 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
     player->setAcceleration(100.0f + virtualRenderer.getTileSize());
     this->player = player;
 }
-
-void GameplayScene::drawCollider(SDL_Renderer* renderer, const SDL_FRect& rect, SDL_Color color) {
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-    SDL_RenderDrawRectF(renderer, &rect);
-}
-

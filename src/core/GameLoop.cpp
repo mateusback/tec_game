@@ -53,10 +53,10 @@ namespace Core
         if (scene) 
             scene->render(renderer);
 
-        // auto currentFPS = (deltaTime > 0.0f) ? static_cast<int>(1.0f / deltaTime) : 0;
-        // TTF_Font* font = Manager::FontManager::get("default");
-        // std::string fpsText = "FPS: " + std::to_string(currentFPS);
-        // Core::TextRenderer::render(renderer, font, fpsText, 10, 10);
+        auto currentFPS = (deltaTime > 0.0f) ? static_cast<int>(1.0f / deltaTime) : 0;
+        TTF_Font* font = Manager::FontManager::get("default");
+        std::string fpsText = "FPS: " + std::to_string(currentFPS);
+        Core::TextRenderer::render(renderer, font, fpsText, 10, 10);
 
         SDL_RenderPresent(renderer);
     }

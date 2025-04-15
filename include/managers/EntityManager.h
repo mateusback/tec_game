@@ -25,18 +25,15 @@ namespace Manager {
 
 		#pragma region Templates
 		template<typename T>
-		std::vector<T*> getEntitiesByType(Entities::EBodyType type) {
+		std::vector<T*> getEntitiesByType() {
 			std::vector<T*> filtered;
-
+		
 			for (auto& e : entities) {
-				auto* body = dynamic_cast<Entities::Body*>(e.get());
-				if (body && body->getBodyType() == type) {
-					if (auto* casted = dynamic_cast<T*>(body)) {
-						filtered.push_back(casted);
-					}
+				if (auto* casted = dynamic_cast<T*>(e.get())) {
+					filtered.push_back(casted);
 				}
 			}
-
+		
 			return filtered;
 		}
 		#pragma endregion

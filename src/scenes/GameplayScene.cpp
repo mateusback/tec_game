@@ -30,7 +30,7 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screen
 
 void GameplayScene::handleEvent(const SDL_Event& event) {
     if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
-        std::printf("TESTEEEEEEEE");
+        //TODO - Implement pause menu
     }
 }
 
@@ -45,7 +45,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
         if (attack)
             entityManager.add(std::move(attack));
     
-        player->setFireTimer(player->getFireRate());
+        player->setAttackTimer(player->getAttackRate());
     }
     
     this->player->update(deltaTime);

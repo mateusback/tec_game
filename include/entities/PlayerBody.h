@@ -42,6 +42,10 @@ namespace Entities
 		experience(0) {}
 		#pragma endregion
 	
+
+		void onCollision(Body* other) override;
+		void update(float deltaTime) override;
+		
 		void handleInput(const Manager::PlayerInput& input);
 		std::unique_ptr<Entities::AttackBody> attack(Point characterCenter, Vector direction);
 		void pickUpItem(Entities::ItemBody* item);

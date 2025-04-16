@@ -16,10 +16,10 @@ namespace Entities
         playerDirection *= this->getAcceleration();
         this->setSpeed(playerDirection);
     
-        if ((shootDirection.x != 0 || shootDirection.y != 0) && this->getFireTimer() <= 0.0f)
+        if ((shootDirection.x != 0 || shootDirection.y != 0) && this->getAttackTimer() <= 0.0f)
         {
             this->attack(this->getCenterPoint(), shootDirection);
-            this->setFireTimer(this->getFireRate());
+            this->setAttackTimer(this->getAttackRate());
         }
     }
 
@@ -27,10 +27,9 @@ namespace Entities
     {
         this->move(deltaTime);
 
-        if (fire_timer > 0.0f)
-            fire_timer -= deltaTime;
+        if (attack_timer > 0.0f)
+        attack_timer -= deltaTime;
 
-        //TODO - REESTRUTURAR UMA LÓGICA BASEADA NO ATTACKSPEED E ATTACKRANGE
     }
 
     std::unique_ptr<Entities::AttackBody> PlayerBody::attack(Point characterCenter, Vector direction)
@@ -94,7 +93,7 @@ namespace Entities
                     this->setAttackDuration(this->getAttackDuration() + effect.value);
                     break;
                 case FireRate:
-                    this->setFireRate(this->getFireRate() + effect.value);
+                    this->setAttackRate(this->getAttackRate() + effect.value);
                     break;
                 case Defense:
                     this->setDefense(this->getDefense() + effect.value);

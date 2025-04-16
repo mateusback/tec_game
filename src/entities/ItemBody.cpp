@@ -8,8 +8,7 @@ namespace Entities
     {
         if (this->has_collision == false) return;
 
-        if (other->getBodyType() == EBodyType::Player) {
-            auto* player = static_cast<PlayerBody*>(other);
+        if (auto* player = dynamic_cast<PlayerBody*>(other)) {
             player->pickUpItem(this);
             this->setVisible(false);
             this->setCollision(false);

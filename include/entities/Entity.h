@@ -16,6 +16,7 @@ namespace Entities {
 		void setActive(bool active) {this->active = active;}
 		#pragma endregion
 	
+		virtual ~Entity() = default;
 	};
 }
 

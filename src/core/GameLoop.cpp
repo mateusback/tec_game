@@ -8,6 +8,22 @@ namespace Core
 {
     GameLoop::GameLoop(SDL_Renderer* renderer) : isRunning(true), lastFrameTime(0), renderer(renderer) {
         this->inputManager = Manager::InputManager();
+        if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) < 0) {
+            std::cerr << "Erro ao inicializar SDL GameController: " << SDL_GetError() << std::endl;
+        }
+        std::cout << "Numero de contoles" << SDL_NumJoysticks() << std::endl;
+        for (int i = 0; i < SDL_NumJoysticks(); ++i) {
+            if (SDL_IsGameController(i)) {
+                SDL_GameController* controller = SDL_GameControllerOpen(i);
+                if (controller) {
+                    std::cout << "Controle conectado: " << SDL_GameControllerName(controller) << std::endl;
+                    inputManager.setController(controller);
+                } else {
+                    std::cerr << "Erro ao abrir controle: " << SDL_GetError() << std::endl;
+                }
+                break;
+            }
+        }
     }
 
     void GameLoop::run() {

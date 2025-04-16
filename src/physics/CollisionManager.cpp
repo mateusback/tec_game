@@ -14,13 +14,13 @@ namespace Physics {
     }
 
     void CollisionManager::resolveCollision(Vector4& a, const Vector4& b) {
-        float axCenter = a.x + a.z / 2.0f;
-        float ayCenter = a.y + a.w / 2.0f;
-        float bxCenter = b.x + b.z / 2.0f;
-        float byCenter = b.y + b.w / 2.0f;
+        float aCenterX = a.x + a.z / 2.0f;
+        float aCenterY = a.y + a.w / 2.0f;
+        float bCenterX = b.x + b.z / 2.0f;
+        float bCenterY = b.y + b.w / 2.0f;
 
-        float dx = axCenter - bxCenter;
-        float dy = ayCenter - byCenter;
+        float dx = aCenterX - bCenterX;
+        float dy = aCenterY - bCenterY;
 
         float combinedHalfWidth = (a.z + b.z) / 2.0f;
         float combinedHalfHeight = (a.w + b.w) / 2.0f;
@@ -41,6 +41,5 @@ namespace Physics {
                     a.y -= overlapY;
             }
         }
-
     }
 }

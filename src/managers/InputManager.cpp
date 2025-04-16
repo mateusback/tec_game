@@ -93,7 +93,7 @@ namespace Manager {
     }
 
     void InputManager::setController(SDL_GameController* ctrl) {
-        controller = ctrl;
+        this->controller = ctrl;
     }
 
 }

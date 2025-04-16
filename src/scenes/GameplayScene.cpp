@@ -51,7 +51,6 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     this->player->update(deltaTime);
     this->entityManager.updateAll(deltaTime);
 
-    //TODO - melhorar esse templete, se eu estou passando o T com o tipo, não preciso do parametro de tipo
     auto tiles = entityManager.getEntitiesByType<Entities::TileBody>();
     for (auto* tile : tiles) {
         if (tile->hasCollision() &&

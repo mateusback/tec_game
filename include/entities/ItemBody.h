@@ -18,12 +18,12 @@ namespace Entities
         #pragma region Constructors
         ItemBody(Vector4 collider, const Item& item,
             bool collision = true, bool visible = true)
-        : Body(EBodyType::Item, collider.x, collider.y, collider.z, collider.w, collision, visible),
+        : Body(collider.x, collider.y, collider.z, collider.w, collision, visible),
             type(item.getType()), item(item) {}
 
         ItemBody(Vector pos, Vector scl, const Item& item,
             bool collision = true, bool visible = true)
-        : Body(EBodyType::Item, pos.x, pos.y, scl.x, scl.y, collision, visible),
+        : Body(pos.x, pos.y, scl.x, scl.y, collision, visible),
             type(item.getType()), item(item) {}
         #pragma endregion
     
@@ -38,7 +38,7 @@ namespace Entities
         #pragma endregion
     
         void update(float deltaTime) override {};
-        void onCollision(Body* other);
+        void onCollision(Body* other) override;
     };
 }
 

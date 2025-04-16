@@ -23,34 +23,27 @@ namespace Entities
         bool has_collision;
         bool is_visible;
         
-        Body(EBodyType type, float x, float y, float w, float h, bool collision = false, bool visible = true)
-        : Entity(type), position(x, y), scale(w, h), has_collision(collision), is_visible(visible) {}
-
-    public:
+        public:
         #pragma region Constructors
         Body() 
-            : Entity(EBodyType::Body), 
-            position(0, 0), 
+            : position(0, 0), 
             scale(50, 50), 
             has_collision(false), 
             is_visible(true) {}
 
         Body(float x = 0, float y = 0, float w = 50, float h = 50, bool collision = false, bool visible = true)
-            : Entity(EBodyType::Body), 
-            position(x, y), 
+            : position(x, y), 
             scale(w, h), 
             has_collision(collision), 
             is_visible(visible) {}
         
         Body(Vector pos, Vector scl, bool collision = false, bool visible = true)
-            : Entity(EBodyType::Body), 
-            position(pos), scale(scl), 
+            : position(pos), scale(scl), 
             has_collision(collision), 
             is_visible(visible) {}
         
         Body(Vector4 collider, bool collision = false, bool visible = true)
-            : Entity(EBodyType::Body), 
-            position(collider.x, collider.y), 
+            : position(collider.x, collider.y), 
             scale(collider.z, collider.w), 
             has_collision(collision), 
             is_visible(visible) {}
@@ -58,16 +51,15 @@ namespace Entities
 		
         virtual void update(float deltaTime) = 0;
 		virtual void render(SDL_Renderer* renderer);
+        virtual void onCollision(Body* other) {};
 
         Vector4 getCollider() const { return Vector4(this->position.x, this->position.y, this->scale.x, this->scale.y); }
-        Point getCenterPoint() const { return Point(this->position.x + this->scale.x / 2, this->position.y + this->scale.y / 2); }
-        virtual EBodyType getBodyType() const {return EBodyType::Body;}
-        
-        virtual void onCollision(Body* other) {};
+        Point getCenterPoint() const { return Point(this->position.x + this->scale.x / 2, this->position.y + this->scale.y / 2); }   
 
 		#pragma region Getters
         bool hasCollision() const { return this->has_collision; }
         bool isVisible() const { return this->is_visible; }
+        SDL_Texture* getTexture() const { return this->texture; }
 		#pragma endregion
 
 		#pragma region Setters

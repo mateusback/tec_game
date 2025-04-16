@@ -1,0 +1,107 @@
+@startuml Entidades Tec_Game
+package "Entidades" {
+    enum EBodyType {
+		Body
+		Moving 
+		Character
+		Player
+		Tile
+		Item
+		Attack
+		Enemy
+    }
+
+    class Entity {
+        #active: bool = true
+        #bodyType: EBodyType
+    }
+
+	class Body {
+		#position: Vector
+		#scale: Vector
+		#texture: SDL_Texture* = nullptr
+		#has_collision: bool
+		#is_visible: bool
+		+virutal void render(SDL_Render* renderer)
+		+virutal void update(float deltaTime)
+		+virtual void onCollision(Body* other)
+		+virutal EBodyType getBodyType()
+	}
+
+	class MovingBody {
+		#speed: Vector
+		#acceleration: float
+		+void move(float deltaTime)
+	}
+
+	class CharacterBody {
+		#name: std::string
+		#health: float
+		#max_health: float
+		#attack_damage: float
+		#attack_speed: float
+		#attack_range: float 
+		#attack_duration: float
+		#attack_rate: float
+		#attack_timer: float
+		#defense: float
+		#level: uint8_t
+	}
+
+	class ItemBody {
+		#type: EItemType
+		#item: Item
+		+void update(float deltaTime) override {}
+		+void onCollision(Body* other) override
+	}
+
+	class TileBody {
+		+void update(float deltaTime) override {}
+        +void onCollision(Body* other) override {}
+	}
+
+	class PlayerBody{
+		#inventory: std::list<Item>
+		#coins: uint8_t
+		#keys: uint8_t
+		#bombs: uint8_t
+		#experience: float
+		+void update(float deltaTime) override
+		+void onCollision(Body other) override
+		+void handleInput(const PlayerInput& input)
+		+std::unique_ptr<AttackBody> attack(Point characterCenter, Vector direction)
+		+void pickUpItem(ItemBody* item)
+	}
+	
+	class AttackBody {
+		#origin: Entity*
+		#attack_damage: float
+		#attack_range: float
+		#attack_duration: float
+		#life_steal: float
+		#critical_chance: float
+		#critical_damage: float
+	}
+			Entity* origin = nullptr;
+        float attack_damage;
+        float attack_range;
+        float attack_duration;
+        float life_steal;
+        float critical_chance;
+        float critical_damage;
+
+	class EnemyBody{
+		TODO
+	}
+
+	Entity <|-- Body
+	Body <|-- ItemBody
+	Body <|-- TileBody
+	Body <|-- MovingBody
+	MovingBody <|-- CharacterBody
+	CharacterBody <|-- PlayerBody
+	CharacterBody <|-- EnemyBody
+
+}
+
+@enduml

@@ -11,7 +11,11 @@
 
 GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight)
     : virtualRenderer(screenWidth, screenHeight, 1, 1) {
-    Manager::TextureManager::Load(renderer, "player", "assets/player.png");
+    Manager::TextureManager::Load(renderer, "player", "assets/player/personagem_S4.png");
+    Manager::TextureManager::Load(renderer, "player_back", "assets/player/personagem_S2.png");
+    Manager::TextureManager::Load(renderer, "player_left", "assets/player/personagem_S3.png");
+    Manager::TextureManager::Load(renderer, "player_right", "assets/player/personagem_S1.png");
+        
     Manager::TextureManager::Load(renderer, "player_with_item", "assets/player_with_item.png");
     Manager::TextureManager::Load(renderer, "attack", "assets/attack.png");
 

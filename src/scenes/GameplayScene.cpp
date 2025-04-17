@@ -40,12 +40,12 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     if (input.shootDirection.x != 0 || input.shootDirection.y != 0)
     {
         auto attack = player->attack(player->getCenterPoint(), input.shootDirection);
-        attack->setTexture(Manager::TextureManager::Get("attack"));
-        attack->setScale(virtualRenderer.getTileSize() /3 , virtualRenderer.getTileSize() /3);
-        if (attack)
+        if(attack){
+            attack->setTexture(Manager::TextureManager::Get("attack"));
+            attack->setScale(virtualRenderer.getTileSize() /3 , virtualRenderer.getTileSize() /3);
+            //TODO - guardar o objeto em uma lista e adicionar nos objetos ativos só no final do frame. 
             entityManager.add(std::move(attack));
-    
-        player->setAttackTimer(player->getAttackRate());
+        }
     }
     
     this->player->update(deltaTime);
@@ -161,7 +161,7 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
         std::string type = e.at("type");
 
         if (type == "Item") {
-            int itemId = e.at("item_id");
+            int itemId = e.at("id");
             int x = e.at("x");
             int y = e.at("y");
         
@@ -185,6 +185,31 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
                 this->entityManager.add(std::move(item));
             }
         }
+        if (type == "Enemy") {
+            int enemyId = e.at("id");
+            int x = e.at("x");
+            int y = e.at("y");
+        
+            //const Enemies::Enemy* itemData = this->enemyManager.getEnemyById(enemyId);
+            // if (itemData) {
+            //     Manager::TextureManager::Load(renderer, itemData->getSpritePath(), itemData->getSpritePath());
+        
+            //     SDL_Rect screenRect = virtualRenderer.tileToScreenRect(x, y);
+        
+            //     auto item = std::make_unique<Entities::ItemBody>(
+            //         Vector4{
+            //             static_cast<float>(screenRect.x),
+            //             static_cast<float>(screenRect.y),
+            //             static_cast<float>(screenRect.w),
+            //             static_cast<float>(screenRect.h)
+            //         },
+            //         *itemData
+            //     );
+            //     item->setTexture(Manager::TextureManager::Get(itemData->getSpritePath()));
+        
+            //     this->entityManager.add(std::move(item));
+            // }
+        }
     }
     
     SDL_Rect playerRect = virtualRenderer.tileToScreenRect(4, 4);
@@ -196,6 +221,7 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
         true,
         true
     );
+    player->setAttackRate(2.0f);
     player->setTexture(Manager::TextureManager::Get("player"));
     player->setAcceleration(100.0f + virtualRenderer.getTileSize());
     this->player = player;

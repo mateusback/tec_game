@@ -11,40 +11,33 @@ namespace Entities
     void PlayerBody::handleInput(const Manager::PlayerInput& input)
     {
         Vector playerDirection = input.moveDirection;
-        Vector shootDirection = input.shootDirection;
     
         playerDirection *= this->getAcceleration();
         this->setSpeed(playerDirection);
-    
-        if ((shootDirection.x != 0 || shootDirection.y != 0) && this->getAttackTimer() <= 0.0f)
-        {
-            this->attack(this->getCenterPoint(), shootDirection);
-            this->setAttackTimer(this->getAttackRate());
-        }
     }
 
     void PlayerBody::update(float deltaTime)
     {
         this->move(deltaTime);
 
-        if (attack_timer > 0.0f)
-        attack_timer -= deltaTime;
+        if (this->attack_timer > 0.0f)
+        this->attack_timer -= deltaTime;
 
     }
 
     std::unique_ptr<Entities::AttackBody> PlayerBody::attack(Point characterCenter, Vector direction)
     {
+        if(this->attack_timer > 0.0f) return nullptr;
         float width = 16.f;
         float height = 16.f;
-        float speed = 350.f;
+        float speed = 100.f;
     
         if (direction.x != 0 || direction.y != 0) {
             float len = std::sqrt(direction.x * direction.x + direction.y * direction.y);
             direction.x /= len;
             direction.y /= len;
         }
-        
-        std::cout << "Attack Direction: " << direction.x << ", " << direction.y << std::endl;
+        this->attack_timer = this->attack_rate;
 
         auto attack = std::make_unique<Entities::AttackBody>(
             characterCenter.x - width / 2,
@@ -55,12 +48,13 @@ namespace Entities
             true,
             10.f,
             200.f,
-            1.2f,
+            4.2f,
             0.f,
             0.1f,
             1.5f 
         );
-    
+
+        std::cout << "Ataque dentro do player" << attack << std::endl;
         attack->setSpeed(direction * speed);
         return attack;
     }

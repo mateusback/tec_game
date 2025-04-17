@@ -2,21 +2,29 @@
 #define ENEMY_H
 
 #include <string>
-#include <vector>
 
 namespace Enemies {
-	class Enemy {
-	private:
-    //todo - continuar
-		int id;
 
-	public:
+    class Enemy {
+    private:
+        int id;
+        std::string name;
+        std::string spritePath;
+        float acceleration;
+        float aggroRange;
+        std::string behavior;
 
-		#pragma region Getters
-		#pragma endregion
+    public:
+        Enemy(int id = -1, std::string name = "", std::string sprite = "", float acceleration = 100.f, float range = 100.f, std::string behavior = "")
+            : id(id), name(name), spritePath(sprite), acceleration(acceleration), aggroRange(range), behavior(behavior) {}
 
-		#pragma region Setters
-		#pragma endregion
-	};
+        int getId() const { return id; }
+        const std::string& getName() const { return name; }
+        const std::string& getSpritePath() const { return spritePath; }
+        float getAcceleration() const { return acceleration; }
+        float getAggroRange() const { return aggroRange; }
+        const std::string& getBehavior() const { return behavior; }
+    };
 }
+
 #endif

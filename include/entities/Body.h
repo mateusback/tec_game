@@ -55,9 +55,11 @@ namespace Entities
 
         Vector4 getCollider() const { return Vector4(this->position.x, this->position.y, this->scale.x, this->scale.y); }
         Point getCenterPoint() const { return Point(this->position.x + this->scale.x / 2, this->position.y + this->scale.y / 2); }   
-
+        
 		#pragma region Getters
         bool hasCollision() const { return this->has_collision; }
+        Vector getPosition() const { return this->position; }
+        Vector getScale() const { return this->scale; }
         bool isVisible() const { return this->is_visible; }
         SDL_Texture* getTexture() const { return this->texture; }
 		#pragma endregion

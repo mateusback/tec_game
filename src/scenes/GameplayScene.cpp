@@ -7,16 +7,17 @@
 #include "../../include/utils/DebugUtils.h"
 #include <SDL2/SDL_image.h>
 #include <fstream>
-#include <iostream>
+
 
 GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight)
     : virtualRenderer(screenWidth, screenHeight, 1, 1) {
     Manager::TextureManager::Load(renderer, "player", "assets/player.png");
     Manager::TextureManager::Load(renderer, "player_with_item", "assets/player_with_item.png");
     Manager::TextureManager::Load(renderer, "attack", "assets/attack.png");
+    Manager::TextureManager::Load(renderer, "enemy", "assets/enemies/shell.png");
 
     Manager::FontManager::load("default", "assets/fonts/Montserrat-Bold.ttf", 16);
-
+    enemyManager.loadFromFile("assets/data/enemies.json");
     tileSet.loadFromFile("assets/data/tileset.json");
     itemManager.loadFromFile("assets/data/items.json");
 
@@ -74,6 +75,14 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
         attack->update(deltaTime);
     }
 
+    auto enemies = entityManager.getEntitiesByType<Entities::EnemyBody>();
+    for (auto* enemy : enemies) {
+        if (enemy->hasCollision() &&
+            Physics::CollisionManager::checkCollision(player->getCollider(), enemy->getCollider())) {
+            player->onCollision(enemy);
+        }
+    }
+
     this->entityManager.removeInactive();
 }
 
@@ -88,6 +97,7 @@ void GameplayScene::render(SDL_Renderer* renderer) {
         Utils::DebugUtils::drawCollidersOfType<Entities::ItemBody>(renderer, entityManager, {0, 0, 255, 255});
         Utils::DebugUtils::drawCollidersOfType<Entities::TileBody>(renderer, entityManager, {0, 255, 0, 255});
         Utils::DebugUtils::drawCollidersOfType<Entities::AttackBody>(renderer, entityManager, {255, 0, 255, 255});
+        Utils::DebugUtils::drawCollidersOfType<Entities::EnemyBody>(renderer, entityManager, {255, 255, 0, 255});
     
         if (player->hasCollision()) {
             SDL_FRect rect = {
@@ -186,29 +196,36 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
             }
         }
         if (type == "Enemy") {
+            std::cout << "Enemy" << std::endl;
             int enemyId = e.at("id");
             int x = e.at("x");
             int y = e.at("y");
+            std::cout << "Enemy ID: " << enemyId << std::endl;
         
-            //const Enemies::Enemy* itemData = this->enemyManager.getEnemyById(enemyId);
-            // if (itemData) {
-            //     Manager::TextureManager::Load(renderer, itemData->getSpritePath(), itemData->getSpritePath());
+            const Enemies::Enemy* enemyData = enemyManager.getEnemyById(enemyId);
+            std::cout << "Enemy Data: " << enemyData << std::endl;
+            if (enemyData) {
+                Manager::TextureManager::Load(renderer, enemyData->getSpritePath(), enemyData->getSpritePath());
+                
+                SDL_Rect screenRect = virtualRenderer.tileToScreenRect(x, y);
         
-            //     SDL_Rect screenRect = virtualRenderer.tileToScreenRect(x, y);
+                auto enemy = std::make_unique<Entities::EnemyBody>(
+                    Vector4{
+                        static_cast<float>(screenRect.x),
+                        static_cast<float>(screenRect.y),
+                        static_cast<float>(screenRect.w),
+                        static_cast<float>(screenRect.h)
+                    },
+                    *enemyData,
+                    enemyData->getAcceleration()
+                );
         
-            //     auto item = std::make_unique<Entities::ItemBody>(
-            //         Vector4{
-            //             static_cast<float>(screenRect.x),
-            //             static_cast<float>(screenRect.y),
-            //             static_cast<float>(screenRect.w),
-            //             static_cast<float>(screenRect.h)
-            //         },
-            //         *itemData
-            //     );
-            //     item->setTexture(Manager::TextureManager::Get(itemData->getSpritePath()));
+                enemy->setTexture(Manager::TextureManager::Get(enemyData->getSpritePath()));
+                enemy->setTarget(this->player);
         
-            //     this->entityManager.add(std::move(item));
-            // }
+                this->entityManager.add(std::move(enemy));
+                std::cout << "Enemy added: " << enemyData->getName() << std::endl;
+            }
         }
     }
     

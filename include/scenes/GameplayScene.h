@@ -7,6 +7,7 @@
 #include "../../include/entities/PlayerBody.h"
 #include "../../include/entities/ItemBody.h"
 #include "../../include/entities/TileBody.h"
+#include "../../include/entities/EnemyBody.h"
 #include "../../include/managers/ItemManager.h"
 #include "../../include/managers/EnemyManager.h"
 #include "../../include/map/Floor.h"

@@ -1,40 +1,10 @@
-{
-    "enemies": [
-      {
-        "id": 1,
-        "name": "Sheel",
-        "spritePath": "assets/enemies/sheel.png",
-        "width": 32,
-        "height": 32,
-        "health": 5,
-        "max_health": 5,
-        "attack_damage": 1,
-        "attack_speed": 1,
-        "attack_range": 32,
-        "attack_duration": 0.5,
-        "defense": 0,
-        "fire_rate": 1,
-        "fire_timer": 0,
-        "level": 1,
-        "aggro_range": 100,
-        "collisionDuringAttack": true,
-        "projectile": {
-          "spritePath": "assets/projectiles/sheel_bullet.png"
-        }
-      },
-
-      {
-        "id": 2,
-        "name": "Bat",
-        "spritePath": "assets/enemies/bat.png",
-        "width": 32,
-        "height": 32,
-        "collisionDuringAttack": true,
-        "attackCooldown": 0,
-        "attackDuration": 0,
-        "chasePlayer": true,
-        "speed": 100
-      }
-    ]
+[
+  {
+    "id": 1,
+    "name": "Shell",
+    "spritePath": "assets/enemies/shell.png",
+    "acceleration": 80,
+    "aggroRange": 100,
+    "behavior": "Shell"
   }
-  
+]

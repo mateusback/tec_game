@@ -25,6 +25,10 @@ namespace Entities
 			this->position += this->speed * deltaTime;
 		}
 
+		void applyForce(const Vector& direction) {
+			this->speed += direction * this->acceleration;
+		}
+
 		#pragma region Getters
 		float getAcceleration() const {	return this->acceleration; }
 		#pragma endregion

@@ -21,9 +21,15 @@
         "entities": [
           {
             "type": "Item",
-            "item_id": 1,
+            "id": 1,
             "x": 3,
             "y": 3
+          },
+          {
+            "type": "Enemy",
+            "id": 1,
+            "x": 2,
+            "y": 1
           }
         ]
       },

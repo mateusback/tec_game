@@ -1,19 +1,17 @@
 @startuml Entidades Tec_Game
 package "Entidades" {
-    enum EBodyType {
-		Body
-		Moving 
-		Character
-		Player
-		Tile
-		Item
-		Attack
-		Enemy
+
+	enum EntityState {
+        Idle
+        Moving
+        Attacking
+        Hidden
+        CoolingDown
+        Dead
     }
 
     class Entity {
         #active: bool = true
-        #bodyType: EBodyType
     }
 
 	class Body {
@@ -37,15 +35,17 @@ package "Entidades" {
 	class CharacterBody {
 		#name: std::string
 		#health: float
-		#max_health: float
-		#attack_damage: float
-		#attack_speed: float
-		#attack_range: float 
-		#attack_duration: float
-		#attack_rate: float
-		#attack_timer: float
+		#maxHealth: float
+		#attackDamage: float
+		#attackSpeed: float
+		#attackRange: float 
+		#attackDuration: float
+		#attackRate: float
+		#attackTimer: float
 		#defense: float
 		#level: uint8_t
+		#stateTimer: float	
+		#state: EntityState
 	}
 
 	class ItemBody {
@@ -75,33 +75,61 @@ package "Entidades" {
 	
 	class AttackBody {
 		#origin: Entity*
-		#attack_damage: float
-		#attack_range: float
-		#attack_duration: float
-		#life_steal: float
-		#critical_chance: float
-		#critical_damage: float
+		#attackDamage: float
+		#attackRange: float
+		#attackDuration: float
+		#lifeSteal: float
+		#criticalChance: float
+		#criticalDamage: float
 	}
-			Entity* origin = nullptr;
-        float attack_damage;
-        float attack_range;
-        float attack_duration;
-        float life_steal;
-        float critical_chance;
-        float critical_damage;
 
-	class EnemyBody{
-		TODO
+	class EffectBody {
+		#duration: Float
+		+update(float deltaTime) override
 	}
+
+    class EnemyBody {
+        -origin: Entity*
+        -attackDamage: float
+        -attackRange: float
+        -attackDuration: float
+        -lifeSteal: float
+        -criticalChance: float
+        -criticalDamage: float
+        +void update(float deltaTime)
+        -void applyEnemyBehavior(float deltaTime)
+    }
+
+	class Enemy {
+        -id: int
+        -name: std::string
+        -spritePath: std::string
+        -acceleration: float
+        -aggroRange: float
+        -health: float
+        -maxHealth: float
+        -attackDamage: float
+        -attackRate: float
+        -attackRange: float
+        -attackSpeed: float
+        -defense: float
+        -behavior: std::string
+    }
 
 	Entity <|-- Body
 	Body <|-- ItemBody
 	Body <|-- TileBody
 	Body <|-- MovingBody
+	body <|-- EffectBody
 	MovingBody <|-- CharacterBody
+	MovingBody <|-- AttackBody
 	CharacterBody <|-- PlayerBody
 	CharacterBody <|-- EnemyBody
+	EnemyBody --> Enemy
+    CharacterBody --> EntityState
+
 
 }
+
 
 @enduml

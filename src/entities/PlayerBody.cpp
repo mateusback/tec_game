@@ -2,6 +2,8 @@
 #include "../../include/managers/TextureManager.h"
 #include "../../include/items/ItemTypes.h"
 #include "../../include/physics/CollisionManager.h"
+#include "../../include/utils/GlobalAccess.h"
+
 #include <SDL2/SDL.h>
 #include <cmath>
 
@@ -11,33 +13,46 @@ namespace Entities
     void PlayerBody::handleInput(const Manager::PlayerInput& input)
     {
         Vector playerDirection = input.moveDirection;
-    
+        Vector spriteDirection;
+
+        if (input.moveDirection.x != 0.f || input.moveDirection.y != 0.f) {
+            spriteDirection = input.moveDirection;
+        } else if (input.shootDirection.x != 0.f || input.shootDirection.y != 0.f) {
+            spriteDirection = input.shootDirection;
+        }
+        
+        updateDirectionSprite(spriteDirection);
         playerDirection *= this->getAcceleration();
         this->setSpeed(playerDirection);
     }
 
     void PlayerBody::update(float deltaTime)
     {
+        if(this->active == false) return;
         this->move(deltaTime);
 
-        if (this->attack_timer > 0.0f)
-        this->attack_timer -= deltaTime;
+        if (this->attackTimer > 0.0f)
+        this->attackTimer -= deltaTime;
 
+        if(this->health <= 0.0f) {
+            this->setActive(false);
+            std::cout << "Player morreu!" << std::endl;
+        }
     }
 
     std::unique_ptr<Entities::AttackBody> PlayerBody::attack(Point characterCenter, Vector direction)
     {
-        if(this->attack_timer > 0.0f) return nullptr;
+        //TODO - DEPOIS AJUSTAR A FORMA DE INSTANCIAR O TAMANHO
+        if(this->attackTimer > 0.0f) return nullptr;
         float width = 16.f;
         float height = 16.f;
-        float speed = 100.f;
     
         if (direction.x != 0 || direction.y != 0) {
             float len = std::sqrt(direction.x * direction.x + direction.y * direction.y);
             direction.x /= len;
             direction.y /= len;
         }
-        this->attack_timer = this->attack_rate;
+        this->attackTimer = this->attackRate;
 
         auto attack = std::make_unique<Entities::AttackBody>(
             characterCenter.x - width / 2,
@@ -54,8 +69,10 @@ namespace Entities
             1.5f 
         );
 
-        std::cout << "Ataque dentro do player" << attack << std::endl;
-        attack->setSpeed(direction * speed);
+        attack->setScale(virtualRenderer()->getTileSizeDividedBy(3), virtualRenderer()->getTileSizeDividedBy(3));
+        attack->setSpeed(direction * virtualRenderer()->normalizeValue(this->attackSpeed));
+        attack->setOrigin(this);
+        attack->setTexture(Manager::TextureManager::Get("attack"));
         return attack;
     }
 
@@ -103,4 +120,17 @@ namespace Entities
         Manager::TextureManager::Clear("player");
         this->setTexture(Manager::TextureManager::Get("player_with_item"));
     }
+
+    void PlayerBody::updateDirectionSprite(const Vector& direction) {
+        if (direction.y < 0) {
+            this->setTexture(Manager::TextureManager::Get("player_b"));
+        } else if (direction.y > 0) {
+            this->setTexture(Manager::TextureManager::Get("player_f"));
+        } else if (direction.x < 0) {
+            this->setTexture(Manager::TextureManager::Get("player_l"));
+        } else if (direction.x > 0) {
+            this->setTexture(Manager::TextureManager::Get("player_r"));
+        }
+    }
+
 }

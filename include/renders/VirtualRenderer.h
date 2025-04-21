@@ -4,6 +4,11 @@
 #include <SDL2/SDL.h>
 #include <algorithm>
 
+#include <my-lib/math-vector.h>
+using Vector = Mylib::Math::Vector<float, 2>;
+using Vector4 = Mylib::Math::Vector<float, 4>;
+using Point = Vector;
+
 namespace Renderer {
     class VirtualRenderer {
     private:
@@ -22,10 +27,19 @@ namespace Renderer {
         SDL_Rect tileToScreenRect(int tileX, int tileY, int tileW = 1, int tileH = 1) const;
         void updateLayout(int tileCols, int tileRows);
 
+        float normalizeValue(float size) const { return size * this->tileSize; }
+        float denormalizeValue(float size) const { return size / this->tileSize; }
+        Vector normalizeVector(const Vector& vector) const { return Vector{ vector.x * this->tileSize, vector.y * this->tileSize }; }
+        Vector denormalizeVector(const Vector& vector) const { return Vector{ vector.x / this->tileSize, vector.y / this->tileSize }; }
+
         float getTileSize() const { return this->tileSize; }
         int getScreenWidth() const { return this->screenWidth; }
         int getScreenHeight() const { return this->screenHeight; }
 
+        float getTileSizeMultipliedBy(float multiplier) const { return this->tileSize * multiplier; }
+        float getTileSizeSubtractedBy(float value) const { return this->tileSize - value; }
+        float getTileSizeAddedBy(float value) const { return this->tileSize + value; }
+        float getTileSizeDividedBy(float value) const { return this->tileSize / value; }
     };
 }
 #endif

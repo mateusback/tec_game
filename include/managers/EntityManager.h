@@ -12,11 +12,14 @@ namespace Manager {
 	class EntityManager {
 	private:
 		std::vector<std::unique_ptr<Entities::Entity>> entities;
+		std::vector<std::unique_ptr<Entities::Entity>> toAdd;
 
 	public:
 		void add(std::unique_ptr<Entities::Entity> entity);
 		void updateAll(float deltaTime);
 		void renderAll(SDL_Renderer* renderer);
+
+		void addAll();
 		void removeInactive();
 
 		#pragma region Getters

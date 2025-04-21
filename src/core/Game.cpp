@@ -3,12 +3,16 @@
 #include "../../include/managers/SceneManager.h"
 #include "../../include/scenes/GameplayScene.h"
 #include "../../include/renders/TextRenderer.h"
+#include "../../include/renders/VirtualRendererGlobal.h"
+#include "../../include/managers/TextureManagerGlobal.h"
 
 #include <iostream>
 
 namespace Core
 {
     Game::Game(const char* title, int width, int height) : window(nullptr), renderer(nullptr), loop(nullptr) {
+
+        #pragma region SDL_Init
         if (SDL_Init(SDL_INIT_VIDEO) < 0) 
         {
             std::cerr << "Erro ao inicializar SDL: " << SDL_GetError() << std::endl;
@@ -40,6 +44,10 @@ namespace Core
             std::cerr << "Erro ao criar renderer: " << SDL_GetError() << std::endl;
             return;
         }
+        #pragma endregion
+
+        Renderer::VirtualRendererGlobal::init(width, height, 1, 1);
+        Manager::TextureManagerGlobal::init();
 
         Manager::SceneManager::setScene(new GameplayScene(renderer, width, height));
 
@@ -59,6 +67,8 @@ namespace Core
     
     Game::~Game() 
     {
+        Renderer::VirtualRendererGlobal::destroy();
+        Manager::TextureManagerGlobal::destroy();
         delete this->loop;
         SDL_DestroyRenderer(this->renderer);
         SDL_DestroyWindow(this->window);

@@ -3,7 +3,16 @@
 namespace Manager
 {
     void EntityManager::add(std::unique_ptr<Entities::Entity> entity) {
-        entities.push_back(std::move(entity));
+        this->toAdd.push_back(std::move(entity));
+    }
+
+    void EntityManager::addAll() {
+        for (auto& e : this->toAdd) {
+            if (e) {
+                this->entities.push_back(std::move(e));
+            }
+        }
+        this->toAdd.clear();
     }
 
     void EntityManager::updateAll(float deltaTime) {

@@ -10,64 +10,66 @@ namespace Entities
     {
     protected:
 		Entity* origin = nullptr;
-        float attack_damage;
-        float attack_range;
-        float attack_duration;
-        float life_steal;
-        float critical_chance;
-        float critical_damage;
+        float attackDamage;
+        float attackRange;
+        float attackDuration;
+        float lifeSteal;
+        float criticalChance;
+        float criticalDamage;
 
     public:
 		#pragma region Constructors
 		AttackBody(Vector position, Vector scale, bool collision = false, bool visible = true, 
 			float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
 			: MovingBody(position.x, position.y, scale.x, scale.y, collision, visible, 0.0f),
-			attack_damage(dmg),
-			attack_range(range),
-			attack_duration(duration),
-			life_steal(lifesteal),
-			critical_chance(crit_chance),
-			critical_damage(crit_dmg) {}
+			attackDamage(dmg),
+			attackRange(range),
+			attackDuration(duration),
+			lifeSteal(lifesteal),
+			criticalChance(crit_chance),
+			criticalDamage(crit_dmg) {}
 
 		AttackBody(float x, float y, float w, float h, bool collision = false, bool visible = true, 
 			float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
 			: MovingBody(x, y, w, h, collision, visible, 0.0f),
-			attack_damage(dmg),
-			attack_range(range),
-			attack_duration(duration),
-			life_steal(lifesteal),
-			critical_chance(crit_chance),
-			critical_damage(crit_dmg) {}
+			attackDamage(dmg),
+			attackRange(range),
+			attackDuration(duration),
+			lifeSteal(lifesteal),
+			criticalChance(crit_chance),
+			criticalDamage(crit_dmg) {}
 
 		AttackBody(Vector4 collider, bool collision = false, bool visible = true, 
 			float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
 			: MovingBody(collider.x, collider.y, collider.w, collider.z, collision, visible, 0.0f),
-			attack_damage(dmg),
-			attack_range(range),
-			attack_duration(duration),
-			life_steal(lifesteal),
-			critical_chance(crit_chance),
-			critical_damage(crit_dmg) {}
+			attackDamage(dmg),
+			attackRange(range),
+			attackDuration(duration),
+			lifeSteal(lifesteal),
+			criticalChance(crit_chance),
+			criticalDamage(crit_dmg) {}
 		#pragma endregion
 
         void update(float deltaTime);
 
 		#pragma region Getters
-		float getAttackDamage() { return this->attack_damage; }
-		float getAttackRange() { return this->attack_range; }
-		float getAttackDuration() { return this->attack_duration; }
-		float getLifeSteal() { return this->life_steal; }
-		float getCriticalChance() { return this->critical_chance; }
-		float getCriticalDamage() { return this->critical_damage; }
+		float getAttackDamage() { return this->attackDamage; }
+		float getAttackRange() { return this->attackRange; }
+		float getAttackDuration() { return this->attackDuration; }
+		float getLifeSteal() { return this->lifeSteal; }
+		float getCriticalChance() { return this->criticalChance; }
+		float getCriticalDamage() { return this->criticalDamage; }
+		Entity* getOrigin() { return this->origin; }
 		#pragma endregion
 
 		#pragma region Setters
-		void setAttackDamage(float attack_damage) { this->attack_damage = attack_damage; }
-		void setAttackRange(float attack_range) { this->attack_range = attack_range; }
-		void setAttackDuration(float attack_duration) { this->attack_duration = attack_duration; }
-		void setLifeSteal(float life_steal) { this->life_steal = life_steal; }
-		void setCriticalChance(float critical_chance) { this->critical_chance = critical_chance; }
-		void setCriticalDamage(float critical_damage) { this->critical_damage = critical_damage; }
+		void setAttackDamage(float attackDamage) { this->attackDamage = attackDamage; }
+		void setAttackRange(float attackRange) { this->attackRange = attackRange; }
+		void setAttackDuration(float attackDuration) { this->attackDuration = attackDuration; }
+		void setLifeSteal(float lifeSteal) { this->lifeSteal = lifeSteal; }
+		void setCriticalChance(float criticalChance) { this->criticalChance = criticalChance; }
+		void setCriticalDamage(float criticalDamage) { this->criticalDamage = criticalDamage; }
+		void setOrigin(Entity* origin) { this->origin = origin; }
 		#pragma endregion
     };
 }

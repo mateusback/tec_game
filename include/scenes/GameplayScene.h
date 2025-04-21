@@ -26,8 +26,6 @@ private:
 
     TileSet tileSet;
 
-    Renderer::VirtualRenderer virtualRenderer;
-
     void loadFloor(int index);
     void loadCurrentRoom(SDL_Renderer* renderer);
 
@@ -37,6 +35,7 @@ public:
     void update(float deltaTime, const Manager::PlayerInput& input);
     void handleEvent(const SDL_Event& event) override;
     void render(SDL_Renderer* renderer) override;
+    void addDestroyEffect(Vector position, Vector scale);
     
     void setItemManager(const Manager::ItemManager& itemManager) { this->itemManager = itemManager; }
     Manager::ItemManager getItemManager() { return itemManager; }

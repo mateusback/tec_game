@@ -6,7 +6,7 @@ namespace Entities
 
     void Body::render(SDL_Renderer* renderer) 
     {
-        if (!is_visible) return;
+        if (!this->is_visible || !this->active) return;
 
         if (this->texture) 
         {

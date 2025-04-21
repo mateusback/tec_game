@@ -19,8 +19,17 @@ bool EnemyManager::loadFromFile(const std::string& filePath) {
         float acceleration = entry["acceleration"];
         float aggroRange = entry["aggroRange"];
         std::string behavior = entry["behavior"];
+        float health = entry.value("health", 100.f);
+        float maxHealth = entry.value("maxHealth", 100.f);
+        float attackDamage = entry.value("attackDamage", 10.f);
+        float attackRate = entry.value("attackRate", 1.f);
+        float attackRange = entry.value("attackRange", 5.f);
+        float attackSpeed = entry.value("attackSpeed", 1.f);
+        float defense = entry.value("defense", 0.f);
 
-        Enemies::Enemy enemy(id, name, spritePath, acceleration, aggroRange, behavior);
+        Enemies::Enemy enemy(id, name, spritePath, acceleration, aggroRange,
+            health, maxHealth, attackDamage, attackRate, attackRange, 
+            attackSpeed, defense, behavior);
         enemyMap[name] = enemy;
     }
 

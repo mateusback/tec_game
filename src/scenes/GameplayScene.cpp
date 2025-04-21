@@ -5,20 +5,25 @@
 #include "../../include/managers/FontManager.h"
 #include "../../include/serializers/FloorSerialization.h"
 #include "../../include/utils/DebugUtils.h"
+#include "../../include/utils/GlobalAccess.h"
+#include "../../include/entities/EffectBody.h"
 #include <SDL2/SDL_image.h>
 #include <fstream>
 
 
-GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight)
-    : virtualRenderer(screenWidth, screenHeight, 1, 1) {
-    Manager::TextureManager::Load(renderer, "player", "assets/player/personagem_S4.png");
-    Manager::TextureManager::Load(renderer, "player_back", "assets/player/personagem_S2.png");
-    Manager::TextureManager::Load(renderer, "player_left", "assets/player/personagem_S3.png");
-    Manager::TextureManager::Load(renderer, "player_right", "assets/player/personagem_S1.png");
+GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight) {
+   textures()->Load(renderer, "player_b", "assets/player/personagem_B.png");
+   textures()->Load(renderer, "player_f", "assets/player/personagem_F.png");
+   textures()->Load(renderer, "player_l", "assets/player/personagem_L.png");
+   textures()->Load(renderer, "player_r", "assets/player/personagem_R.png");
         
-    Manager::TextureManager::Load(renderer, "player_with_item", "assets/player_with_item.png");
-    Manager::TextureManager::Load(renderer, "attack", "assets/attack.png");
-    Manager::TextureManager::Load(renderer, "enemy", "assets/enemies/shell.png");
+   textures()->Load(renderer, "player_with_item", "assets/player_with_item.png");
+   textures()->Load(renderer, "attack", "assets/attack.png");
+   textures()->Load(renderer, "attack_destroy", "assets/attack_fade.png");
+
+
+    //todo, depois colocar isso na lista do inimigo
+    textures()->Load(renderer, "shell_hidden", "assets/enemies/shell_hidden.png");
 
     Manager::FontManager::load("default", "assets/fonts/Montserrat-Bold.ttf", 16);
     enemyManager.loadFromFile("assets/data/enemies.json");
@@ -26,7 +31,7 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screen
     itemManager.loadFromFile("assets/data/items.json");
 
     for (const auto& [id, tile] : tileSet.getAllTiles()) {
-        Manager::TextureManager::Load(renderer, tile.spritePath, tile.spritePath);
+       textures()->Load(renderer, tile.spritePath, tile.spritePath);
     }
 
     loadFloor(1);
@@ -46,17 +51,19 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     {
         auto attack = player->attack(player->getCenterPoint(), input.shootDirection);
         if(attack){
-            attack->setTexture(Manager::TextureManager::Get("attack"));
-            attack->setScale(virtualRenderer.getTileSize() /3 , virtualRenderer.getTileSize() /3);
-            //TODO - guardar o objeto em uma lista e adicionar nos objetos ativos só no final do frame. 
             entityManager.add(std::move(attack));
         }
     }
     
     this->player->update(deltaTime);
-    this->entityManager.updateAll(deltaTime);
+    //this->entityManager.updateAll(deltaTime);
 
+    auto items = entityManager.getEntitiesByType<Entities::ItemBody>();
     auto tiles = entityManager.getEntitiesByType<Entities::TileBody>();
+    auto enemies = entityManager.getEntitiesByType<Entities::EnemyBody>();
+    auto attacks = entityManager.getEntitiesByType<Entities::AttackBody>();
+    auto effects = entityManager.getEntitiesByType<Entities::EffectBody>();
+
     for (auto* tile : tiles) {
         if (tile->hasCollision() &&
             Physics::CollisionManager::checkCollision(player->getCollider(), tile->getCollider())) {
@@ -65,29 +72,62 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
         }
     }
     
-    auto items = entityManager.getEntitiesByType<Entities::ItemBody>();
     for (auto* item : items) {
         if (item->hasCollision() &&
             Physics::CollisionManager::checkCollision(player->getCollider(), item->getCollider())) {
-                std::cout << "ItemBody count: " << items.size() << std::endl;
             player->onCollision(item);
         }
     }
     
-    auto attacks = entityManager.getEntitiesByType<Entities::AttackBody>();
     for (auto* attack : attacks) {
         attack->update(deltaTime);
-    }
 
-    auto enemies = entityManager.getEntitiesByType<Entities::EnemyBody>();
-    for (auto* enemy : enemies) {
-        if (enemy->hasCollision() &&
-            Physics::CollisionManager::checkCollision(player->getCollider(), enemy->getCollider())) {
-            player->onCollision(enemy);
+        if (attack->getOrigin() != this->player && player->hasCollision() && attack->hasCollision() &&
+        Physics::CollisionManager::checkCollision(attack->getCollider(), player->getCollider())) {
+            player->takeDamage(attack->getAttackDamage());
+            attack->setActive(false);
+
+            addDestroyEffect(attack->getPosition(), attack->getScale());
+            continue;
+        }
+
+        if (attack->getOrigin() == this->player) {
+            for (auto* enemy : enemies) {
+                if (enemy->hasCollision() && attack->hasCollision() &&
+                    Physics::CollisionManager::checkCollision(enemy->getCollider(), attack->getCollider())) {
+    
+                    enemy->takeDamage(attack->getAttackDamage());
+                    attack->setActive(false);
+    
+                    addDestroyEffect(attack->getPosition(), attack->getScale());
+                    if (enemy->getHealth() <= 0)
+                        enemy->setActive(false);
+                    break;
+                }
+            }
+        }
+
+        for (auto* tile : tiles) {
+            if (tile->hasCollision() &&
+                Physics::CollisionManager::checkCollision(attack->getCollider(), tile->getCollider())) {
+    
+                attack->setActive(false);
+                addDestroyEffect(attack->getPosition(), attack->getScale());
+                break;
+            }
         }
     }
 
+    for (auto* enemy : enemies) {
+        enemy->update(deltaTime);
+    }
+
+    for (auto* effect : effects) {
+        effect->update(deltaTime);
+    }
+
     this->entityManager.removeInactive();
+    this->entityManager.addAll();
 }
 
 void GameplayScene::render(SDL_Renderer* renderer) {
@@ -96,6 +136,35 @@ void GameplayScene::render(SDL_Renderer* renderer) {
     //TODO - Isso foi um grande erro, lembrar de separar em camadas depois
     this->entityManager.renderAll(renderer);
     this->player->render(renderer);
+
+    auto enemies = entityManager.getEntitiesByType<Entities::EnemyBody>();
+    for (auto* enemy : enemies) {
+        SDL_FRect barBg, barFill;
+    
+        float healthPercent = enemy->getHealthPercent();
+        Vector pos = enemy->getPosition();
+        Vector size = enemy->getScale();
+    
+        barBg = {
+            pos.x,
+            pos.y - 6.f,
+            size.x,
+            5.f
+        };
+    
+        barFill = {
+            pos.x,
+            pos.y - 6.f,
+            size.x * healthPercent,
+            5.f
+        };
+    
+        SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
+        SDL_RenderFillRectF(renderer, &barBg);
+    
+        SDL_SetRenderDrawColor(renderer, 200, 50, 50, 255);
+        SDL_RenderFillRectF(renderer, &barFill);
+    }
 
     if (true) {
         Utils::DebugUtils::drawCollidersOfType<Entities::ItemBody>(renderer, entityManager, {0, 0, 255, 255});
@@ -145,7 +214,7 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
     int tileCols = currentRoom->layout[0].size();
     int tileRows = currentRoom->layout.size();
 
-    this->virtualRenderer.updateLayout(tileCols, tileRows);
+    virtualRenderer()->updateLayout(tileCols, tileRows);
 
     for (int row = 0; row < tileRows; ++row) {
         for (int col = 0; col < tileCols; ++col) {
@@ -154,7 +223,7 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
             if (!tile) continue;
 
             SDL_Texture* texture = Manager::TextureManager::Get(tile->spritePath);
-            SDL_Rect screenRect = virtualRenderer.tileToScreenRect(col, row);
+            SDL_Rect screenRect = virtualRenderer()->tileToScreenRect(col, row);
 
             auto tileBody = std::make_unique<Entities::TileBody>(
                 Vector4{
@@ -171,6 +240,21 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
         }
     }
 
+    SDL_Rect playerRect = virtualRenderer()->tileToScreenRect(4, 4);
+    player = new Entities::PlayerBody(
+        static_cast<float>(playerRect.x),
+        static_cast<float>(playerRect.y),
+        static_cast<float>(playerRect.w * 1.5f),
+        static_cast<float>(playerRect.h),	
+        true,
+        true
+    );
+    player->setAttackRate(1.0f);
+    player->setAttackSpeed(3.5f);
+    player->setTexture(Manager::TextureManager::Get("player_f"));
+    player->setAcceleration(virtualRenderer()->normalizeValue(2));
+    this->player = player;
+
     for (const auto& e : currentRoom->entities) {
         std::string type = e.at("type");
 
@@ -181,9 +265,9 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
         
             const Items::Item* itemData = itemManager.getItemById(itemId);
             if (itemData) {
-                Manager::TextureManager::Load(renderer, itemData->getSpritePath(), itemData->getSpritePath());
+               textures()->Load(renderer, itemData->getSpritePath(), itemData->getSpritePath());
         
-                SDL_Rect screenRect = virtualRenderer.tileToScreenRect(x, y);
+                SDL_Rect screenRect = virtualRenderer()->tileToScreenRect(x, y);
         
                 auto item = std::make_unique<Entities::ItemBody>(
                     Vector4{
@@ -194,24 +278,22 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
                     },
                     *itemData
                 );
-                item->setTexture(Manager::TextureManager::Get(itemData->getSpritePath()));
+                item->setTexture(textures()->Get(itemData->getSpritePath()));
         
                 this->entityManager.add(std::move(item));
             }
         }
         if (type == "Enemy") {
-            std::cout << "Enemy" << std::endl;
             int enemyId = e.at("id");
             int x = e.at("x");
             int y = e.at("y");
             std::cout << "Enemy ID: " << enemyId << std::endl;
         
             const Enemies::Enemy* enemyData = enemyManager.getEnemyById(enemyId);
-            std::cout << "Enemy Data: " << enemyData << std::endl;
             if (enemyData) {
-                Manager::TextureManager::Load(renderer, enemyData->getSpritePath(), enemyData->getSpritePath());
+               textures()->Load(renderer, enemyData->getSpritePath(), enemyData->getSpritePath());
                 
-                SDL_Rect screenRect = virtualRenderer.tileToScreenRect(x, y);
+                SDL_Rect screenRect = virtualRenderer()->tileToScreenRect(x, y);
         
                 auto enemy = std::make_unique<Entities::EnemyBody>(
                     Vector4{
@@ -221,10 +303,10 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
                         static_cast<float>(screenRect.h)
                     },
                     *enemyData,
-                    enemyData->getAcceleration()
+                    this->entityManager
                 );
         
-                enemy->setTexture(Manager::TextureManager::Get(enemyData->getSpritePath()));
+                enemy->setTexture(textures()->Get(enemyData->getSpritePath()));
                 enemy->setTarget(this->player);
         
                 this->entityManager.add(std::move(enemy));
@@ -232,18 +314,14 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
             }
         }
     }
-    
-    SDL_Rect playerRect = virtualRenderer.tileToScreenRect(4, 4);
-    player = new Entities::PlayerBody(
-        static_cast<float>(playerRect.x),
-        static_cast<float>(playerRect.y),
-        static_cast<float>(playerRect.w * 1.5),
-        static_cast<float>(playerRect.h * 1.5),
-        true,
-        true
+}
+
+void GameplayScene::addDestroyEffect(Vector position, Vector scale) {
+    auto effect = std::make_unique<Entities::EffectBody>(
+        position,
+        scale,
+        textures()->Get("attack_destroy"),
+        0.2f
     );
-    player->setAttackRate(2.0f);
-    player->setTexture(Manager::TextureManager::Get("player"));
-    player->setAcceleration(100.0f + virtualRenderer.getTileSize());
-    this->player = player;
+    entityManager.add(std::move(effect));
 }

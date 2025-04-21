@@ -15,6 +15,8 @@ namespace Core {
         virtual void handleEvent(const SDL_Event& event) = 0;
         virtual void update(float deltaTime, const Manager::PlayerInput& input) = 0;
         virtual void render(SDL_Renderer* renderer) = 0;
+
+        virtual Manager::EntityManager& getEntityManager() { return entityManager; }
     };    
 }
 

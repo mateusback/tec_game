@@ -16,6 +16,7 @@ namespace Entities
 		uint8_t coins;
 		uint8_t keys;
 		uint8_t bombs;
+		float bombCooldown = 5.0f;
 		float experience;
 
 	public:
@@ -57,9 +58,11 @@ namespace Entities
 		int getKeys() { return this->keys; }
 		int getBombs() { return this->bombs; }
 		float getExperience() { return this->experience; }
+		float getBombCooldown() { return this->bombCooldown; }
 		#pragma endregion
 
 		#pragma region Setters
+		void setBombCooldown(float cooldown) { this->bombCooldown = cooldown; }
 		#pragma endregion
 	};
 }

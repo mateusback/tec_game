@@ -2,10 +2,13 @@
 #define TILE_BODY_H
 
 #include "Body.h"
+#include "../map/Tile.h"
 
 namespace Entities {
     class TileBody : public Body {
     protected:
+        int tileId = -1;
+        const Tile* tileData = nullptr;
         TileBody(float x = 0, float y = 0, float w = 50, float h = 50, bool solid = false)
         : Body(x, y, w, h, solid, true) {}
     public:
@@ -20,11 +23,19 @@ namespace Entities {
         : Body(collider.x, collider.y, collider.z, collider.w, solid, true) { this->setTexture(texture); }
         #pragma endregion
 
-		#pragma region Getters
-        #pragma endregion
-        
+
         void update(float deltaTime) override {}
         void onCollision(Body* other) override {}
+
+		#pragma region Getters
+        int getTileId() const { return tileId; }
+        const Tile* getTileData() const { return tileData; }
+        #pragma endregion
+        
+        #pragma region Setters
+        void setTileId(int id) { tileId = id; }
+        void setTileData(const Tile* tile) { tileData = tile; }
+        #pragma endregion
     };
 }
 

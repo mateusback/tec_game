@@ -12,6 +12,8 @@ namespace Manager {
         Vector moveDirection = {0.f, 0.f};
         Vector shootDirection = {0.f, 0.f};
         bool shoot = false;
+        bool pause = false;
+        bool putBomb = false;
     };
 
     class InputManager {

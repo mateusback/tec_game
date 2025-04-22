@@ -16,6 +16,7 @@ namespace Manager {
         Vector playerDirection = {0.f, 0.f};
         Vector shootDirection = {0.f, 0.f};
         this->currentInput.shoot = false;
+        this->currentInput.putBomb = false;
 
         if (keyboard[SDL_SCANCODE_W]) playerDirection.y -= 1;
         if (keyboard[SDL_SCANCODE_S]) playerDirection.y += 1;
@@ -26,6 +27,9 @@ namespace Manager {
         if (keyboard[SDL_SCANCODE_DOWN]) shootDirection.y = 1;
         if (keyboard[SDL_SCANCODE_LEFT]) shootDirection.x = -1;
         if (keyboard[SDL_SCANCODE_RIGHT]) shootDirection.x = 1;
+
+
+        if (keyboard[SDL_SCANCODE_E]) this->currentInput.putBomb = true;
 
         if (shootDirection.x != 0 || shootDirection.y != 0)
         {
@@ -52,6 +56,7 @@ namespace Manager {
         Vector playerDirection = {0.f, 0.f};
         Vector shootDirection = {0.f, 0.f};
         this->currentInput.shoot = false;
+        this->currentInput.putBomb = false;
     
         float lx = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX) / 32768.0f;
         float ly = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY) / 32768.0f;
@@ -77,6 +82,8 @@ namespace Manager {
             shootDirection.y /= length;
             this->currentInput.shoot = true;
         }
+
+        if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_A) == SDL_PRESSED) this->currentInput.putBomb = true;
     
         this->currentInput.moveDirection = playerDirection;
         this->currentInput.shootDirection = shootDirection;

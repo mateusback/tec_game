@@ -7,6 +7,7 @@
 #include "../../include/utils/DebugUtils.h"
 #include "../../include/utils/GlobalAccess.h"
 #include "../../include/entities/EffectBody.h"
+#include "../../include/entities/BombBody.h"
 #include <SDL2/SDL_image.h>
 #include <fstream>
 
@@ -24,6 +25,9 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screen
 
     //todo, depois colocar isso na lista do inimigo
     textures()->Load(renderer, "shell_hidden", "assets/enemies/shell_hidden.png");
+    textures()->Load(renderer, "bomb", "assets/bomb.png");
+    textures()->Load(renderer, "bomb_explosion", "assets/bomb_explosion.png");
+    textures()->Load(renderer, "rock_destroyed", "assets/tiles/rock-destroyed.png");
 
     Manager::FontManager::load("default", "assets/fonts/Montserrat-Bold.ttf", 16);
     enemyManager.loadFromFile("assets/data/enemies.json");
@@ -54,6 +58,30 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
             entityManager.add(std::move(attack));
         }
     }
+
+    //TODO - Depois passar para o player
+    if (input.putBomb && player->getBombCooldown() <= 0.0f) {
+        Vector pos = player->getPosition();
+        auto bomb = std::make_unique<Entities::BombBody>(
+            Vector4{
+                pos.x,
+                pos.y,
+                virtualRenderer()->getTileSize(),
+                virtualRenderer()->getTileSize()  
+            },
+            true,
+            true,
+            2.0f,
+            virtualRenderer()->getTileSize() * 3.0f,
+            60.0f,
+            entityManager,
+            tileSet
+        );
+        player->setBombCooldown(5.0f);
+        bomb->setTexture(Manager::TextureManager::Get("bomb"));
+        entityManager.add(std::move(bomb));
+    }
+
     
     this->player->update(deltaTime);
     //this->entityManager.updateAll(deltaTime);
@@ -63,6 +91,11 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     auto enemies = entityManager.getEntitiesByType<Entities::EnemyBody>();
     auto attacks = entityManager.getEntitiesByType<Entities::AttackBody>();
     auto effects = entityManager.getEntitiesByType<Entities::EffectBody>();
+    auto bombs = entityManager.getEntitiesByType<Entities::BombBody>();
+
+    for (auto* bomb : bombs) {
+        bomb->update(deltaTime);
+    }
 
     for (auto* tile : tiles) {
         if (tile->hasCollision() &&
@@ -235,6 +268,8 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
                 texture,
                 tile->solid
             );
+            tileBody->setTileId(tileId);
+            tileBody->setTileData(tile);
 
             this->entityManager.add(std::move(tileBody));
         }

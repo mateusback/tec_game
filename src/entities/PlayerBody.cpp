@@ -38,6 +38,10 @@ namespace Entities
             this->setActive(false);
             std::cout << "Player morreu!" << std::endl;
         }
+
+        if (this->bombCooldown > 0.0f) {
+            this->bombCooldown -= deltaTime;
+        }
     }
 
     std::unique_ptr<Entities::AttackBody> PlayerBody::attack(Point characterCenter, Vector direction)

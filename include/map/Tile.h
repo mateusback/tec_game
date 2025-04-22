@@ -8,6 +8,8 @@ struct Tile {
     std::string name;
     std::string spritePath;
     bool solid = false;
+    bool destructible = false;
+    int destroyedId = -1;
 };
 
 #endif

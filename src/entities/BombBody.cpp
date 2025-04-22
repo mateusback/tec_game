@@ -26,7 +26,7 @@ namespace Entities {
             const Tile* tileData = tile->getTileData();
             if (!tileData) continue;
         
-            if (dist <= this->explosionRadius * this->scale.x &&
+            if (dist <= this->explosionRadius &&
                 tileData->destructible &&
                 tileData->destroyedId != -1)
             {
@@ -45,7 +45,7 @@ namespace Entities {
     
         for (auto* enemy : enemies) {
             float dist = (enemy->getPosition() - this->getPosition()).length();
-            if (dist <= this->explosionRadius * this->scale.x) {
+            if (dist <= this->explosionRadius) {
                 enemy->takeDamage(this->explosionDamage);
                 if (enemy->getHealth() <= 0) {
                     enemy->setActive(false);

@@ -207,8 +207,8 @@ void GameplayScene::render(SDL_Renderer* renderer) {
     
         if (player->hasCollision()) {
             SDL_FRect rect = {
-                player->getCollider().x, player->getCollider().y,
-                player->getCollider().w, player->getCollider().z
+                player->getHitbox().x, player->getHitbox().y,
+                player->getHitbox().w, player->getHitbox().z
             };
             Utils::DebugUtils::drawCollider(renderer, rect, {255, 0, 0, 255});
         }
@@ -288,6 +288,7 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
     player->setAttackSpeed(3.5f);
     player->setTexture(Manager::TextureManager::Get("player_f"));
     player->setAcceleration(virtualRenderer()->normalizeValue(2));
+    player->setHitboxMargin(0.2f, 0.2f);
     this->player = player;
 
     for (const auto& e : currentRoom->entities) {

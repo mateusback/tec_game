@@ -22,6 +22,8 @@ namespace Entities
         SDL_Texture* texture = nullptr;
         bool has_collision;
         bool is_visible;
+        float hitboxMarginX = 0.0f;
+        float hitboxMarginY = 0.0f;
         
         public:
         #pragma region Constructors
@@ -54,7 +56,9 @@ namespace Entities
         virtual void onCollision(Body* other) {};
 
         Vector4 getCollider() const { return Vector4(this->position.x, this->position.y, this->scale.x, this->scale.y); }
-        Point getCenterPoint() const { return Point(this->position.x + this->scale.x / 2, this->position.y + this->scale.y / 2); }   
+        Point getCenterPoint() const { return Point(this->position.x + this->scale.x / 2, this->position.y + this->scale.y / 2); } 
+        Vector4 getHitbox() const { return Vector4(this->position.x + this->scale.x * hitboxMarginX / 2,this->position.y + this->scale.y * hitboxMarginY / 2,
+                this->scale.x - this->scale.x * hitboxMarginX, this->scale.y - this->scale.y * hitboxMarginY);}  
         
 		#pragma region Getters
         bool hasCollision() const { return this->has_collision; }
@@ -72,6 +76,7 @@ namespace Entities
         void setPosition(Vector pos) { this->position = pos; }
         void setScale(float w, float h) { this->scale.x = w; this->scale.y = h; }
         void setScale(Vector scl) { this->scale = scl; }
+        void setHitboxMargin(float marginX, float marginY) { this->hitboxMarginX = marginX;this->hitboxMarginY = marginY; }
 		#pragma endregion
     };
 }

@@ -93,7 +93,6 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     auto effects = entityManager.getEntitiesByType<Entities::EffectBody>();
     auto bombs = entityManager.getEntitiesByType<Entities::BombBody>();
     Vector totalDisplacement = {0.f, 0.f};
-    Vector4 currentHitbox = player->getHitbox();
 
     for (auto* bomb : bombs) {
         bomb->update(deltaTime);

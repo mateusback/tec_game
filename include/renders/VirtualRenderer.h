@@ -25,6 +25,7 @@ namespace Renderer {
         }
 
         SDL_Rect tileToScreenRect(int tileX, int tileY, int tileW = 1, int tileH = 1) const;
+        Vector4 mapToScreen(float x, float y, float w = 1.0f, float h = 1.0f) const;
         void updateLayout(int tileCols, int tileRows);
 
         float normalizeValue(float size) const { return size * this->tileSize; }

@@ -88,9 +88,9 @@ namespace Entities
         other->onCollision(this);
         Physics::CollisionManager::resolveCollision(originalHitbox, otherHitbox);
     
-        Vector4 newHitbox = this->getHitbox();
-        float deltaX = originalHitbox.x - newHitbox.x;
-        float deltaY = originalHitbox.y - newHitbox.y;
+        //Vector4 newHitbox = this->getHitbox();
+        float deltaX = originalHitbox.x - this->getHitbox().x;
+        float deltaY = originalHitbox.y - this->getHitbox().y;
     
         this->position.x += deltaX;
         this->position.y += deltaY;

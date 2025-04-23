@@ -92,6 +92,8 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     auto attacks = entityManager.getEntitiesByType<Entities::AttackBody>();
     auto effects = entityManager.getEntitiesByType<Entities::EffectBody>();
     auto bombs = entityManager.getEntitiesByType<Entities::BombBody>();
+    Vector totalDisplacement = {0.f, 0.f};
+    Vector4 currentHitbox = player->getHitbox();
 
     for (auto* bomb : bombs) {
         bomb->update(deltaTime);
@@ -99,15 +101,21 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
 
     for (auto* tile : tiles) {
         if (tile->hasCollision() &&
-            Physics::CollisionManager::checkCollision(player->getCollider(), tile->getCollider())) {
-            player->onCollision(tile);
-            break;
+            Physics::CollisionManager::checkCollision(currentHitbox, tile->getHitbox())) {
+    
+            Vector4 originalHitbox = currentHitbox;
+            Physics::CollisionManager::resolveCollision(currentHitbox, tile->getHitbox());
+    
+            totalDisplacement.x += currentHitbox.x - originalHitbox.x;
+            totalDisplacement.y += currentHitbox.y - originalHitbox.y;
         }
     }
+
+    player->setPosition(player->getPosition().x + totalDisplacement.x, player->getPosition().y + totalDisplacement.y);
     
     for (auto* item : items) {
         if (item->hasCollision() &&
-            Physics::CollisionManager::checkCollision(player->getCollider(), item->getCollider())) {
+            Physics::CollisionManager::checkCollision(player->getHitbox(), item->getHitbox())) {
             player->onCollision(item);
         }
     }
@@ -116,7 +124,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
         attack->update(deltaTime);
 
         if (attack->getOrigin() != this->player && player->hasCollision() && attack->hasCollision() &&
-        Physics::CollisionManager::checkCollision(attack->getCollider(), player->getCollider())) {
+        Physics::CollisionManager::checkCollision(attack->getCollider(), player->getHitbox())) {
             player->takeDamage(attack->getAttackDamage());
             attack->setActive(false);
 

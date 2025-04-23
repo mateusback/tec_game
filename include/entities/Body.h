@@ -57,8 +57,17 @@ namespace Entities
 
         Vector4 getCollider() const { return Vector4(this->position.x, this->position.y, this->scale.x, this->scale.y); }
         Point getCenterPoint() const { return Point(this->position.x + this->scale.x / 2, this->position.y + this->scale.y / 2); } 
-        Vector4 getHitbox() const { return Vector4(this->position.x + this->scale.x * hitboxMarginX / 2,this->position.y + this->scale.y * hitboxMarginY / 2,
-                this->scale.x - this->scale.x * hitboxMarginX, this->scale.y - this->scale.y * hitboxMarginY);}  
+        Vector4 getHitbox() const {
+            float marginX = this->scale.x * hitboxMarginX;
+            float marginY = this->scale.y * hitboxMarginY;
+        
+            return Vector4(
+                this->position.x + marginX / 2,
+                this->position.y + marginY / 2,
+                this->scale.x - marginX,
+                this->scale.y - marginY
+            );
+        }
         
 		#pragma region Getters
         bool hasCollision() const { return this->has_collision; }

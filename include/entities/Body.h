@@ -19,11 +19,10 @@ namespace Entities
     protected:
 		Vector position;
 		Vector scale;
+        Vector hitboxOffset = {0.f, 0.f};
         SDL_Texture* texture = nullptr;
         bool has_collision;
         bool is_visible;
-        float hitboxMarginX = 0.0f;
-        float hitboxMarginY = 0.0f;
         
         public:
         #pragma region Constructors
@@ -55,19 +54,20 @@ namespace Entities
 		virtual void render(SDL_Renderer* renderer);
         virtual void onCollision(Body* other) {};
 
-        Vector4 getCollider() const { return Vector4(this->position.x, this->position.y, this->scale.x, this->scale.y); }
+        Vector4 getFullSize() const { return Vector4(this->position.x, this->position.y, this->scale.x, this->scale.y); }
         Point getCenterPoint() const { return Point(this->position.x + this->scale.x / 2, this->position.y + this->scale.y / 2); } 
         Vector4 getHitbox() const {
-            float marginX = this->scale.x * hitboxMarginX;
-            float marginY = this->scale.y * hitboxMarginY;
+            if (this->hitboxOffset == Vector{0.f, 0.f}) return getFullSize();
         
-            return Vector4(
-                this->position.x + marginX / 2,
-                this->position.y + marginY / 2,
-                this->scale.x - marginX,
-                this->scale.y - marginY
-            );
+            float marginX = scale.x * hitboxOffset.x * 0.5f;
+            float marginY = scale.y * hitboxOffset.y * 0.5f;
+        
+            float newW = scale.x - (2 * marginX);
+            float newH = scale.y - (2 * marginY);
+        
+            return Vector4(position.x + marginX, position.y + marginY, newW, newH);
         }
+        
         
 		#pragma region Getters
         bool hasCollision() const { return this->has_collision; }
@@ -85,7 +85,7 @@ namespace Entities
         void setPosition(Vector pos) { this->position = pos; }
         void setScale(float w, float h) { this->scale.x = w; this->scale.y = h; }
         void setScale(Vector scl) { this->scale = scl; }
-        void setHitboxMargin(float marginX, float marginY) { this->hitboxMarginX = marginX;this->hitboxMarginY = marginY; }
+        void setHitboxMargin(float marginX, float marginY) { this->hitboxOffset.x = marginX;this->hitboxOffset.y = marginY; }
 		#pragma endregion
     };
 }

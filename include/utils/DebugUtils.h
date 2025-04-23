@@ -13,21 +13,23 @@ namespace Utils {
             for (auto& e : manager.getEntities()) {
                 if (auto* body = dynamic_cast<T*>(e.get())) {
                     if (body->hasCollision()) {
+                        Vector4 hitbox = body->getHitbox();
                         SDL_FRect rect = {
-                            body->getCollider().x, body->getCollider().y,
-                            body->getCollider().w, body->getCollider().z
+                            hitbox.x, hitbox.y,
+                            hitbox.z, hitbox.w
                         };
                         drawCollider(renderer, rect, color);
                     }
                 }
             }
         }
+
         static void drawCollider(SDL_Renderer* renderer, const SDL_FRect& rect, SDL_Color color) {
             SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
             SDL_RenderDrawRectF(renderer, &rect);
         }
-        
     };
+
 }
  
 

@@ -16,8 +16,10 @@ namespace Entities {
     void BombBody::explode() {
         std::cout << "Bomba explodiu!" << std::endl;
         Vector explosionScale = {this->explosionRadius, this->explosionRadius};
-        this->addDestroyEffect(this->position, explosionScale);
-    
+        Vector explosionCenter = this->position + (this->scale / 2.0f);
+        Vector explosionPos = explosionCenter - (explosionScale / 2.0f);
+        this->addDestroyEffect(explosionPos, explosionScale);
+            
         auto tiles = entityManager.getEntitiesByType<TileBody>();
         auto enemies = entityManager.getEntitiesByType<EnemyBody>();
     
@@ -59,7 +61,7 @@ namespace Entities {
             position,
             scale,
             textures()->Get("bomb_explosion"),
-            0.2f
+            0.5f
         );
         entityManager.add(std::move(effect));
     }

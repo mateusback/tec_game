@@ -124,7 +124,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
         attack->update(deltaTime);
 
         if (attack->getOrigin() != this->player && player->hasCollision() && attack->hasCollision() &&
-        Physics::CollisionManager::checkCollision(attack->getCollider(), player->getHitbox())) {
+        Physics::CollisionManager::checkCollision(attack->getHitbox(), player->getHitbox())) {
             player->takeDamage(attack->getAttackDamage());
             attack->setActive(false);
 
@@ -135,7 +135,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
         if (attack->getOrigin() == this->player) {
             for (auto* enemy : enemies) {
                 if (enemy->hasCollision() && attack->hasCollision() &&
-                    Physics::CollisionManager::checkCollision(enemy->getCollider(), attack->getCollider())) {
+                    Physics::CollisionManager::checkCollision(enemy->getHitbox(), attack->getHitbox())) {
     
                     enemy->takeDamage(attack->getAttackDamage());
                     attack->setActive(false);
@@ -150,7 +150,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
 
         for (auto* tile : tiles) {
             if (tile->hasCollision() &&
-                Physics::CollisionManager::checkCollision(attack->getCollider(), tile->getCollider())) {
+                Physics::CollisionManager::checkCollision(attack->getHitbox(), tile->getHitbox())) {
     
                 attack->setActive(false);
                 addDestroyEffect(attack->getPosition(), attack->getScale());
@@ -283,19 +283,17 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
         }
     }
 
-    SDL_Rect playerRect = virtualRenderer()->tileToScreenRect(4, 4);
+    Vector4 playerVect = virtualRenderer()->mapToScreen(4, 4, 1, 1);
     player = new Entities::PlayerBody(
-        static_cast<float>(playerRect.x),
-        static_cast<float>(playerRect.y),
-        static_cast<float>(playerRect.w * 1.5f),
-        static_cast<float>(playerRect.h),	
+        playerVect,
         true,
         true
     );
+
     player->setAttackRate(1.0f);
     player->setAttackSpeed(3.5f);
     player->setTexture(Manager::TextureManager::Get("player_f"));
-    player->setAcceleration(virtualRenderer()->normalizeValue(2));
+    player->setAcceleration(virtualRenderer()->normalizeValue(3));
     player->setHitboxMargin(0.2f, 0.2f);
     this->player = player;
 

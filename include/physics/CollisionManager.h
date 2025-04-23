@@ -11,7 +11,7 @@ namespace Physics
     {
     public:
         static bool checkCollision(const Vector4& a, const Vector4& b);
-        static void resolveCollision(Vector4& a, const Vector4& b);
+        static void resolveCollision(Entities::Body* a, const Entities::Body* b);
     };
 }
 

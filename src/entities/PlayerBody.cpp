@@ -82,8 +82,6 @@ namespace Entities
 
     void PlayerBody::onCollision(Body* other)
     {
-        Vector4 originalHitbox = this->getHitbox();
-        Vector4 otherHitbox = other->getHitbox();
     
         other->onCollision(this);
         Physics::CollisionManager::resolveCollision(originalHitbox, otherHitbox);

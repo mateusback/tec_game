@@ -7,16 +7,17 @@ namespace Entities
     void Body::render(SDL_Renderer* renderer) 
     {
         if (!this->is_visible || !this->active) return;
+        Vector4 fullSize = this->getFullSize();
 
         if (this->texture) 
         {
-            SDL_FRect rect = { this->getCollider().x, this->getCollider().y, this->getCollider().w, this->getCollider().z };
+            SDL_FRect rect = { fullSize.x, fullSize.y, fullSize.w, fullSize.z };
             SDL_RenderCopyF(renderer, this->texture, nullptr, &rect);
         } 
         else 
         {
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-            SDL_FRect rect = { this->getCollider().x, this->getCollider().y, this->getCollider().w, this->getCollider().z };
+            SDL_FRect rect = { fullSize.x, fullSize.y, fullSize.w, fullSize.z };
             SDL_RenderFillRectF(renderer, &rect);
         }
     }

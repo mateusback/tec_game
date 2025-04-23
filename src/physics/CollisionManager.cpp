@@ -11,33 +11,34 @@ namespace Physics {
         );
     }
 
-    void CollisionManager::resolveCollision(Vector4& a, const Vector4& b) {
-        float aCenterX = a.x + a.z / 2.0f;
-        float aCenterY = a.y + a.w / 2.0f;
-        float bCenterX = b.x + b.z / 2.0f;
-        float bCenterY = b.y + b.w / 2.0f;
+    void CollisionManager::resolveCollision(Entities::Body* a, const Entities::Body* b) {
+        Vector4 aHitbox = a->getHitbox();
+        Vector4 bHitbox = b->getHitbox();
+
+        float aCenterX = aHitbox.x + aHitbox.z / 2.0f;
+        float aCenterY = aHitbox.y + aHitbox.w / 2.0f;
+        float bCenterX = bHitbox.x + bHitbox.z / 2.0f;
+        float bCenterY = bHitbox.y + bHitbox.w / 2.0f;
 
         float dx = aCenterX - bCenterX;
         float dy = aCenterY - bCenterY;
 
-        float combinedHalfWidth = (a.z + b.z) / 2.0f;
-        float combinedHalfHeight = (a.w + b.w) / 2.0f;
+        float combinedHalfWidth = (aHitbox.z + bHitbox.z) / 2.0f;
+        float combinedHalfHeight = (aHitbox.w + bHitbox.w) / 2.0f;
 
         float overlapX = combinedHalfWidth - std::abs(dx);
         float overlapY = combinedHalfHeight - std::abs(dy);
 
         if (overlapX > 0 && overlapY > 0) {
+            Vector pos = a->getPosition();
+
             if (overlapX < overlapY) {
-                if (dx > 0)
-                    a.x += overlapX;
-                else
-                    a.x -= overlapX;
+                pos.x += (dx > 0) ? overlapX : -overlapX;
             } else {
-                if (dy > 0)
-                    a.y += overlapY;
-                else
-                    a.y -= overlapY;
+                pos.y += (dy > 0) ? overlapY : -overlapY;
             }
+
+            a->setPosition(pos);
         }
     }
 }

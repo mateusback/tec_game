@@ -101,13 +101,9 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
 
     for (auto* tile : tiles) {
         if (tile->hasCollision() &&
-            Physics::CollisionManager::checkCollision(currentHitbox, tile->getHitbox())) {
-    
-            Vector4 originalHitbox = currentHitbox;
-            Physics::CollisionManager::resolveCollision(currentHitbox, tile->getHitbox());
-    
-            totalDisplacement.x += currentHitbox.x - originalHitbox.x;
-            totalDisplacement.y += currentHitbox.y - originalHitbox.y;
+            Physics::CollisionManager::checkCollision(player->getHitbox(), tile->getHitbox())) {
+            player->onCollision(tile);
+            break;
         }
     }
 

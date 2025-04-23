@@ -82,18 +82,9 @@ namespace Entities
 
     void PlayerBody::onCollision(Body* other)
     {
-    
         other->onCollision(this);
-        Physics::CollisionManager::resolveCollision(originalHitbox, otherHitbox);
-    
-        //Vector4 newHitbox = this->getHitbox();
-        float deltaX = originalHitbox.x - this->getHitbox().x;
-        float deltaY = originalHitbox.y - this->getHitbox().y;
-    
-        this->position.x += deltaX;
-        this->position.y += deltaY;
+        Physics::CollisionManager::resolveCollision(this, other);
     }
-    
 
     //TODO - DÁ PRA COLOCAR NO ITEM MANAGER
     void PlayerBody::pickUpItem(ItemBody* item){

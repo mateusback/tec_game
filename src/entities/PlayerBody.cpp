@@ -123,6 +123,8 @@ namespace Entities
         this->setTexture(Manager::TextureManager::Get("player_with_item"));
     }
 
+    //TODO - COLOCAR UMA CLASSE SPRITE QUE É UM VETOR DE TEXTURAS, E DEPOIS UM VETOR DE ANIMAÇÕES
+    //TODO - CRIAR UMA CLASSE DE ANIMAÇÃO QUE TEM UM VETOR DE TEXTURAS E UM VETOR DE TEMPOS
     void PlayerBody::updateDirectionSprite(const Vector& direction) {
         if (direction.y < 0) {
             this->setTexture(Manager::TextureManager::Get("player_b"));

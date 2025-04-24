@@ -19,6 +19,8 @@ namespace Enemies {
         float attackRange;
         float attackSpeed;
         float defense;
+        //TODO - TROCAR PARA ENUM
+        //TODO - CRIAR CLASSE DE COMPORTAMENTO
         std::string behavior;
 
     public:

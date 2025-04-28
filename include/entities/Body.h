@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <my-lib/math-vector.h>
 #include <nlohmann/json.hpp>
+#include "managers/AnimationManager.h"
 
 #include "Entity.h"
 
@@ -20,9 +21,10 @@ namespace Entities
 		Vector position;
 		Vector scale;
         Vector hitboxOffset = {0.f, 0.f};
-        SDL_Texture* texture = nullptr;
         bool has_collision;
         bool is_visible;
+
+        Manager::AnimationManager animationManager;
         
         public:
         #pragma region Constructors
@@ -50,9 +52,22 @@ namespace Entities
             is_visible(visible) {}
         #pragma endregion
 		
-        virtual void update(float deltaTime) = 0;
-		virtual void render(SDL_Renderer* renderer);
+        virtual void update(float deltaTime) {
+            this->animationManager.update(deltaTime);
+        }
+
+        virtual void render(SDL_Renderer* renderer) {
+            if (!is_visible)
+                return;
+
+            const Sprite* sprite = this->animationManager.getCurrentSprite();
+            if (sprite && sprite->getTexture()) {
+                SDL_RenderCopyF(renderer, sprite->getTexture(), &sprite->getSourceRect(), &this->getRect());
+            }
+        }
+
         virtual void onCollision(Body* other) {};
+        virtual void loadAnimations() = 0;
 
         Vector4 getFullSize() const { return Vector4(this->position.x, this->position.y, this->scale.x, this->scale.y); }
         Point getCenterPoint() const { return Point(this->position.x + this->scale.x / 2, this->position.y + this->scale.y / 2); } 
@@ -74,13 +89,14 @@ namespace Entities
         Vector getPosition() const { return this->position; }
         Vector getScale() const { return this->scale; }
         bool isVisible() const { return this->is_visible; }
-        SDL_Texture* getTexture() const { return this->texture; }
+        Manager::AnimationManager& getAnimationManager() { return this->animationManager; }
+        const Manager::AnimationManager& getAnimationManager() const { return this->animationManager; }
+        inline SDL_FRect getRect() const { return { this->position.x, this->position.y, this->scale.x, this->scale.y }; }
 		#pragma endregion
 
 		#pragma region Setters
         void setCollision(bool collision) { this->has_collision = collision; }
         void setVisible(bool visible) { this->is_visible = visible; }
-		void setTexture(SDL_Texture* tex) { this->texture = tex; }
         void setPosition(float x, float y) { this->position.x = x; this->position.y = y; }
         void setPosition(Vector pos) { this->position = pos; }
         void setScale(float w, float h) { this->scale.x = w; this->scale.y = h; }

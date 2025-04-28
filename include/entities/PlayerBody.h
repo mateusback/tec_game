@@ -18,6 +18,7 @@ namespace Entities
 		uint8_t bombs;
 		float bombCooldown = 5.0f;
 		float experience;
+		EDirection currentDirection = EDirection::Down;
 
 	public:
 		#pragma region Constructors

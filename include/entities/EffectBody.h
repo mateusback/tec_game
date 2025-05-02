@@ -16,6 +16,9 @@ namespace Entities {
             this->setTexture(texture);
         }
 
+        void loadAnimations() override {
+        }
+
         void update(float deltaTime) override {
             duration -= deltaTime;
             if (duration <= 0.f)

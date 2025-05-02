@@ -3,7 +3,7 @@
 namespace Manager
 {
     std::vector<Renderer::Sprite> AnimationLoader::loadFromIndices(SDL_Texture* texture, int sheetWidthPixels, const std::vector<int>& indices, int tileWidth, int tileHeight) {
-        std::vector<Sprite> frames;
+        std::vector<Renderer::Sprite> frames;
         frames.reserve(indices.size());
         
         int tilesPerRow = sheetWidthPixels / tileWidth;
@@ -36,7 +36,8 @@ namespace Manager
         return loadFromIndices(texture, sheetWidthPixels, indices, tileWidth, tileHeight);
     }
 
-    static Renderer::Sprite AnimationLoader::loadSingleFrame(SDL_Texture* texture, int sheetWidthPixels, int frameIndex, int tileWidth = 32, int tileHeight = 32) {
+    Renderer::Sprite AnimationLoader::loadSingleFrame(SDL_Texture* texture, int sheetWidthPixels, int frameIndex, int tileWidth, int tileHeight)
+    {
         int tilesPerRow = sheetWidthPixels / tileWidth;
     
         int row = frameIndex / tilesPerRow;

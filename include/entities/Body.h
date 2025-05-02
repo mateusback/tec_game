@@ -7,6 +7,7 @@
 #include "managers/AnimationManager.h"
 
 #include "Entity.h"
+#include "renders/Sprite.h"
 
 using Vector = Mylib::Math::Vector<float, 2>;
 using Vector4 = Mylib::Math::Vector<float, 4>;
@@ -23,6 +24,8 @@ namespace Entities
         Vector hitboxOffset = {0.f, 0.f};
         bool has_collision;
         bool is_visible;
+        bool is_animated = false;
+        SDL_Texture* texture = nullptr;
 
         Manager::AnimationManager animationManager;
         
@@ -52,22 +55,12 @@ namespace Entities
             is_visible(visible) {}
         #pragma endregion
 		
-        virtual void update(float deltaTime) {
-            this->animationManager.update(deltaTime);
-        }
+        virtual void update(float deltaTime);
 
-        virtual void render(SDL_Renderer* renderer) {
-            if (!is_visible)
-                return;
-
-            const Sprite* sprite = this->animationManager.getCurrentSprite();
-            if (sprite && sprite->getTexture()) {
-                SDL_RenderCopyF(renderer, sprite->getTexture(), &sprite->getSourceRect(), &this->getRect());
-            }
-        }
+        virtual void render(SDL_Renderer* renderer);
 
         virtual void onCollision(Body* other) {};
-        virtual void loadAnimations() = 0;
+        virtual void loadAnimations() {};
 
         Vector4 getFullSize() const { return Vector4(this->position.x, this->position.y, this->scale.x, this->scale.y); }
         Point getCenterPoint() const { return Point(this->position.x + this->scale.x / 2, this->position.y + this->scale.y / 2); } 
@@ -92,6 +85,7 @@ namespace Entities
         Manager::AnimationManager& getAnimationManager() { return this->animationManager; }
         const Manager::AnimationManager& getAnimationManager() const { return this->animationManager; }
         inline SDL_FRect getRect() const { return { this->position.x, this->position.y, this->scale.x, this->scale.y }; }
+        SDL_Texture* getTexture() const { return this->texture; }
 		#pragma endregion
 
 		#pragma region Setters
@@ -102,6 +96,8 @@ namespace Entities
         void setScale(float w, float h) { this->scale.x = w; this->scale.y = h; }
         void setScale(Vector scl) { this->scale = scl; }
         void setHitboxMargin(float marginX, float marginY) { this->hitboxOffset.x = marginX;this->hitboxOffset.y = marginY; }
+        void setHitboxMargin(Vector margin) { this->hitboxOffset = margin; }
+        void setTexture(SDL_Texture* texture) { this->texture = texture; }
 		#pragma endregion
     };
 }

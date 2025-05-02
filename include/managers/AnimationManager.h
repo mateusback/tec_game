@@ -8,18 +8,18 @@
 namespace Manager {
     class AnimationManager {
     private:
-        Mylib::unordered_map_string_key<Animation> animations;
-        Animation* currentAnimation = nullptr;
+        Mylib::unordered_map_string_key<Renderer::Animation> animations;
+        Renderer::Animation* currentAnimation = nullptr;
 
     public:
-        void addAnimation(const std::string_view name, const Animation& animation) {
-            animations[name] = animation;
+        void addAnimation(const std::string& name, const Renderer::Animation& animation) {
+            animations.insert({std::string(name), animation});
             if (!currentAnimation) {
                 currentAnimation = &animations[name];
             }
         }
 
-        void setAnimation(const std::string_view name) {
+        void setAnimation(const std::string& name) {
             if (animations.contains(name) && currentAnimation != &animations[name]) {
                 currentAnimation = &animations[name];
                 currentAnimation->reset();

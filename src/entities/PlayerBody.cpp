@@ -3,6 +3,8 @@
 #include "../../include/items/ItemTypes.h"
 #include "../../include/physics/CollisionManager.h"
 #include "../../include/utils/GlobalAccess.h"
+#include "../../include/managers/AnimationLoader.h"
+
 
 #include <SDL2/SDL.h>
 #include <cmath>
@@ -123,19 +125,18 @@ namespace Entities
         this->setTexture(Manager::TextureManager::Get("player_with_item"));
     }
 
-    void loadAnimations() override
-    {
+    void PlayerBody::loadAnimations() {
         SDL_Texture* texture = Manager::TextureManager::Get("player_sheet");
     
-        animationManager.addAnimation("walk_down", Animation(Manager::AnimationLoader::loadRange(texture, 256, 0, 4), 0.1f));
-        animationManager.addAnimation("walk_up", Animation(Manager::AnimationLoader::loadRange(texture, 256, 8, 4), 0.1f));
-        animationManager.addAnimation("walk_left", Animation(Manager::AnimationLoader::loadRange(texture, 256, 16, 4), 0.1f));
-        animationManager.addAnimation("walk_right", Animation(Manager::AnimationLoader::loadRange(texture, 256, 24, 4), 0.1f));
+        animationManager.addAnimation("walk_down", Renderer::Animation(Manager::AnimationLoader::loadRange(texture, 256, 0, 4), 0.1f));
+        animationManager.addAnimation("walk_up", Renderer::Animation(Manager::AnimationLoader::loadRange(texture, 256, 8, 4), 0.1f));
+        animationManager.addAnimation("walk_left", Renderer::Animation(Manager::AnimationLoader::loadRange(texture, 256, 16, 4), 0.1f));
+        animationManager.addAnimation("walk_right", Renderer::Animation(Manager::AnimationLoader::loadRange(texture, 256, 24, 4), 0.1f));
     
-        animationManager.addAnimation("idle_down", Animation({Manager::AnimationLoader::loadSingleFrame(texture, 256, 0)}, 1.0f));
-        animationManager.addAnimation("idle_up", Animation({Manager::AnimationLoader::loadSingleFrame(texture, 256, 8)}, 1.0f));
-        animationManager.addAnimation("idle_left", Animation({Manager::AnimationLoader::loadSingleFrame(texture, 256, 16)}, 1.0f));
-        animationManager.addAnimation("idle_right", Animation({Manager::AnimationLoader::loadSingleFrame(texture, 256, 24)}, 1.0f));
+        animationManager.addAnimation("idle_down", Renderer::Animation({Manager::AnimationLoader::loadSingleFrame(texture, 256, 0)}, 1.0f));
+        animationManager.addAnimation("idle_up", Renderer::Animation({Manager::AnimationLoader::loadSingleFrame(texture, 256, 8)}, 1.0f));
+        animationManager.addAnimation("idle_left", Renderer::Animation({Manager::AnimationLoader::loadSingleFrame(texture, 256, 16)}, 1.0f));
+        animationManager.addAnimation("idle_right", Renderer::Animation({Manager::AnimationLoader::loadSingleFrame(texture, 256, 24)}, 1.0f));
     
         animationManager.setAnimation("idle_down");
     }    

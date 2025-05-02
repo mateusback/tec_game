@@ -2,6 +2,8 @@
 #define ANIMATION_H
 
 #include <vector>
+#include "Sprite.h"
+
 namespace Renderer {
     class Animation {
     private:
@@ -14,6 +16,14 @@ namespace Renderer {
     public:
         Animation(const std::vector<Sprite>& frames, float frameTime, bool loop = true)
             : frames(frames), frameTime(frameTime), loop(loop) {}
+        
+        Animation()
+        : frames(),
+            frameTime(0.0f),
+            timer(0.0f),
+            currentFrame(0),
+            loop(false) {}
+           
 
         void update(float deltaTime) {
             timer += deltaTime;

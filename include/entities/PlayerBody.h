@@ -47,6 +47,7 @@ namespace Entities
 
 		void onCollision(Body* other) override;
 		void update(float deltaTime) override;
+		void loadAnimations() override;
 		
 		void handleInput(const Manager::PlayerInput& input);
 		std::unique_ptr<Entities::AttackBody> attack(Point characterCenter, Vector direction);

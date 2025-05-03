@@ -12,29 +12,50 @@ namespace Manager {
         Renderer::Animation* currentAnimation = nullptr;
 
     public:
-        void addAnimation(const std::string& name, const Renderer::Animation& animation) {
-            animations.insert({std::string(name), animation});
-            if (!currentAnimation) {
-                currentAnimation = &animations[name];
-            }
+    void addAnimation(const std::string& name, const Renderer::Animation& animation) {
+        std::cout << "[AnimationManager] Adicionando animação: " << name << std::endl;
+        animations.insert({std::string(name), animation});
+    }
+    
+    void setAnimation(const std::string& name) {
+        if (!animations.contains(name)) {
+            std::cout << "[AnimationManager] Animação não encontrada: " << name << std::endl;
+            return;
         }
+    
+        if (currentAnimation != &animations[name]) {
+            currentAnimation = &animations[name];
+            currentAnimation->reset();
+        } else {
+        }
+    }
+    
+    void update(float deltaTime) {
+        if (this->currentAnimation) {
+            this->currentAnimation->update(deltaTime);
+        }
+    }
+    
+    const Renderer::Sprite* getCurrentSprite() const {
+        if (!currentAnimation) {
+            return nullptr;
+        }
+        
+        return &currentAnimation->getCurrentFrame();
+    }
 
-        void setAnimation(const std::string& name) {
-            if (animations.contains(name) && currentAnimation != &animations[name]) {
-                currentAnimation = &animations[name];
-                currentAnimation->reset();
-            }
-        }
+        std::vector<Renderer::Sprite> loadFromIndices(SDL_Texture* texture, int sheetWidthPixels, const std::vector<int>& indices, int tileWidth, int tileHeight);
 
-        void update(float deltaTime) {
-            if (currentAnimation) {
-                currentAnimation->update(deltaTime);
-            }
-        }
+        std::vector<Renderer::Sprite> loadRange(SDL_Texture* texture, int sheetWidthPixels, int startFrame, int frameCount, int tileWidth, int tileHeight);
+    
+        Renderer::Sprite loadSingleFrame(SDL_Texture* texture, int sheetWidthPixels, int frameIndex, int tileWidth, int tileHeight);
 
-        const Renderer::Sprite* getCurrentSprite() const {
-            return currentAnimation ? &currentAnimation->getCurrentSprite() : nullptr;
+        std::vector<Renderer::Sprite> loadSquareTiles(SDL_Texture* texture, int sheetWidthPixels, const std::vector<int>& indices, int tileSize)
+        {
+            return loadFromIndices(texture, sheetWidthPixels, indices, tileSize, tileSize);
         }
+        
+
     };
 }
 

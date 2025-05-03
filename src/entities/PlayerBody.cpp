@@ -19,8 +19,12 @@ namespace Entities
 
         if (input.moveDirection.x != 0.f || input.moveDirection.y != 0.f) {
             spriteDirection = input.moveDirection;
+            this->animationManager.setAnimation("walk");
         } else if (input.shootDirection.x != 0.f || input.shootDirection.y != 0.f) {
             spriteDirection = input.shootDirection;
+            this->animationManager.setAnimation("walk");
+        } else{
+            this->animationManager.setAnimation("idle");
         }
         
         updateDirectionSprite(spriteDirection);
@@ -30,6 +34,7 @@ namespace Entities
 
     void PlayerBody::update(float deltaTime)
     {
+        this->animationManager.update(deltaTime);
         if(this->active == false) return;
         this->move(deltaTime);
 
@@ -39,6 +44,7 @@ namespace Entities
         if(this->health <= 0.0f) {
             this->setActive(false);
             std::cout << "Player morreu!" << std::endl;
+            this->animationManager.setAnimation("death");
         }
 
         if (this->bombCooldown > 0.0f) {
@@ -52,6 +58,7 @@ namespace Entities
         if(this->attackTimer > 0.0f) return nullptr;
         float width = 16.f;
         float height = 16.f;
+        this->animationManager.setAnimation("attack");
     
         if (direction.x != 0 || direction.y != 0) {
             float len = std::sqrt(direction.x * direction.x + direction.y * direction.y);
@@ -127,32 +134,41 @@ namespace Entities
 
     void PlayerBody::loadAnimations() {
         SDL_Texture* texture = Manager::TextureManager::Get("player_sheet");
+
+        using Manager::AnimationLoader;
     
-        animationManager.addAnimation("walk_down", Renderer::Animation(Manager::AnimationLoader::loadRange(texture, 256, 0, 4), 0.1f));
-        animationManager.addAnimation("walk_up", Renderer::Animation(Manager::AnimationLoader::loadRange(texture, 256, 8, 4), 0.1f));
-        animationManager.addAnimation("walk_left", Renderer::Animation(Manager::AnimationLoader::loadRange(texture, 256, 16, 4), 0.1f));
-        animationManager.addAnimation("walk_right", Renderer::Animation(Manager::AnimationLoader::loadRange(texture, 256, 24, 4), 0.1f));
+        const int tileSize = 32;
+        const float frameDuration = 0.15f;
     
-        animationManager.addAnimation("idle_down", Renderer::Animation({Manager::AnimationLoader::loadSingleFrame(texture, 256, 0)}, 1.0f));
-        animationManager.addAnimation("idle_up", Renderer::Animation({Manager::AnimationLoader::loadSingleFrame(texture, 256, 8)}, 1.0f));
-        animationManager.addAnimation("idle_left", Renderer::Animation({Manager::AnimationLoader::loadSingleFrame(texture, 256, 16)}, 1.0f));
-        animationManager.addAnimation("idle_right", Renderer::Animation({Manager::AnimationLoader::loadSingleFrame(texture, 256, 24)}, 1.0f));
+        int sheetWidthPixels = 416; 
     
-        animationManager.setAnimation("idle_down");
-    }    
+        auto loadAnim = [&](const std::string& name, int row, int frameCount, bool loop = true) {
+            int startIndex = row * (sheetWidthPixels / tileSize); 
+            auto frames = AnimationLoader::loadRange(texture, sheetWidthPixels, startIndex, frameCount, tileSize, tileSize);
+            Renderer::Animation anim(frames, frameDuration, loop);
+            this->animationManager.addAnimation(name, anim);
+        };
+        
+            loadAnim("idle", 4, 5);
+            loadAnim("walk", 3, 7);
+            loadAnim("attack", 8, 7, false);
+            loadAnim("death", 7, 7, false);
+        
+            this->animationManager.setAnimation("idle");
+    }
 
     //TODO - COLOCAR UMA CLASSE SPRITE QUE É UM VETOR DE TEXTURAS, E DEPOIS UM VETOR DE ANIMAÇÕES
     //TODO - CRIAR UMA CLASSE DE ANIMAÇÃO QUE TEM UM VETOR DE TEXTURAS E UM VETOR DE TEMPOS
     void PlayerBody::updateDirectionSprite(const Vector& direction) {
-        if (direction.y < 0) {
-            this->setTexture(Manager::TextureManager::Get("player_b"));
-        } else if (direction.y > 0) {
-            this->setTexture(Manager::TextureManager::Get("player_f"));
-        } else if (direction.x < 0) {
-            this->setTexture(Manager::TextureManager::Get("player_l"));
-        } else if (direction.x > 0) {
-            this->setTexture(Manager::TextureManager::Get("player_r"));
-        }
+        // if (direction.y < 0) {
+        //     this->setTexture(Manager::TextureManager::Get("player_b"));
+        // } else if (direction.y > 0) {
+        //     this->setTexture(Manager::TextureManager::Get("player_f"));
+        // } else if (direction.x < 0) {
+        //     this->setTexture(Manager::TextureManager::Get("player_l"));
+        // } else if (direction.x > 0) {
+        //     this->setTexture(Manager::TextureManager::Get("player_r"));
+        // }
     }
 
 }

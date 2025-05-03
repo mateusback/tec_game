@@ -1,4 +1,5 @@
 #include "../../include/managers/AnimationLoader.h"
+#include <iostream>
 
 namespace Manager
 {
@@ -7,6 +8,7 @@ namespace Manager
         frames.reserve(indices.size());
         
         int tilesPerRow = sheetWidthPixels / tileWidth;
+        std::cout << "Tiles por linha: " << tilesPerRow << std::endl;
         
         for (int idx : indices) {
             int row = idx / tilesPerRow;
@@ -18,6 +20,9 @@ namespace Manager
                 tileWidth,
                 tileHeight
             };
+
+            std::cout << "[Frame] idx: " << idx << " => row: " << row << ", col: " << col
+            << " => x: " << srcRect.x << ", y: " << srcRect.y << std::endl;
         
             frames.emplace_back(texture, srcRect);
         }
@@ -52,4 +57,5 @@ namespace Manager
     
         return Renderer::Sprite(texture, srcRect);
     }
+
 } 

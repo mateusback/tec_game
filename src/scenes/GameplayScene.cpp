@@ -17,6 +17,7 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screen
    textures()->Load(renderer, "player_f", "assets/player/personagem_F.png");
    textures()->Load(renderer, "player_l", "assets/player/personagem_L.png");
    textures()->Load(renderer, "player_r", "assets/player/personagem_R.png");
+    textures()->Load(renderer, "player_sheet", "assets/animations/player.png");
         
    textures()->Load(renderer, "player_with_item", "assets/player_with_item.png");
    textures()->Load(renderer, "attack", "assets/attack.png");
@@ -288,6 +289,7 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
     player->setAttackRate(1.0f);
     player->setAttackSpeed(3.5f);
     player->setTexture(Manager::TextureManager::Get("player_f"));
+    player->loadAnimations();
     player->setAcceleration(virtualRenderer()->normalizeValue(3));
     player->setHitboxMargin(0.2f, 0.2f);
     this->player = player;

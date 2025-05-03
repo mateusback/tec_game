@@ -19,25 +19,28 @@ namespace Renderer {
         
         Animation()
         : frames(),
-            frameTime(0.0f),
+            frameTime(0.2f),
             timer(0.0f),
             currentFrame(0),
             loop(false) {}
            
-
         void update(float deltaTime) {
+            if (frames.empty()) return;
+        
             timer += deltaTime;
-            if (timer >= frameTime && !frames.empty()) {
+        
+            if (timer >= frameTime) {
                 timer -= frameTime;
                 currentFrame++;
+        
                 if (currentFrame >= frames.size()) {
                     currentFrame = loop ? 0 : frames.size() - 1;
                 }
             }
         }
 
-        const Sprite& getCurrentSprite() const {
-            return frames[currentFrame];
+        const Sprite& getCurrentFrame() const {
+            return this->frames[this->currentFrame];
         }
 
         void reset() {

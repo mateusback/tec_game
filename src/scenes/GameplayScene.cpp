@@ -10,7 +10,6 @@
 #include <SDL2/SDL_image.h>
 #include <fstream>
 
-
 GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight) {
     textures()->Load(renderer, "player_b", "assets/player/personagem_B.png");
     textures()->Load(renderer, "player_f", "assets/player/personagem_F.png");
@@ -25,6 +24,7 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screen
     textures()->Load(renderer, "shell_hidden", "assets/enemies/shell_hidden.png");
     textures()->Load(renderer, "bomb", "assets/bomb.png");
     textures()->Load(renderer, "bomb_explosion", "assets/bomb_explosion.png");
+    textures()->Load(renderer, "hudsheet", "assets/hudsheet.png");
 
     audio()->loadSoundEffect("bomb_explosion", "assets/audio/explosion.mp3");
     audio()->loadSoundEffect("shoot", "assets/audio/shoot.mp3");
@@ -38,10 +38,12 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screen
 
     itemManager.loadFromFile("assets/data/items.json");
     textures()->Load(renderer, "tileset", tileSet.getSpriteSheetPath());
+    this->hudRenderer = new Renderer::HudRenderer(renderer);
 
     loadFloor(1);
     loadCurrentRoom(renderer);
 }
+
 
 void GameplayScene::handleEvent(const SDL_Event& event) {
     if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
@@ -222,7 +224,7 @@ void GameplayScene::render(SDL_Renderer* renderer) {
             Utils::DebugUtils::drawCollider(renderer, rect, {255, 0, 0, 255});
         }
     }
-
+    this->hudRenderer->render(renderer, this->player);
     SDL_RenderPresent(renderer);
 }
 
@@ -375,4 +377,12 @@ void GameplayScene::addDestroyEffect(Vector position, Vector scale) {
         0.2f
     );
     entityManager.add(std::move(effect));
+}
+
+GameplayScene::~GameplayScene() {
+    delete this->hudRenderer;
+    this->hudRenderer = nullptr;
+
+    delete this->player;
+    this->player = nullptr;
 }

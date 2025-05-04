@@ -40,6 +40,11 @@ namespace Renderer {
             timer = 0.0f;
             finished = false;
         }
+
+        const Sprite& getFrame(int index) const {
+            return frames.at(index);
+        }
+        
     };
 }
 

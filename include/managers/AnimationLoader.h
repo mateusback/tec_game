@@ -1,4 +1,3 @@
-
 #ifndef ANIMATION_LOADER_H
 #define ANIMATION_LOADER_H
 

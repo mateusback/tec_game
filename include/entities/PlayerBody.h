@@ -55,15 +55,18 @@ namespace Entities
 		void updateDirectionSprite(const Vector& direction);
 
 		#pragma region Getters
-		std::list<Items::Item> getInventory() { return this->inventory; }
-		int getMoney() { return this->coins; }
-		int getKeys() { return this->keys; }
-		int getBombs() { return this->bombs; }
-		float getExperience() { return this->experience; }
-		float getBombCooldown() { return this->bombCooldown; }
+		const std::list<Items::Item>& getInventory() const { return this->inventory; }
+		uint8_t getCoins() const { return this->coins; }
+		uint8_t getKeys() const { return this->keys; }
+		uint8_t getBombs() const { return this->bombs; }
+		float getExperience() const { return this->experience; }
+		float getBombCooldown() const { return this->bombCooldown; }
 		#pragma endregion
 
 		#pragma region Setters
+		void setCoins(uint8_t value) { this->coins = value; }
+		void setKeys(uint8_t value) { this->keys = value; }
+		void setBombs(uint8_t value) { this->bombs = value; }
 		void setBombCooldown(float cooldown) { this->bombCooldown = cooldown; }
 		#pragma endregion
 	};

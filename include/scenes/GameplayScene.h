@@ -13,6 +13,7 @@
 #include "../../include/map/Floor.h"
 #include "../../include/map/TileSet.h"
 #include "../../include/renders/VirtualRenderer.h"
+#include "../renders/HudRenderer.h"
 
 class GameplayScene : public Core::Scene {
 private:
@@ -23,6 +24,7 @@ private:
     Map::Room* currentRoom = nullptr;
     Manager::EntityManager entityManager;
     bool debugMode = false;
+    Renderer::HudRenderer* hudRenderer = nullptr;
 
     TileSet tileSet;
 
@@ -31,6 +33,7 @@ private:
 
 public:
     GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight);
+    ~GameplayScene() override;
 
     void update(float deltaTime, const Manager::PlayerInput& input);
     void handleEvent(const SDL_Event& event) override;

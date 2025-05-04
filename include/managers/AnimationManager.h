@@ -48,6 +48,19 @@ namespace Manager {
         animations.clear();
         currentAnimation = nullptr;
     }
+
+
+    const Renderer::Sprite& getFrame(const std::string& animationName, int index) const {
+        return animations.at(animationName).getFrame(index);
+    }
+    
+    const Renderer::Sprite& getFrame(int index) const {
+        return currentAnimation->getFrame(index);
+    }
+    
+    SDL_Texture* getTexture() const {
+        return currentAnimation->getFrame(0).getTexture();
+    }
     
     };
 }

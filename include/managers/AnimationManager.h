@@ -43,6 +43,11 @@ namespace Manager {
         
         return &currentAnimation->getCurrentFrame();
     }
+
+    void clear() {
+        animations.clear();
+        currentAnimation = nullptr;
+    }
     
     };
 }

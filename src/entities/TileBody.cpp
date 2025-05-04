@@ -3,6 +3,7 @@
 
 namespace Entities {
     void TileBody::initStaticTile(SDL_Texture* tileSheet, int sheetWidthPixels, int tileIndex, int tileSize) {
+        this->animationManager.clear();
         auto sprite = Manager::AnimationLoader::loadSingleFrame(tileSheet, sheetWidthPixels, tileIndex, tileSize, tileSize);
         this->animationManager.addAnimation("default", Renderer::Animation({ sprite }, 0.0f, false));
         this->animationManager.setAnimation("default");

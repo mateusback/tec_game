@@ -37,11 +37,18 @@ namespace Entities {
                 if (destroyedTileData) {
                     tile->setCollision(destroyedTileData->solid);
                     tile->setTileId(tileData->destroyedId);
+                    std::cout << "Tile ID: " << tile->getTileId() << std::endl;
+                    std::cout << "Tile Data ID: " << tileData->destroyedId << std::endl;
+                    std::cout << "Tile Data Index: " << destroyedTileData->index << std::endl;
                     tile->setTileData(destroyedTileData);
+                    std::cout << "[TileBody] Trocando para tile index: " << destroyedTileData->index << std::endl;
+                    SDL_Texture* tileSheet = textures()->Get("tileset");
+                    float sheetWidthPixels = textures()->getTextureScale(tileSheet).x;
+                    
                     tile->initStaticTile(
-                        textures()->Get(tileSet.getSpriteSheetPath()), 
-                        textures()->getTextureScale(textures()->Get(tileSet.getSpriteSheetPath())).x, 
-                        destroyedTileData->index, 
+                        tileSheet,
+                        sheetWidthPixels,
+                        destroyedTileData->index,
                         tileSet.getTileSize()
                     );
                 }

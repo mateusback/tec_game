@@ -81,6 +81,7 @@ namespace Entities
         Vector getPosition() const { return this->position; }
         Vector getScale() const { return this->scale; }
         bool isVisible() const { return this->is_visible; }
+        bool isAnimated() const { return this->is_animated; }
         Manager::AnimationManager& getAnimationManager() { return this->animationManager; }
         const Manager::AnimationManager& getAnimationManager() const { return this->animationManager; }
         inline SDL_FRect getRect() const { return { this->position.x, this->position.y, this->scale.x, this->scale.y }; }
@@ -97,6 +98,7 @@ namespace Entities
         void setHitboxMargin(float marginX, float marginY) { this->hitboxOffset.x = marginX;this->hitboxOffset.y = marginY; }
         void setHitboxMargin(Vector margin) { this->hitboxOffset = margin; }
         void setTexture(SDL_Texture* texture) { this->texture = texture; }
+        void setAnimated(bool animated) { this->is_animated = animated; }
 		#pragma endregion
     };
 }

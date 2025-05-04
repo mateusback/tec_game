@@ -6,7 +6,7 @@
 struct Tile {
     int id;
     std::string name;
-    std::string spritePath;
+    int index = 0;
     bool solid = false;
     bool destructible = false;
     int destroyedId = -1;

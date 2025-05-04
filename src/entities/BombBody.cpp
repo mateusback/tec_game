@@ -35,13 +35,15 @@ namespace Entities {
             {
                 const Tile* destroyedTileData = tileSet.getTile(tileData->destroyedId);
                 if (destroyedTileData) {
-                    tile->setTexture(textures()->Get(destroyedTileData->spritePath));
                     tile->setCollision(destroyedTileData->solid);
                     tile->setTileId(tileData->destroyedId);
                     tile->setTileData(destroyedTileData);
-        
-                    std::cout << "Tile destruído: " << tileData->name
-                              << " -> " << destroyedTileData->name << std::endl;
+                    tile->initStaticTile(
+                        textures()->Get(tileSet.getSpriteSheetPath()), 
+                        textures()->getTextureScale(textures()->Get(tileSet.getSpriteSheetPath())).x, 
+                        destroyedTileData->index, 
+                        tileSet.getTileSize()
+                    );
                 }
             }
         }

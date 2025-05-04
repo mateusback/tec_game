@@ -142,6 +142,7 @@ namespace Entities
 
     void PlayerBody::loadAnimations() {
         SDL_Texture* texture = Manager::TextureManager::Get("player_sheet");
+        this->is_animated = true;
 
         using Manager::AnimationLoader;
     

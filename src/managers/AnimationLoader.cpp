@@ -40,6 +40,15 @@ namespace Manager
 
     Renderer::Sprite AnimationLoader::loadSingleFrame(SDL_Texture* texture, int sheetWidthPixels, int frameIndex, int tileWidth, int tileHeight)
     {
+        if (tileWidth == 0 || tileHeight == 0) {
+            std::cerr << "[Erro] tileWidth ou tileHeight é zero em loadSingleFrame!" << std::endl;
+            return Renderer::Sprite(texture, {0, 0, 0, 0});
+        }
+        if (texture == nullptr) {
+            std::cerr << "[Erro] Textura é nula em loadSingleFrame!" << std::endl;
+            return Renderer::Sprite(nullptr, {0, 0, 0, 0});
+        }
+
         int tilesPerRow = sheetWidthPixels / tileWidth;
     
         int row = frameIndex / tilesPerRow;

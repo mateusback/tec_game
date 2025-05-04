@@ -43,19 +43,7 @@ namespace Manager {
         
         return &currentAnimation->getCurrentFrame();
     }
-
-        std::vector<Renderer::Sprite> loadFromIndices(SDL_Texture* texture, int sheetWidthPixels, const std::vector<int>& indices, int tileWidth, int tileHeight);
-
-        std::vector<Renderer::Sprite> loadRange(SDL_Texture* texture, int sheetWidthPixels, int startFrame, int frameCount, int tileWidth, int tileHeight);
     
-        Renderer::Sprite loadSingleFrame(SDL_Texture* texture, int sheetWidthPixels, int frameIndex, int tileWidth, int tileHeight);
-
-        std::vector<Renderer::Sprite> loadSquareTiles(SDL_Texture* texture, int sheetWidthPixels, const std::vector<int>& indices, int tileSize)
-        {
-            return loadFromIndices(texture, sheetWidthPixels, indices, tileSize, tileSize);
-        }
-        
-
     };
 }
 

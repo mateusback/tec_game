@@ -22,11 +22,9 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screen
     textures()->Load(renderer, "attack", "assets/attack.png");
     textures()->Load(renderer, "attack_destroy", "assets/attack_fade.png");
 
-    //todo, depois colocar isso na lista do inimigo
     textures()->Load(renderer, "shell_hidden", "assets/enemies/shell_hidden.png");
     textures()->Load(renderer, "bomb", "assets/bomb.png");
     textures()->Load(renderer, "bomb_explosion", "assets/bomb_explosion.png");
-    textures()->Load(renderer, "rock_destroyed", "assets/tiles/rock-destroyed.png");
 
     audio()->loadSoundEffect("bomb_explosion", "assets/audio/explosion.mp3");
     audio()->loadSoundEffect("shoot", "assets/audio/shoot.mp3");
@@ -37,11 +35,9 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screen
     Manager::FontManager::load("default", "assets/fonts/Montserrat-Bold.ttf", 16);
     enemyManager.loadFromFile("assets/data/enemies.json");
     tileSet.loadFromFile("assets/data/tileset.json");
-    itemManager.loadFromFile("assets/data/items.json");
 
-    for (const auto& [id, tile] : tileSet.getAllTiles()) {
-       textures()->Load(renderer, tile.spritePath, tile.spritePath);
-    }
+    itemManager.loadFromFile("assets/data/items.json");
+    textures()->Load(renderer, "tileset", tileSet.getSpriteSheetPath());
 
     loadFloor(1);
     loadCurrentRoom(renderer);
@@ -262,13 +258,16 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
 
     virtualRenderer()->updateLayout(tileCols, tileRows);
 
+    SDL_Texture* tileSheet = textures()->Get("tileset");
+    int tileSize = tileSet.getTileSize();
+    int sheetWidthPixels = textures()->getTextureScale(tileSheet)[0];
+
     for (int row = 0; row < tileRows; ++row) {
         for (int col = 0; col < tileCols; ++col) {
             int tileId = currentRoom->layout[row][col];
             const Tile* tile = tileSet.getTile(tileId);
             if (!tile) continue;
 
-            SDL_Texture* texture = Manager::TextureManager::Get(tile->spritePath);
             SDL_Rect screenRect = virtualRenderer()->tileToScreenRect(col, row);
 
             auto tileBody = std::make_unique<Entities::TileBody>(
@@ -278,9 +277,13 @@ void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
                     static_cast<float>(screenRect.w),
                     static_cast<float>(screenRect.h)
                 },
-                texture,
+                tileSheet,
                 tile->solid
             );
+
+            tileBody->initStaticTile(tileSheet, sheetWidthPixels, tile->index, tileSize);
+            tileBody->setAnimated(false);
+
             tileBody->setTileId(tileId);
             tileBody->setTileData(tile);
 

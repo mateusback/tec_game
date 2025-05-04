@@ -27,6 +27,8 @@ namespace Entities {
         void update(float deltaTime) override {}
         void onCollision(Body* other) override {}
 
+        void initStaticTile(SDL_Texture* tileSheet, int sheetWidthPixels, int tileIndex, int tileSize = 32);
+        
 		#pragma region Getters
         int getTileId() const { return tileId; }
         const Tile* getTileData() const { return tileData; }

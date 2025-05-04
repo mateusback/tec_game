@@ -3,7 +3,9 @@
 namespace Entities
 {
     void Body::update(float deltaTime)  {
-        this->animationManager.update(deltaTime);
+        if (this->is_animated) {
+            this->animationManager.update(deltaTime);
+        }
     }
 
     void Body::render(SDL_Renderer* renderer) 

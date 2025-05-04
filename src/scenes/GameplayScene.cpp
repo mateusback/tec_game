@@ -1,6 +1,5 @@
 #include "../../include/scenes/GameplayScene.h"
 #include "../../include/physics/CollisionManager.h"
-#include "../../include/managers/TextureManager.h"
 #include "../../include/renders/TextRenderer.h"
 #include "../../include/managers/FontManager.h"
 #include "../../include/serializers/FloorSerialization.h"
@@ -13,22 +12,27 @@
 
 
 GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight) {
-   textures()->Load(renderer, "player_b", "assets/player/personagem_B.png");
-   textures()->Load(renderer, "player_f", "assets/player/personagem_F.png");
-   textures()->Load(renderer, "player_l", "assets/player/personagem_L.png");
-   textures()->Load(renderer, "player_r", "assets/player/personagem_R.png");
+    textures()->Load(renderer, "player_b", "assets/player/personagem_B.png");
+    textures()->Load(renderer, "player_f", "assets/player/personagem_F.png");
+    textures()->Load(renderer, "player_l", "assets/player/personagem_L.png");
+    textures()->Load(renderer, "player_r", "assets/player/personagem_R.png");
     textures()->Load(renderer, "player_sheet", "assets/animations/player.png");
-        
-   textures()->Load(renderer, "player_with_item", "assets/player_with_item.png");
-   textures()->Load(renderer, "attack", "assets/attack.png");
-   textures()->Load(renderer, "attack_destroy", "assets/attack_fade.png");
 
+    textures()->Load(renderer, "player_with_item", "assets/player_with_item.png");
+    textures()->Load(renderer, "attack", "assets/attack.png");
+    textures()->Load(renderer, "attack_destroy", "assets/attack_fade.png");
 
     //todo, depois colocar isso na lista do inimigo
     textures()->Load(renderer, "shell_hidden", "assets/enemies/shell_hidden.png");
     textures()->Load(renderer, "bomb", "assets/bomb.png");
     textures()->Load(renderer, "bomb_explosion", "assets/bomb_explosion.png");
     textures()->Load(renderer, "rock_destroyed", "assets/tiles/rock-destroyed.png");
+
+    audio()->loadSoundEffect("bomb_explosion", "assets/audio/explosion.mp3");
+    audio()->loadSoundEffect("shoot", "assets/audio/shoot.mp3");
+    audio()->loadSoundEffect("hit-enemy", "assets/audio/hit-enemy.mp3");
+    audio()->loadSoundEffect("hit-player", "assets/audio/hit-player.mp3");
+    audio()->loadSoundEffect("pickup-item", "assets/audio/pickup-item.mp3");
 
     Manager::FontManager::load("default", "assets/fonts/Montserrat-Bold.ttf", 16);
     enemyManager.loadFromFile("assets/data/enemies.json");
@@ -122,6 +126,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
         if (attack->getOrigin() != this->player && player->hasCollision() && attack->hasCollision() &&
         Physics::CollisionManager::checkCollision(attack->getHitbox(), player->getHitbox())) {
             player->takeDamage(attack->getAttackDamage());
+            audio()->playSoundEffect("hit-player", 0);
             attack->setActive(false);
 
             addDestroyEffect(attack->getPosition(), attack->getScale());
@@ -134,6 +139,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
                     Physics::CollisionManager::checkCollision(enemy->getHitbox(), attack->getHitbox())) {
     
                     enemy->takeDamage(attack->getAttackDamage());
+                    audio()->playSoundEffect("hit-enemy", 0);
                     attack->setActive(false);
     
                     addDestroyEffect(attack->getPosition(), attack->getScale());

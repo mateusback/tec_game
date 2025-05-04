@@ -65,6 +65,7 @@ namespace Entities
             this->animationManager.setAnimation("idle");
             this->setState(EntityState::Idle);
         });
+        audio()->playSoundEffect("shoot", 0);
     
         if (direction.x != 0 || direction.y != 0) {
             float len = std::sqrt(direction.x * direction.x + direction.y * direction.y);
@@ -103,6 +104,7 @@ namespace Entities
 
     //TODO - DÁ PRA COLOCAR NO ITEM MANAGER
     void PlayerBody::pickUpItem(ItemBody* item){
+        audio()->playSoundEffect("pickup-item", 0);
         for (const auto& effect : item->getItem().getEffects()) {
             switch (effect.target) {
 				using enum Items::EEffectTarget;

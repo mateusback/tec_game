@@ -14,6 +14,7 @@ namespace Entities {
     }
 
     void BombBody::explode() {
+        audio()->playSoundEffect("bomb_explosion", 0);
         std::cout << "Bomba explodiu!" << std::endl;
         Vector explosionScale = {this->explosionRadius, this->explosionRadius};
         Vector explosionCenter = this->position + (this->scale / 2.0f);

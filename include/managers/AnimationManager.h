@@ -17,16 +17,16 @@ namespace Manager {
         animations.insert({std::string(name), animation});
     }
     
-    void setAnimation(const std::string& name) {
+    void setAnimation(const std::string& name, std::function<void()> onComplete = nullptr, bool force = false) {
         if (!animations.contains(name)) {
             std::cout << "[AnimationManager] Animação não encontrada: " << name << std::endl;
             return;
         }
     
-        if (currentAnimation != &animations[name]) {
+        if (force || currentAnimation != &animations[name]) {
             currentAnimation = &animations[name];
             currentAnimation->reset();
-        } else {
+            currentAnimation->onComplete = onComplete;
         }
     }
     

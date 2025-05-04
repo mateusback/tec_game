@@ -76,7 +76,6 @@ namespace Entities
             return Vector4(position.x + marginX, position.y + marginY, newW, newH);
         }
         
-        
 		#pragma region Getters
         bool hasCollision() const { return this->has_collision; }
         Vector getPosition() const { return this->position; }

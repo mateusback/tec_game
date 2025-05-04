@@ -20,9 +20,6 @@ namespace Manager
                 tileWidth,
                 tileHeight
             };
-
-            std::cout << "[Frame] idx: " << idx << " => row: " << row << ", col: " << col
-            << " => x: " << srcRect.x << ", y: " << srcRect.y << std::endl;
         
             frames.emplace_back(texture, srcRect);
         }

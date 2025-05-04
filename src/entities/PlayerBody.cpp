@@ -5,7 +5,6 @@
 #include "../../include/utils/GlobalAccess.h"
 #include "../../include/managers/AnimationLoader.h"
 
-
 #include <SDL2/SDL.h>
 #include <cmath>
 
@@ -19,12 +18,15 @@ namespace Entities
 
         if (input.moveDirection.x != 0.f || input.moveDirection.y != 0.f) {
             spriteDirection = input.moveDirection;
-            this->animationManager.setAnimation("walk");
+            if(state != EntityState::Attacking) {
+                this->animationManager.setAnimation("walk");
+            }
         } else if (input.shootDirection.x != 0.f || input.shootDirection.y != 0.f) {
             spriteDirection = input.shootDirection;
-            this->animationManager.setAnimation("walk");
-        } else{
-            this->animationManager.setAnimation("idle");
+        } 
+
+        if(this->state == EntityState::Idle) {
+            this->setState(EntityState::Idle);
         }
         
         updateDirectionSprite(spriteDirection);
@@ -41,10 +43,11 @@ namespace Entities
         if (this->attackTimer > 0.0f)
         this->attackTimer -= deltaTime;
 
-        if(this->health <= 0.0f) {
-            this->setActive(false);
-            std::cout << "Player morreu!" << std::endl;
-            this->animationManager.setAnimation("death");
+        if (this->health <= 0.0f) {
+            this->animationManager.setAnimation("death", [this]() {
+                this->state = EntityState::Dead;
+                this->setActive(false);
+            });
         }
 
         if (this->bombCooldown > 0.0f) {
@@ -54,11 +57,14 @@ namespace Entities
 
     std::unique_ptr<Entities::AttackBody> PlayerBody::attack(Point characterCenter, Vector direction)
     {
-        //TODO - DEPOIS AJUSTAR A FORMA DE INSTANCIAR O TAMANHO
         if(this->attackTimer > 0.0f) return nullptr;
         float width = 16.f;
         float height = 16.f;
-        this->animationManager.setAnimation("attack");
+        this->setState(EntityState::Attacking);
+        this->animationManager.setAnimation("attack", [this]() {
+            this->animationManager.setAnimation("idle");
+            this->setState(EntityState::Idle);
+        });
     
         if (direction.x != 0 || direction.y != 0) {
             float len = std::sqrt(direction.x * direction.x + direction.y * direction.y);

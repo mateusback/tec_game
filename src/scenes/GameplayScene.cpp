@@ -165,6 +165,9 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
 
     this->entityManager.removeInactive();
     this->entityManager.addAll();
+    if(!this->player->isActive()) {
+        //TODO - Implementar tela de game over
+    }
 }
 
 void GameplayScene::render(SDL_Renderer* renderer) {

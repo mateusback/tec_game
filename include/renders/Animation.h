@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "Sprite.h"
+#include <functional>
 
 namespace Renderer {
     class Animation {
@@ -12,32 +13,23 @@ namespace Renderer {
         float timer = 0.0f;
         size_t currentFrame = 0;
         bool loop = true;
-
+        bool finished = false;
+        
     public:
+        std::function<void()> onComplete = nullptr;
+
         Animation(const std::vector<Sprite>& frames, float frameTime, bool loop = true)
-            : frames(frames), frameTime(frameTime), loop(loop) {}
+            : frames(frames), frameTime(frameTime), loop(loop), finished(false) {}
         
         Animation()
         : frames(),
-            frameTime(0.2f),
+            frameTime(0.1f),
             timer(0.0f),
             currentFrame(0),
-            loop(false) {}
+            loop(false),
+            finished(false) {}
            
-        void update(float deltaTime) {
-            if (frames.empty()) return;
-        
-            timer += deltaTime;
-        
-            if (timer >= frameTime) {
-                timer -= frameTime;
-                currentFrame++;
-        
-                if (currentFrame >= frames.size()) {
-                    currentFrame = loop ? 0 : frames.size() - 1;
-                }
-            }
-        }
+        void update(float deltaTime);
 
         const Sprite& getCurrentFrame() const {
             return this->frames[this->currentFrame];
@@ -46,6 +38,7 @@ namespace Renderer {
         void reset() {
             currentFrame = 0;
             timer = 0.0f;
+            finished = false;
         }
     };
 }

@@ -274,11 +274,11 @@ bool RoomManager::hasDoorOnBorder(Utils::EDirection direction) const {
                 if (row.front() == 7) return true;
             break;
         case Utils::EDirection::Up:
-            for (int col = 0; col < layout[0].size(); ++col)
+            for (std::size_t col = 0; col < layout[0].size(); ++col)
                 if (layout[0][col] == 7) return true;
             break;
         case Utils::EDirection::Down:
-            for (int col = 0; col < layout[0].size(); ++col)
+            for (std::size_t col = 0; col < layout[0].size(); ++col)
                 if (layout.back()[col] == 7) return true;
             break;
     }

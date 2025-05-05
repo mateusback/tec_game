@@ -5,8 +5,10 @@
 #include "../../include/serializers/FloorSerialization.h"
 #include "../../include/utils/DebugUtils.h"
 #include "../../include/utils/GlobalAccess.h"
+#include "../../include/utils/Types.h"
 #include "../../include/entities/EffectBody.h"
 #include "../../include/entities/BombBody.h"
+
 #include <SDL2/SDL_image.h>
 #include <fstream>
 
@@ -35,13 +37,20 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screen
     Manager::FontManager::load("default", "assets/fonts/Montserrat-Bold.ttf", 16);
     enemyManager.loadFromFile("assets/data/enemies.json");
     tileSet.loadFromFile("assets/data/tileset.json");
-
     itemManager.loadFromFile("assets/data/items.json");
     textures()->Load(renderer, "tileset", tileSet.getSpriteSheetPath());
-    this->hudRenderer = new Renderer::HudRenderer(renderer);
 
-    loadFloor(1);
-    loadCurrentRoom(renderer);
+    this->roomManager = new Manager::RoomManager(renderer, 
+        &this->entityManager, &this->tileSet, 
+        &this->itemManager, &this->enemyManager);
+
+
+    this->roomManager->loadFloor(1);
+    this->roomManager->loadRoomByType(Map::ERoomType::Start);
+    this->player = this->roomManager->getPlayer();
+    std::cout << "Player position: " << this->player->getPosition().x << ", " << this->player->getPosition().y << std::endl;
+
+    this->hudRenderer = new Renderer::HudRenderer(renderer);
 }
 
 
@@ -169,6 +178,9 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
 
     this->entityManager.removeInactive();
     this->entityManager.addAll();
+
+    this->roomManager->checkAndMovePlayerBetweenRooms();
+
     if(!this->player->isActive()) {
         //TODO - Implementar tela de game over
     }
@@ -228,147 +240,6 @@ void GameplayScene::render(SDL_Renderer* renderer) {
     SDL_RenderPresent(renderer);
 }
 
-void GameplayScene::loadFloor(int index) {
-    std::string path = "assets/data/floor" + std::to_string(index) + ".json";
-    std::ifstream file(path);
-    if (!file.is_open()) {
-        std::cerr << "Erro ao abrir floor: " << path << std::endl;
-        return;
-    }
-
-    nlohmann::json j;
-    file >> j;
-    from_json(j, floor);
-
-    for (auto& room : floor.rooms) {
-        if (room.type == Map::ERoomType::Start) {
-            currentRoom = &room;
-            break;
-        }
-    }
-
-    if (!currentRoom) {
-        std::cerr << "Sala inicial não encontrada no andar " << index << std::endl;
-    }
-}
-
-void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
-    if (!currentRoom) return;
-
-    int tileCols = currentRoom->layout[0].size();
-    int tileRows = currentRoom->layout.size();
-
-    virtualRenderer()->updateLayout(tileCols, tileRows);
-
-    SDL_Texture* tileSheet = textures()->Get("tileset");
-    int tileSize = tileSet.getTileSize();
-    int sheetWidthPixels = textures()->getTextureScale(tileSheet)[0];
-
-    for (int row = 0; row < tileRows; ++row) {
-        for (int col = 0; col < tileCols; ++col) {
-            int tileId = currentRoom->layout[row][col];
-            const Tile* tile = tileSet.getTile(tileId);
-            if (!tile) continue;
-
-            SDL_Rect screenRect = virtualRenderer()->tileToScreenRect(col, row);
-
-            auto tileBody = std::make_unique<Entities::TileBody>(
-                Vector4{
-                    static_cast<float>(screenRect.x),
-                    static_cast<float>(screenRect.y),
-                    static_cast<float>(screenRect.w),
-                    static_cast<float>(screenRect.h)
-                },
-                tileSheet,
-                tile->solid
-            );
-
-            tileBody->initStaticTile(tileSheet, sheetWidthPixels, tile->index, tileSize);
-            tileBody->setAnimated(false);
-
-            tileBody->setTileId(tileId);
-            tileBody->setTileData(tile);
-
-            this->entityManager.add(std::move(tileBody));
-        }
-    }
-
-    Vector4 playerVect = virtualRenderer()->mapToScreen(4, 4, 1, 1);
-    player = new Entities::PlayerBody(
-        playerVect,
-        true,
-        true
-    );
-
-    player->setAttackRate(1.0f);
-    player->setAttackSpeed(3.5f);
-    player->setTexture(Manager::TextureManager::Get("player_f"));
-    player->loadAnimations();
-    player->setAcceleration(virtualRenderer()->normalizeValue(3));
-    player->setHitboxMargin(0.2f, 0.2f);
-    this->player = player;
-
-    for (const auto& e : currentRoom->entities) {
-        std::string type = e.at("type");
-
-        if (type == "Item") {
-            int itemId = e.at("id");
-            int x = e.at("x");
-            int y = e.at("y");
-        
-            const Items::Item* itemData = itemManager.getItemById(itemId);
-            if (itemData) {
-               textures()->Load(renderer, itemData->getSpritePath(), itemData->getSpritePath());
-        
-                SDL_Rect screenRect = virtualRenderer()->tileToScreenRect(x, y);
-        
-                auto item = std::make_unique<Entities::ItemBody>(
-                    Vector4{
-                        static_cast<float>(screenRect.x),
-                        static_cast<float>(screenRect.y),
-                        static_cast<float>(screenRect.w),
-                        static_cast<float>(screenRect.h)
-                    },
-                    *itemData
-                );
-                item->setTexture(textures()->Get(itemData->getSpritePath()));
-        
-                this->entityManager.add(std::move(item));
-            }
-        }
-        if (type == "Enemy") {
-            int enemyId = e.at("id");
-            int x = e.at("x");
-            int y = e.at("y");
-            std::cout << "Enemy ID: " << enemyId << std::endl;
-        
-            const Enemies::Enemy* enemyData = enemyManager.getEnemyById(enemyId);
-            if (enemyData) {
-               textures()->Load(renderer, enemyData->getSpritePath(), enemyData->getSpritePath());
-                
-                SDL_Rect screenRect = virtualRenderer()->tileToScreenRect(x, y);
-        
-                auto enemy = std::make_unique<Entities::EnemyBody>(
-                    Vector4{
-                        static_cast<float>(screenRect.x),
-                        static_cast<float>(screenRect.y),
-                        static_cast<float>(screenRect.w),
-                        static_cast<float>(screenRect.h)
-                    },
-                    *enemyData,
-                    this->entityManager
-                );
-        
-                enemy->setTexture(textures()->Get(enemyData->getSpritePath()));
-                enemy->setTarget(this->player);
-        
-                this->entityManager.add(std::move(enemy));
-                std::cout << "Enemy added: " << enemyData->getName() << std::endl;
-            }
-        }
-    }
-}
-
 void GameplayScene::addDestroyEffect(Vector position, Vector scale) {
     auto effect = std::make_unique<Entities::EffectBody>(
         position,
@@ -385,4 +256,7 @@ GameplayScene::~GameplayScene() {
 
     delete this->player;
     this->player = nullptr;
+
+    delete this->roomManager;
+    this->roomManager = nullptr;
 }

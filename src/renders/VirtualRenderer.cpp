@@ -26,4 +26,13 @@ namespace Renderer {
         this->tileSize = std::min(sizeByWidth, sizeByHeight);
     }  
 
+    Vector VirtualRenderer::tileToScreenPosition(int col, int row) const {
+        float tileSize = this->getTileSize();
+    
+        return Vector{
+            col * tileSize,
+            row * tileSize
+        };
+    }
+
 }

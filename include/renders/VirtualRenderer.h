@@ -28,6 +28,8 @@ namespace Renderer {
         Vector4 mapToScreen(float x, float y, float w = 1.0f, float h = 1.0f) const;
         void updateLayout(int tileCols, int tileRows);
 
+        Vector tileToScreenPosition(int col, int row) const;
+
         float normalizeValue(float size) const { return size * this->tileSize; }
         float denormalizeValue(float size) const { return size / this->tileSize; }
         Vector normalizeVector(const Vector& vector) const { return Vector{ vector.x * this->tileSize, vector.y * this->tileSize }; }

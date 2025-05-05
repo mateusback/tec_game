@@ -21,6 +21,8 @@ namespace Manager {
 
 		void addAll();
 		void removeInactive();
+		void clear() { this->entities.clear(); }
+		void clearAll() { this->entities.clear(); this->toAdd.clear(); }
 
 		#pragma region Getters
 		std::vector<std::unique_ptr<Entities::Entity>>& getEntities() { return this->entities; }

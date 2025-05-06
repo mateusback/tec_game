@@ -17,6 +17,16 @@ namespace Entities {
 
     public:
         EnemyBody(Vector4 collider, const Enemies::Enemy& data, Manager::EntityManager& entityManager);
+        EnemyBody(const EnemyBody& other)
+        : CharacterBody(other),
+        enemyData(other.enemyData),
+        target(other.target),
+        agrroRange(other.agrroRange),
+        entityManager(other.entityManager) {
+            
+            this->setTexture(other.getTexture());
+            this->setPosition(other.getPosition());
+        }
 
         std::unique_ptr<AttackBody> attack(Point origin, Vector direction);
 

@@ -25,6 +25,14 @@ namespace Entities
             bool collision = true, bool visible = true)
         : Body(pos.x, pos.y, scl.x, scl.y, collision, visible),
             type(item.getType()), item(item) {}
+
+        ItemBody(const ItemBody& other)
+        : Body(other),
+          type(other.type),
+          item(other.item) {
+            this->setTexture(other.getTexture());
+            this->setPosition(other.getPosition());
+          }
         #pragma endregion
     
         #pragma region Getters

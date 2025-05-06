@@ -3,6 +3,7 @@
 #include "../../include/entities/EnemyBody.h"
 #include "../../include/entities/EffectBody.h"
 #include "../../include/Utils/GlobalAccess.h"
+#include "../../include/utils/GlobalAccess.h"
 
 namespace Entities {
     void BombBody::update(float deltaTime) {

@@ -24,14 +24,13 @@ namespace Renderer {
             this->tileSize = std::min(w, h);
         }
 
-        SDL_Rect tileToScreenRect(int tileX, int tileY, int tileW = 1, int tileH = 1) const;
         Vector4 mapToScreen(float x, float y, float w = 1.0f, float h = 1.0f) const;
         void updateLayout(int tileCols, int tileRows);
 
         Vector tileToScreenPosition(int col, int row) const;
 
-        float normalizeValue(float size) const { return size * this->tileSize; }
-        float denormalizeValue(float size) const { return size / this->tileSize; }
+        float normalizeValue(float value) const { return value * this->tileSize; }
+        float denormalizeValue(float value) const { return value / this->tileSize; }
         Vector normalizeVector(const Vector& vector) const { return Vector{ vector.x * this->tileSize, vector.y * this->tileSize }; }
         Vector denormalizeVector(const Vector& vector) const { return Vector{ vector.x / this->tileSize, vector.y / this->tileSize }; }
 

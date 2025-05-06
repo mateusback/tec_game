@@ -13,7 +13,6 @@ namespace Manager {
 
     public:
     void addAnimation(const std::string& name, const Renderer::Animation& animation) {
-        std::cout << "[AnimationManager] Adicionando animação: " << name << std::endl;
         animations.insert({std::string(name), animation});
     }
     

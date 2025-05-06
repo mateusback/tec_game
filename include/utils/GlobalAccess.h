@@ -4,6 +4,7 @@
 #include "../managers/TextureManagerGlobal.h"
 #include "../renders/VirtualRendererGlobal.h"
 #include "../managers/AudioManagerGlobal.h"
+#include "../managers/RoomManager.h"
 
 inline Manager::TextureManager* textures() {
     return Manager::TextureManagerGlobal::instance;

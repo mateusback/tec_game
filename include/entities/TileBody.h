@@ -21,6 +21,12 @@ namespace Entities {
 
         TileBody(Vector4 collider, SDL_Texture* texture, bool solid = false)
         : Body(collider.x, collider.y, collider.z, collider.w, solid, true) { this->setTexture(texture); }
+
+        TileBody(const TileBody& other)
+        : Body(other), tileId(other.tileId), tileData(other.tileData) {
+            this->setTexture(other.getTexture());
+            this->setPosition(other.getPosition());
+        }
         #pragma endregion
 
 

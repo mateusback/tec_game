@@ -13,32 +13,8 @@
 #include <fstream>
 
 GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight) {
-    textures()->Load(renderer, "player_b", "assets/player/personagem_B.png");
-    textures()->Load(renderer, "player_f", "assets/player/personagem_F.png");
-    textures()->Load(renderer, "player_l", "assets/player/personagem_L.png");
-    textures()->Load(renderer, "player_r", "assets/player/personagem_R.png");
-    textures()->Load(renderer, "player_sheet", "assets/animations/player.png");
-
-    textures()->Load(renderer, "player_with_item", "assets/player_with_item.png");
-    textures()->Load(renderer, "attack", "assets/attack.png");
-    textures()->Load(renderer, "attack_destroy", "assets/attack_fade.png");
-
-    textures()->Load(renderer, "shell_hidden", "assets/enemies/shell_hidden.png");
-    textures()->Load(renderer, "bomb", "assets/bomb.png");
-    textures()->Load(renderer, "bomb_explosion", "assets/bomb_explosion.png");
-    textures()->Load(renderer, "hudsheet", "assets/hudsheet.png");
-
-    audio()->loadSoundEffect("bomb_explosion", "assets/audio/explosion.mp3");
-    audio()->loadSoundEffect("shoot", "assets/audio/shoot.mp3");
-    audio()->loadSoundEffect("hit-enemy", "assets/audio/hit-enemy.mp3");
-    audio()->loadSoundEffect("hit-player", "assets/audio/hit-player.mp3");
-    audio()->loadSoundEffect("pickup-item", "assets/audio/pickup-item.mp3");
-
-    Manager::FontManager::load("default", "assets/fonts/Montserrat-Bold.ttf", 16);
-    enemyManager.loadFromFile("assets/data/enemies.json");
-    tileSet.loadFromFile("assets/data/tileset.json");
-    itemManager.loadFromFile("assets/data/items.json");
-    textures()->Load(renderer, "tileset", tileSet.getSpriteSheetPath());
+    Manager::AudioManagerGlobal::init();
+    this->loadResources(renderer);
 
     this->roomManager = new Manager::RoomManager(renderer, 
         &this->entityManager, &this->tileSet, 
@@ -178,7 +154,8 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
 
     this->entityManager.removeInactive();
     this->entityManager.addAll();
-
+    
+    this->roomManager->update(deltaTime);
     this->roomManager->checkAndMovePlayerBetweenRooms();
 
     if(!this->player->isActive()) {
@@ -238,6 +215,36 @@ void GameplayScene::render(SDL_Renderer* renderer) {
     }
     this->hudRenderer->render(renderer, this->player);
     SDL_RenderPresent(renderer);
+}
+
+
+void GameplayScene::loadResources(SDL_Renderer* renderer){
+    textures()->Load(renderer, "player_b", "assets/player/personagem_B.png");
+    textures()->Load(renderer, "player_f", "assets/player/personagem_F.png");
+    textures()->Load(renderer, "player_l", "assets/player/personagem_L.png");
+    textures()->Load(renderer, "player_r", "assets/player/personagem_R.png");
+    textures()->Load(renderer, "player_sheet", "assets/animations/player.png");
+
+    textures()->Load(renderer, "player_with_item", "assets/player_with_item.png");
+    textures()->Load(renderer, "attack", "assets/attack.png");
+    textures()->Load(renderer, "attack_destroy", "assets/attack_fade.png");
+
+    textures()->Load(renderer, "shell_hidden", "assets/enemies/shell_hidden.png");
+    textures()->Load(renderer, "bomb", "assets/bomb.png");
+    textures()->Load(renderer, "bomb_explosion", "assets/bomb_explosion.png");
+    textures()->Load(renderer, "hudsheet", "assets/hudsheet.png");
+
+    audio()->loadSoundEffect("bomb_explosion", "assets/audio/explosion.mp3");
+    audio()->loadSoundEffect("shoot", "assets/audio/shoot.mp3");
+    audio()->loadSoundEffect("hit-enemy", "assets/audio/hit-enemy.mp3");
+    audio()->loadSoundEffect("hit-player", "assets/audio/hit-player.mp3");
+    audio()->loadSoundEffect("pickup-item", "assets/audio/pickup-item.mp3");
+
+    Manager::FontManager::load("default", "assets/fonts/Montserrat-Bold.ttf", 16);
+    this->enemyManager.loadFromFile("assets/data/enemies.json");
+    this->tileSet.loadFromFile("assets/data/tileset.json");
+    this->itemManager.loadFromFile("assets/data/items.json");
+    textures()->Load(renderer, "tileset", tileSet.getSpriteSheetPath());
 }
 
 void GameplayScene::addDestroyEffect(Vector position, Vector scale) {

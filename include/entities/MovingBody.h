@@ -2,6 +2,7 @@
 #define MOVING_BODY_H
 
 #include "Body.h"
+
 namespace Entities
 {
 	class MovingBody : public Body {

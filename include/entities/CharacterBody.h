@@ -73,6 +73,7 @@ namespace Entities
 		}
 
 		float getHealthPercent() const { return this->health / this->maxHealth; }
+		bool isDead() const { return this->health <= 0; }
 
 		#pragma region Getters
 		std::string getName() const { return this->name; }

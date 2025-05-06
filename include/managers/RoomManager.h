@@ -9,6 +9,9 @@
 #include "EnemyManager.h"
 #include "../utils/Types.h"
 #include "../entities/PlayerBody.h"
+#include "../map/RoomState.h"
+#include "../utils/GlobalAccess.h"
+#include "../entities/Body.h"
 
 namespace Manager {
     
@@ -23,6 +26,7 @@ namespace Manager {
         ItemManager* itemManager = nullptr;
         EnemyManager* enemyManager = nullptr;
         Entities::PlayerBody* player = nullptr;
+        std::unordered_map<int, Map::RoomState> roomStates;
     
     public:
         RoomManager(SDL_Renderer* renderer,
@@ -36,20 +40,31 @@ namespace Manager {
         void loadRoom(Map::Room* room);
         void loadRoomByType(Map::ERoomType type);
 
-        void updateLayout(Map::Room* room);
+        void update(float deltaTime);
+
+        void updateVirutalRenderer(Map::Room* room);
         void loadTiles(Map::Room* room);
-        void loadEntities(Map::Room* room);
+        void loadEntities(Map::Room* room);        
         void createPlayerInStartRoom();
 
         void moveToRoomInDirection(Utils::EDirection direction);
         void checkAndMovePlayerBetweenRooms();
-        bool hasDoorOnBorder(Utils::EDirection direction) const;
+        bool areAllEnemiesDefeated() const;
+        void openDoorsOfCurrentRoom();
+        void saveCurrentRoomState();
+
+        void setEntityPositionByPixels(Entities::Body* entity, Vector position);
+        void setEntityPositionByTiles(Entities::Body* entity, Vector position);
 
         Map::Room* getCurrentRoom();
         Map::Room* getRoomByPosition(int x, int y);
         const std::vector<Map::Room>& getRooms();
 
         Entities::PlayerBody* getPlayer() const { return this->player; }
+
+        #pragma region "temp"
+        void tempMovePlayer(int cols, int rows);
+        #pragma endregion
     };
 }
 

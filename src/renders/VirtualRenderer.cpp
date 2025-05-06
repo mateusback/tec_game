@@ -1,8 +1,8 @@
 #include "../include/renders/VirtualRenderer.h"
 
 namespace Renderer {
-    Vector4 VirtualRenderer::mapToScreen(float x, float y, float w, float h) const {
-        return Vector4{
+    Vector4f VirtualRenderer::mapToScreen(float x, float y, float w, float h) const {
+        return Vector4f{
             x * this->tileSize,
             y * this->tileSize,
             w * this->tileSize,
@@ -16,10 +16,10 @@ namespace Renderer {
         this->tileSize = std::min(sizeByWidth, sizeByHeight);
     }  
 
-    Vector VirtualRenderer::tileToScreenPosition(int col, int row) const {
+    Vector2f VirtualRenderer::tileToScreenPosition(int col, int row) const {
         float tileSize = this->getTileSize();
     
-        return Vector{
+        return Vector2f{
             col * tileSize,
             row * tileSize
         };

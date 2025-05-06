@@ -49,9 +49,9 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
 
     //TODO - Depois passar para o player
     if (input.putBomb && player->getBombCooldown() <= 0.0f) {
-        Vector pos = player->getPosition();
+        Vector2f pos = player->getPosition();
         auto bomb = std::make_unique<Entities::BombBody>(
-            Vector4{
+            Vector4f{
                 pos.x,
                 pos.y,
                 virtualRenderer()->getTileSize(),
@@ -80,7 +80,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     auto attacks = entityManager.getEntitiesByType<Entities::AttackBody>();
     auto effects = entityManager.getEntitiesByType<Entities::EffectBody>();
     auto bombs = entityManager.getEntitiesByType<Entities::BombBody>();
-    Vector totalDisplacement = {0.f, 0.f};
+    Vector2f totalDisplacement = {0.f, 0.f};
 
     for (auto* bomb : bombs) {
         bomb->update(deltaTime);
@@ -175,8 +175,8 @@ void GameplayScene::render(SDL_Renderer* renderer) {
         SDL_FRect barBg, barFill;
     
         float healthPercent = enemy->getHealthPercent();
-        Vector pos = enemy->getPosition();
-        Vector size = enemy->getScale();
+        Vector2f pos = enemy->getPosition();
+        Vector2f size = enemy->getScale();
     
         barBg = {
             pos.x,
@@ -247,7 +247,7 @@ void GameplayScene::loadResources(SDL_Renderer* renderer){
     textures()->Load(renderer, "tileset", tileSet.getSpriteSheetPath());
 }
 
-void GameplayScene::addDestroyEffect(Vector position, Vector scale) {
+void GameplayScene::addDestroyEffect(Vector2f position, Vector2f scale) {
     auto effect = std::make_unique<Entities::EffectBody>(
         position,
         scale,

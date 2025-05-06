@@ -47,14 +47,14 @@ namespace Manager {
         void loadEntities(Map::Room* room);        
         void createPlayerInStartRoom();
 
-        void moveToRoomInDirection(Utils::EDirection direction);
+        void moveToRoomInDirection(EDirection direction);
         void checkAndMovePlayerBetweenRooms();
         bool areAllEnemiesDefeated() const;
         void openDoorsOfCurrentRoom();
         void saveCurrentRoomState();
 
-        void setEntityPositionByPixels(Entities::Body* entity, Vector position);
-        void setEntityPositionByTiles(Entities::Body* entity, Vector position);
+        void setEntityPositionByPixels(Entities::Body* entity, Vector2f position);
+        void setEntityPositionByTiles(Entities::Body* entity, Vector2f position);
 
         Map::Room* getCurrentRoom();
         Map::Room* getRoomByPosition(int x, int y);

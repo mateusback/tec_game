@@ -7,7 +7,7 @@ namespace Entities
 {
 	class MovingBody : public Body {
 	protected:
-		Vector speed;
+		Vector2f speed;
 		float acceleration;
 	
 	public:
@@ -15,10 +15,10 @@ namespace Entities
 		MovingBody(float x = 0, float y = 0, float w = 0, float h = 0, bool collision = false, bool visible = true, float acceleration = 100.0f)
 			: Body(x, y, w, h, collision, visible), speed(0.0f, 0.0f) {}
 		
-		MovingBody(Vector pos, Vector scl, bool collision = false, bool visible = true, float acceleration = 100.0f)
+		MovingBody(Vector2f pos, Vector2f scl, bool collision = false, bool visible = true, float acceleration = 100.0f)
 			: Body(pos.x, pos.y, scl.x, scl.y, collision, visible), speed(0.0f, 0.0f) {}
 
-		MovingBody(Vector4 collider, bool collision = false, bool visible = true, float acceleration = 100.0f)
+		MovingBody(Vector4f collider, bool collision = false, bool visible = true, float acceleration = 100.0f)
 			: Body(collider.x, collider.y, collider.z, collider.w, collision, visible), speed(0.0f, 0.0f) {}
 		#pragma endregion
 
@@ -31,7 +31,7 @@ namespace Entities
 		#pragma endregion
 
 		#pragma region Setters
-		void setSpeed(Vector speed) { this->speed = speed; }
+		void setSpeed(Vector2f speed) { this->speed = speed; }
 		void setAcceleration(float acceleration) { this->acceleration = acceleration; }
 		#pragma endregion
 	};

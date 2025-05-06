@@ -2,11 +2,16 @@
 #include "../../include/managers/AnimationLoader.h"
 
 namespace Entities {
-    void TileBody::initStaticTile(SDL_Texture* tileSheet, int sheetWidthPixels, int tileIndex, int tileSize) {
+    void TileBody::initStaticTile(SDL_Texture* tileSheet, int tileIndex) {
         this->animationManager.clear();
-        auto sprite = Manager::AnimationLoader::loadSingleFrame(tileSheet, sheetWidthPixels, tileIndex, tileSize, tileSize);
-        this->animationManager.addAnimation("default", Renderer::Animation({ sprite }, 0.0f, false));
+
+        auto sprite = Manager::AnimationLoader::loadSingleFrame(tileSheet, tileIndex);
+        std::vector<Renderer::Sprite> frames = { std::move(sprite) };
+
+        Renderer::Animation anim(frames, 0.0f, false);
+        this->animationManager.addAnimation("default", anim);
         this->animationManager.setAnimation("default");
+
         this->is_animated = false;
     }
 } 

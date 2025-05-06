@@ -81,16 +81,16 @@ void RoomManager::loadRoom(Map::Room* room) {
 
 void RoomManager::loadTiles(Map::Room* room) {
     if (!room) return;
+
     SDL_Texture* tileSheet = textures()->Get("tileset");
-    int tileSize = this->tileSet->getTileSize();
-    int sheetWidthPixels = textures()->getTextureScale(tileSheet)[0];
+
     for (size_t row = 0; row < room->layout.size(); ++row) {
         for (size_t col = 0; col < room->layout[row].size(); ++col) {
             int tileId = room->layout[row][col];
             const Tile* tile = this->tileSet->getTile(tileId);
             if (!tile) continue;
 
-            Vector4 screenVect = virtualRenderer()->mapToScreen(col, row);
+            Vector4f screenVect = virtualRenderer()->mapToScreen(col, row);
 
             auto tileBody = std::make_unique<Entities::TileBody>(
                 screenVect,
@@ -98,9 +98,10 @@ void RoomManager::loadTiles(Map::Room* room) {
                 tile->solid
             );
 
-            tileBody->initStaticTile(tileSheet, sheetWidthPixels, tile->index, tileSize);
+            tileBody->initStaticTile(tileSheet, tile->index);
             tileBody->setTileId(tileId);
-            tileBody->setTileData(tile);            
+            tileBody->setTileData(tile);
+
             this->entityManager->add(std::move(tileBody));
         }
     }
@@ -119,7 +120,7 @@ void RoomManager::loadEntities(Map::Room* room) {
             const Items::Item* itemData = this->itemManager->getItemById(id);
             if (itemData) {
                 textures()->Load(this->renderer, itemData->getSpritePath(), itemData->getSpritePath());
-                Vector4 screenVect = virtualRenderer()->mapToScreen(x, y, 0.5f, 0.5f);
+                Vector4f screenVect = virtualRenderer()->mapToScreen(x, y, 0.5f, 0.5f);
 
                 auto item = std::make_unique<Entities::ItemBody>(
                     screenVect,
@@ -135,7 +136,7 @@ void RoomManager::loadEntities(Map::Room* room) {
             const Enemies::Enemy* enemyData = this->enemyManager->getEnemyById(id);
             if (enemyData) {
                 textures()->Load(this->renderer, enemyData->getSpritePath(), enemyData->getSpritePath());
-                Vector4 screenVect = virtualRenderer()->mapToScreen(x, y);
+                Vector4f screenVect = virtualRenderer()->mapToScreen(x, y);
 
                 auto enemy = std::make_unique<Entities::EnemyBody>(
                     screenVect,
@@ -166,7 +167,7 @@ void RoomManager::update(float deltaTime) {
 }
 
 void RoomManager::createPlayerInStartRoom() {
-    Vector4 playerVect = virtualRenderer()->mapToScreen(4, 4, 1, 1);
+    Vector4f playerVect = virtualRenderer()->mapToScreen(4, 4, 1, 1);
     this->player = new Entities::PlayerBody(playerVect, true, true);
 
     this->player->setAttackRate(1.0f);
@@ -209,15 +210,15 @@ const std::vector<Map::Room>& RoomManager::getRooms() {
 }
 
 
-void RoomManager::moveToRoomInDirection(Utils::EDirection direction) {
+void RoomManager::moveToRoomInDirection(EDirection direction) {
     int newX = this->currentRoom->x;
     int newY = this->currentRoom->y;
 
     switch (direction) {
-        case Utils::EDirection::Right: newX += 1; break;
-        case Utils::EDirection::Left:  newX -= 1; break;
-        case Utils::EDirection::Up:    newY -= 1; break;
-        case Utils::EDirection::Down:  newY += 1; break;
+        case EDirection::Right: newX += 1; break;
+        case EDirection::Left:  newX -= 1; break;
+        case EDirection::Up:    newY -= 1; break;
+        case EDirection::Down:  newY += 1; break;
     }
 
     Map::Room* nextRoom = getRoomByPosition(newX, newY);
@@ -233,7 +234,7 @@ void RoomManager::moveToRoomInDirection(Utils::EDirection direction) {
 void RoomManager::checkAndMovePlayerBetweenRooms() {
     if (!this->player || !this->currentRoom) return;
 
-    Vector center = this->player->getCenterPoint();
+    Vector2f center = this->player->getCenterPoint();
     int tileSize = virtualRenderer()->getTileSize();
     
     int tileX = static_cast<int>(center.x / tileSize);
@@ -243,19 +244,19 @@ void RoomManager::checkAndMovePlayerBetweenRooms() {
     int rows = static_cast<int>(this->currentRoom->layout.size());
 
     if (tileX >= cols) {
-        moveToRoomInDirection(Utils::EDirection::Right);
+        moveToRoomInDirection(EDirection::Right);
         tempMovePlayer(cols, rows);
     }
     else if (tileX < 0) {
-        moveToRoomInDirection(Utils::EDirection::Left);
+        moveToRoomInDirection(EDirection::Left);
         tempMovePlayer(cols, rows);
     }
     else if (tileY < 0) {
-        moveToRoomInDirection(Utils::EDirection::Up);
+        moveToRoomInDirection(EDirection::Up);
         tempMovePlayer(cols, rows);
     }
     else if (tileY >= rows) {
-        moveToRoomInDirection(Utils::EDirection::Down);
+        moveToRoomInDirection(EDirection::Down);
         tempMovePlayer(cols, rows);
     }
 }
@@ -311,11 +312,11 @@ void RoomManager::tempMovePlayer(int cols, int rows) {
 }
 #pragma endregion
 
-void RoomManager::setEntityPositionByPixels(Entities::Body* entity, Vector position) {
+void RoomManager::setEntityPositionByPixels(Entities::Body* entity, Vector2f position) {
     entity->setPosition(virtualRenderer()->normalizeVector(position));
 }
 
-void RoomManager::setEntityPositionByTiles(Entities::Body* entity, Vector position) {
+void RoomManager::setEntityPositionByTiles(Entities::Body* entity, Vector2f position) {
     entity->setPosition(virtualRenderer()->denormalizeVector(position));
 }
 

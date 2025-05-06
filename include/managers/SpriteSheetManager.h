@@ -8,10 +8,10 @@
 namespace Manager {
     class SpriteSheetManager {
     private:
-        std::vector<Renderer::Sprite> icons;
+        std::vector<Renderer::Sprite> sprites;
 
     public:
-        void load(SDL_Texture* texture, int sheetWidthPixels, const std::vector<int>& indices, int tileWidth = 32, int tileHeight = 32);
+        void load(SDL_Texture* texture, const std::vector<int>& indices);
         const Renderer::Sprite& get(int index) const;
     };
 }

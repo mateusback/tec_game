@@ -29,14 +29,14 @@ namespace Entities
 		bombs(0), 
 		experience(0) {}
 
-		PlayerBody(Vector pos, Vector scl, bool collision = false, bool visible = true)
+		PlayerBody(Vector2f pos, Vector2f scl, bool collision = false, bool visible = true)
 		: CharacterBody(pos.x, pos.y, scl.x, scl.y, collision, visible), 
 		coins(0), 
 		keys(0), 
 		bombs(0), 
 		experience(0) {}
 
-		PlayerBody(Vector4 collider, bool collision = false, bool visible = true)
+		PlayerBody(Vector4f collider, bool collision = false, bool visible = true)
 		: CharacterBody(collider.x, collider.y, collider.z, collider.w, collision, visible), 
 		coins(0), 
 		keys(0), 
@@ -50,9 +50,9 @@ namespace Entities
 		void loadAnimations() override;
 		
 		void handleInput(const Manager::PlayerInput& input);
-		std::unique_ptr<Entities::AttackBody> attack(Point characterCenter, Vector direction);
+		std::unique_ptr<Entities::AttackBody> attack(Pointf characterCenter, Vector2f direction);
 		void pickUpItem(Entities::ItemBody* item);
-		void updateDirectionSprite(const Vector& direction);
+		void updateDirectionSprite(const Vector2f& direction);
 
 		#pragma region Getters
 		const std::list<Items::Item>& getInventory() const { return this->inventory; }

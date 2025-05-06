@@ -16,12 +16,12 @@ namespace Entities
 
     public:
         #pragma region Constructors
-        ItemBody(Vector4 collider, const Item& item,
+        ItemBody(Vector4f collider, const Item& item,
             bool collision = true, bool visible = true)
         : Body(collider.x, collider.y, collider.z, collider.w, collision, visible),
             type(item.getType()), item(item) {}
 
-        ItemBody(Vector pos, Vector scl, const Item& item,
+        ItemBody(Vector2f pos, Vector2f scl, const Item& item,
             bool collision = true, bool visible = true)
         : Body(pos.x, pos.y, scl.x, scl.y, collision, visible),
             type(item.getType()), item(item) {}

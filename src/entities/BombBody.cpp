@@ -17,19 +17,21 @@ namespace Entities {
     void BombBody::explode() {
         audio()->playSoundEffect("bomb_explosion", 0);
         std::cout << "Bomba explodiu!" << std::endl;
-        Vector explosionScale = {this->explosionRadius, this->explosionRadius};
-        Vector explosionCenter = this->position + (this->scale / 2.0f);
-        Vector explosionPos = explosionCenter - (explosionScale / 2.0f);
+        Vector2f explosionScale = {this->explosionRadius, this->explosionRadius};
+        Vector2f explosionCenter = this->position + (this->scale / 2.0f);
+        Vector2f explosionPos = explosionCenter - (explosionScale / 2.0f);
         this->addDestroyEffect(explosionPos, explosionScale);
             
         auto tiles = entityManager.getEntitiesByType<TileBody>();
         auto enemies = entityManager.getEntitiesByType<EnemyBody>();
     
+        SDL_Texture* tileSheet = textures()->Get("tileset");
+
         for (auto* tile : tiles) {
             float dist = (tile->getPosition() - this->getPosition()).length();
             const Tile* tileData = tile->getTileData();
             if (!tileData) continue;
-        
+
             if (dist <= this->explosionRadius &&
                 tileData->destructible &&
                 tileData->destroyedId != -1)
@@ -38,20 +40,8 @@ namespace Entities {
                 if (destroyedTileData) {
                     tile->setCollision(destroyedTileData->solid);
                     tile->setTileId(tileData->destroyedId);
-                    std::cout << "Tile ID: " << tile->getTileId() << std::endl;
-                    std::cout << "Tile Data ID: " << tileData->destroyedId << std::endl;
-                    std::cout << "Tile Data Index: " << destroyedTileData->index << std::endl;
                     tile->setTileData(destroyedTileData);
-                    std::cout << "[TileBody] Trocando para tile index: " << destroyedTileData->index << std::endl;
-                    SDL_Texture* tileSheet = textures()->Get("tileset");
-                    float sheetWidthPixels = textures()->getTextureScale(tileSheet).x;
-                    
-                    tile->initStaticTile(
-                        tileSheet,
-                        sheetWidthPixels,
-                        destroyedTileData->index,
-                        tileSet.getTileSize()
-                    );
+                    tile->initStaticTile(tileSheet, destroyedTileData->index);
                 }
             }
         }
@@ -67,7 +57,7 @@ namespace Entities {
         }
     }
 
-    void BombBody::addDestroyEffect(Vector position, Vector scale) {
+    void BombBody::addDestroyEffect(Vector2f position, Vector2f scale) {
         auto effect = std::make_unique<Entities::EffectBody>(
             position,
             scale,

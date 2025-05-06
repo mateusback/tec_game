@@ -16,10 +16,10 @@ namespace Entities {
         TileBody(float x, float y, float w, float h, SDL_Texture* texture, bool solid = false)
         : Body(x, y, w, h, solid, true) { this->setTexture(texture); }
 
-        TileBody(Vector pos, Vector scl, SDL_Texture* texture, bool solid = false)
+        TileBody(Vector2f pos, Vector2f scl, SDL_Texture* texture, bool solid = false)
         : Body(pos.x, pos.y, scl.x, scl.y, solid, true) { this->setTexture(texture); }
 
-        TileBody(Vector4 collider, SDL_Texture* texture, bool solid = false)
+        TileBody(Vector4f collider, SDL_Texture* texture, bool solid = false)
         : Body(collider.x, collider.y, collider.z, collider.w, solid, true) { this->setTexture(texture); }
 
         TileBody(const TileBody& other)
@@ -33,7 +33,7 @@ namespace Entities {
         void update(float deltaTime) override {}
         void onCollision(Body* other) override {}
 
-        void initStaticTile(SDL_Texture* tileSheet, int sheetWidthPixels, int tileIndex, int tileSize = 32);
+        void initStaticTile(SDL_Texture* tileSheet, int tileIndex);
         
 		#pragma region Getters
         int getTileId() const { return tileId; }

@@ -5,9 +5,7 @@
 #include <algorithm>
 
 #include <my-lib/math-vector.h>
-using Vector = Mylib::Math::Vector<float, 2>;
-using Vector4 = Mylib::Math::Vector<float, 4>;
-using Point = Vector;
+#include "../utils/Types.h"
 
 namespace Renderer {
     class VirtualRenderer {
@@ -24,15 +22,15 @@ namespace Renderer {
             this->tileSize = std::min(w, h);
         }
 
-        Vector4 mapToScreen(float x, float y, float w = 1.0f, float h = 1.0f) const;
+        Vector4f mapToScreen(float x, float y, float w = 1.0f, float h = 1.0f) const;
         void updateLayout(int tileCols, int tileRows);
 
-        Vector tileToScreenPosition(int col, int row) const;
+        Vector2f tileToScreenPosition(int col, int row) const;
 
         float normalizeValue(float value) const { return value * this->tileSize; }
         float denormalizeValue(float value) const { return value / this->tileSize; }
-        Vector normalizeVector(const Vector& vector) const { return Vector{ vector.x * this->tileSize, vector.y * this->tileSize }; }
-        Vector denormalizeVector(const Vector& vector) const { return Vector{ vector.x / this->tileSize, vector.y / this->tileSize }; }
+        Vector2f normalizeVector(const Vector2f& vector) const { return Vector2f{ vector.x * this->tileSize, vector.y * this->tileSize }; }
+        Vector2f denormalizeVector(const Vector2f& vector) const { return Vector2f{ vector.x / this->tileSize, vector.y / this->tileSize }; }
 
         float getTileSize() const { return this->tileSize; }
         int getScreenWidth() const { return this->screenWidth; }

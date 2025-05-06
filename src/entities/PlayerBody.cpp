@@ -13,8 +13,8 @@ namespace Entities
 
     void PlayerBody::handleInput(const Manager::PlayerInput& input)
     {
-        Vector playerDirection = input.moveDirection;
-        Vector spriteDirection;
+        Vector2f playerDirection = input.moveDirection;
+        Vector2f spriteDirection;
 
         if (input.moveDirection.x != 0.f || input.moveDirection.y != 0.f) {
             spriteDirection = input.moveDirection;
@@ -55,7 +55,7 @@ namespace Entities
         }
     }
 
-    std::unique_ptr<Entities::AttackBody> PlayerBody::attack(Point characterCenter, Vector direction)
+    std::unique_ptr<Entities::AttackBody> PlayerBody::attack(Pointf characterCenter, Vector2f direction)
     {
         if(this->attackTimer > 0.0f) return nullptr;
         float width = 16.f;
@@ -143,32 +143,20 @@ namespace Entities
     void PlayerBody::loadAnimations() {
         SDL_Texture* texture = Manager::TextureManager::Get("player_sheet");
         this->is_animated = true;
-
-        using Manager::AnimationLoader;
     
-        const int tileSize = 32;
-        const float frameDuration = 0.15f;
+        Manager::AnimationLoader::loadNamedAnimations(texture, {
+            {"idle",   4, 5},
+            {"walk",   3, 7},
+            {"attack", 8, 7, false},
+            {"death",  7, 7, false}
+        }, this->animationManager);
     
-        int sheetWidthPixels = 416; 
-    
-        auto loadAnim = [&](const std::string& name, int row, int frameCount, bool loop = true) {
-            int startIndex = row * (sheetWidthPixels / tileSize); 
-            auto frames = AnimationLoader::loadRange(texture, sheetWidthPixels, startIndex, frameCount, tileSize, tileSize);
-            Renderer::Animation anim(frames, frameDuration, loop);
-            this->animationManager.addAnimation(name, anim);
-        };
-        
-            loadAnim("idle", 4, 5);
-            loadAnim("walk", 3, 7);
-            loadAnim("attack", 8, 7, false);
-            loadAnim("death", 7, 7, false);
-        
-            this->animationManager.setAnimation("idle");
+        this->animationManager.setAnimation("idle");
     }
 
     //TODO - COLOCAR UMA CLASSE SPRITE QUE É UM VETOR DE TEXTURAS, E DEPOIS UM VETOR DE ANIMAÇÕES
     //TODO - CRIAR UMA CLASSE DE ANIMAÇÃO QUE TEM UM VETOR DE TEXTURAS E UM VETOR DE TEMPOS
-    void PlayerBody::updateDirectionSprite(const Vector& direction) {
+    void PlayerBody::updateDirectionSprite(const Vector2f& direction) {
         // if (direction.y < 0) {
         //     this->setTexture(Manager::TextureManager::Get("player_b"));
         // } else if (direction.y > 0) {

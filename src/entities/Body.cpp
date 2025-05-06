@@ -11,7 +11,7 @@ namespace Entities
     void Body::render(SDL_Renderer* renderer) 
     {
         if (!this->is_visible || !this->active) return;
-        Vector4 fullSize = this->getFullSize();
+        Vector4f fullSize = this->getFullSize();
 
 
         const Renderer::Sprite* sprite = this->animationManager.getCurrentSprite();

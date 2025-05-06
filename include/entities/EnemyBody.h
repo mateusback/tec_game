@@ -16,7 +16,7 @@ namespace Entities {
         Manager::EntityManager& entityManager;
 
     public:
-        EnemyBody(Vector4 collider, const Enemies::Enemy& data, Manager::EntityManager& entityManager);
+        EnemyBody(Vector4f collider, const Enemies::Enemy& data, Manager::EntityManager& entityManager);
         EnemyBody(const EnemyBody& other)
         : CharacterBody(other),
         enemyData(other.enemyData),
@@ -28,7 +28,7 @@ namespace Entities {
             this->setPosition(other.getPosition());
         }
 
-        std::unique_ptr<AttackBody> attack(Point origin, Vector direction);
+        std::unique_ptr<AttackBody> attack(Pointf origin, Vector2f direction);
 
         void setTarget(PlayerBody* player) { this->target = player; }
         PlayerBody* getTarget() const { return this->target; }

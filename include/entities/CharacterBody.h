@@ -40,7 +40,7 @@ namespace Entities
 			defense(0.0f),
 			level(1) {}
 
-		CharacterBody(Vector pos, Vector scl, bool collision = false, bool visible = true, float acceleration = 100.0f)
+		CharacterBody(Vector2f pos, Vector2f scl, bool collision = false, bool visible = true, float acceleration = 100.0f)
 			: MovingBody(pos.x, pos.y, scl.x, scl.y, collision, visible, acceleration),
 			health(100.0f), 
 			maxHealth(100.0f), 
@@ -53,7 +53,7 @@ namespace Entities
 			defense(0.0f),
 			level(1) {}
 
-		CharacterBody(Vector4 collider, bool collision = false, bool visible = true, float acceleration = 100.0f)
+		CharacterBody(Vector4f collider, bool collision = false, bool visible = true, float acceleration = 100.0f)
 			: MovingBody(collider.x, collider.y, collider.z, collider.w, collision, visible, acceleration),
 			health(100.0f), 
 			maxHealth(100.0f), 

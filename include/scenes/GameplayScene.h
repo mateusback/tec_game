@@ -38,7 +38,7 @@ public:
     void update(float deltaTime, const Manager::PlayerInput& input);
     void handleEvent(const SDL_Event& event) override;
     void render(SDL_Renderer* renderer) override;
-    void addDestroyEffect(Vector position, Vector scale);
+    void addDestroyEffect(Vector2f position, Vector2f scale);
     void loadResources(SDL_Renderer* renderer);
     
     void setItemManager(const Manager::ItemManager& itemManager) { this->itemManager = itemManager; }

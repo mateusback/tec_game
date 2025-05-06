@@ -6,8 +6,7 @@ using namespace Renderer;
 
 HudRenderer::HudRenderer(SDL_Renderer* renderer) {
     SDL_Texture* texture = textures()->Get("hudsheet");
-    std::vector<int> indices = { 0, 1, 2, 3, 4 };
-    this->hudIcons.load(texture, 160, indices);
+    this->hudIcons.load(texture, { 0, 1, 2, 3, 4 });
 }
 
 void HudRenderer::render(SDL_Renderer* renderer, const Entities::PlayerBody* player) {

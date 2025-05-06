@@ -18,7 +18,7 @@ namespace Entities
         const TileSet& tileSet;
         
         public:
-        BombBody(Vector4 rect,
+        BombBody(Vector4f rect,
             bool collision,
             bool visible,
             float time,
@@ -35,7 +35,7 @@ namespace Entities
    
         virtual void update(float deltaTime) override;
         void explode();
-        void addDestroyEffect(Vector position, Vector scale);
+        void addDestroyEffect(Vector2f position, Vector2f scale);
         
 		#pragma region Getters
         float getTimeToExplode() const { return this->timeToExplode; }

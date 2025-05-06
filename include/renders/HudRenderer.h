@@ -17,6 +17,7 @@ namespace Renderer {
         void drawHearts(SDL_Renderer* renderer, int hp, int maxHp);
         void drawBombs(SDL_Renderer* renderer, int bombs);
         void drawCoins(SDL_Renderer* renderer, int coins);
+        void drawScore(SDL_Renderer* renderer);
     };
 }
 

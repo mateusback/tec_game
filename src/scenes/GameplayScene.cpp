@@ -13,7 +13,6 @@
 #include <fstream>
 
 GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight) {
-    Manager::AudioManagerGlobal::init();
     this->loadResources(renderer);
 
     this->roomManager = new Manager::RoomManager(renderer, 
@@ -126,8 +125,11 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
                     attack->setActive(false);
     
                     addDestroyEffect(attack->getPosition(), attack->getScale());
-                    if (enemy->getHealth() <= 0)
+                    if (enemy->getHealth() <= 0){
+                        //TODO - TALVEZ COLOCAR O SCORE NO JSON
+                        score()->add(20);
                         enemy->setActive(false);
+                    }
                     break;
                 }
             }

@@ -56,6 +56,7 @@ namespace Core
         Renderer::VirtualRendererGlobal::init(width, height, 1, 1);
         Manager::TextureManagerGlobal::init();
         Manager::AudioManagerGlobal::init();
+        Manager::ScoreManagerGlobal::init();
 
         Manager::SceneManager::setScene(new GameplayScene(renderer, width, height));
 
@@ -78,6 +79,7 @@ namespace Core
         Renderer::VirtualRendererGlobal::destroy();
         Manager::TextureManagerGlobal::destroy();
         Manager::AudioManagerGlobal::destroy();
+        Manager::ScoreManagerGlobal::destroy();
         delete this->loop;
         SDL_DestroyRenderer(this->renderer);
         SDL_DestroyWindow(this->window);

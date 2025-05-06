@@ -3,18 +3,58 @@
 
 #include <vector>
 #include <memory>
-#include "../entities/TileBody.h"
-#include "../entities/EnemyBody.h"
-#include "../entities/ItemBody.h"
+#include "../utils/Types.h"
 
 namespace Map {
+
+    struct BaseEntityState {
+        Vector2i position;
+        int id;
+        bool isActive = true;
+    };
+
+    struct TileState : public BaseEntityState {
+        bool solid;
+
+        TileState(int id, Vector2i pos, bool solid)
+        {
+            this->id = id;
+            this->position = pos;
+            this->solid = solid;
+            this->isActive = true;
+        }
+    };
+
+    struct EnemyState : public BaseEntityState {
+        int health;
+        
+        EnemyState(int id, Vector2i pos, int health, bool isDefeated)
+        {
+            this->id = id;
+            this->position = pos;
+            this->health = health;
+            this->isActive = !isDefeated;
+        }
+    };
+
+    struct ItemState : public BaseEntityState {
+        ItemState(int id, Vector2i pos, bool isCollected)
+        {
+            this->id = id;
+            this->position = pos;
+            this->isActive = !isCollected;
+        }
+    };
+
     struct RoomState {
         Map::Room* roomRef;
-        std::vector<std::unique_ptr<Entities::TileBody>> tiles;
-        std::vector<std::unique_ptr<Entities::EnemyBody>> enemies;
-        std::vector<std::unique_ptr<Entities::ItemBody>> items;
+        std::vector<TileState> tiles;
+        std::vector<EnemyState> enemies;
+        std::vector<ItemState> items;
         bool wasVisited = false;
+        bool doorsOpened = false;
     };
+
 }
 
 #endif

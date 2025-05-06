@@ -61,12 +61,36 @@ void RoomManager::loadRoom(Map::Room* room) {
     Map::RoomState& state = roomStates[room->id];
 
     if (state.wasVisited) {
-        for (auto& tile : state.tiles)
-            this->entityManager->add(std::make_unique<Entities::TileBody>(*tile));
-        for (auto& enemy : state.enemies)
-            this->entityManager->add(std::make_unique<Entities::EnemyBody>(*enemy));
-        for (auto& item : state.items)
-            this->entityManager->add(std::make_unique<Entities::ItemBody>(*item));
+        for (auto& t : state.tiles) {
+            const Tile* tileData = this->tileSet->getTile(t.id);
+            Vector4f screenVect = virtualRenderer()->mapToScreen(t.position);
+            auto tile = std::make_unique<Entities::TileBody>(screenVect, textures()->Get("tileset"), tileData->solid);
+            tile->initStaticTile(textures()->Get("tileset"), tileData->index);
+            tile->setTileId(t.id);
+            this->entityManager->add(std::move(tile));
+        }
+    
+        for (auto& e : state.enemies) {
+            const Enemies::Enemy* enemyData = this->enemyManager->getEnemyById(e.id);
+            Vector4f screenVect = virtualRenderer()->mapToScreen(e.position);
+            auto enemy = std::make_unique<Entities::EnemyBody>(screenVect, *enemyData, *this->entityManager);
+            enemy->setTexture(textures()->Get(enemyData->getSpritePath()));
+            enemy->setHealth(e.health);
+            enemy->setActive(e.isActive);
+            enemy->setTarget(this->player);
+            this->entityManager->add(std::move(enemy));
+        }
+    
+        for (auto& i : state.items) {
+            const Items::Item* itemData = this->itemManager->getItemById(i.id);
+            Vector4f screenVect = virtualRenderer()->mapToScreen(i.position);
+            auto item = std::make_unique<Entities::ItemBody>(screenVect, *itemData);
+            item->setTexture(textures()->Get(itemData->getSpritePath()));
+            item->setActive(i.isActive);
+            this->entityManager->add(std::move(item));
+        }
+    
+        this->currentRoom->doorsOpen = state.doorsOpened;
         return;
     }
     if (room->type == Map::ERoomType::Start)
@@ -285,25 +309,39 @@ void RoomManager::saveCurrentRoomState() {
 
     Map::RoomState& state = roomStates[this->currentRoom->id];
     state.wasVisited = true;
-
     state.tiles.clear();
-    
+    state.enemies.clear();
+    state.items.clear();
+
     for (auto* tile : entityManager->getEntitiesByType<Entities::TileBody>()) {
         if (!tile->isActive()) continue;
-        state.tiles.push_back(std::make_unique<Entities::TileBody>(*tile));
+        state.tiles.push_back({
+            tile->getTileId(),
+            virtualRenderer()->screenToTilePosition(tile->getPosition()),
+            tile->hasCollision()
+        });
     }
 
-    state.enemies.clear();
     for (auto* enemy : entityManager->getEntitiesByType<Entities::EnemyBody>()) {
         if (!enemy->isActive()) continue;
-        state.enemies.push_back(std::make_unique<Entities::EnemyBody>(*enemy));
+        state.enemies.push_back({
+            enemy->getEnemyData().getId(),
+            virtualRenderer()->screenToTilePosition(enemy->getPosition()),
+            static_cast<int>(enemy->getHealth()),
+            enemy->isDead()
+        });
     }
 
-    state.items.clear();
     for (auto* item : entityManager->getEntitiesByType<Entities::ItemBody>()) {
         if (!item->isActive()) continue;
-        state.items.push_back(std::make_unique<Entities::ItemBody>(*item));
+        state.items.push_back({
+            item->getItem().getId(),
+            virtualRenderer()->screenToTilePosition(item->getPosition()),
+            item->isActive()
+        });
     }
+
+    state.doorsOpened = this->currentRoom->doorsOpen;
 }
 
 #pragma region "temp"

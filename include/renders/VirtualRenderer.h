@@ -13,6 +13,7 @@ namespace Renderer {
         float tileSize;
         int screenWidth;
         int screenHeight;
+        Vector2f cameraOffset = {0, 0};
 
     public:
         VirtualRenderer(int screenWidth, int screenHeight, int tileCols, int tileRows)
@@ -23,9 +24,11 @@ namespace Renderer {
         }
 
         Vector4f mapToScreen(float x, float y, float w = 1.0f, float h = 1.0f) const;
+        Vector4f mapToScreen(Vector2i position, float w = 1.0f, float h = 1.0f) const;
         void updateLayout(int tileCols, int tileRows);
 
         Vector2f tileToScreenPosition(int col, int row) const;
+        Vector2i screenToTilePosition(Vector2f position) const;
 
         float normalizeValue(float value) const { return value * this->tileSize; }
         float denormalizeValue(float value) const { return value / this->tileSize; }
@@ -40,6 +43,8 @@ namespace Renderer {
         float getTileSizeSubtractedBy(float value) const { return this->tileSize - value; }
         float getTileSizeAddedBy(float value) const { return this->tileSize + value; }
         float getTileSizeDividedBy(float value) const { return this->tileSize / value; }
+        void setCameraOffset(Vector2f offset) { this->cameraOffset = offset; }
+        Vector2f getCameraOffset() const { return this->cameraOffset; }
     };
 }
 #endif

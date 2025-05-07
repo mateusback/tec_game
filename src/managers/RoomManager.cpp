@@ -67,6 +67,7 @@ void RoomManager::loadRoom(Map::Room* room) {
             auto tile = std::make_unique<Entities::TileBody>(screenVect, textures()->Get("tileset"), tileData->solid);
             tile->initStaticTile(textures()->Get("tileset"), tileData->index);
             tile->setTileId(t.id);
+            tile->setTileData(tileData);
             this->entityManager->add(std::move(tile));
         }
     
@@ -334,7 +335,7 @@ void RoomManager::saveCurrentRoomState() {
         state.tiles.push_back({
             tile->getTileId(),
             virtualRenderer()->screenToTilePosition(tile->getPosition()),
-            tile->hasCollision()
+            tile->getTileData()->solid
         });
     }
 

@@ -15,6 +15,7 @@
 #include "../renders/VirtualRenderer.h"
 #include "../renders/HudRenderer.h"
 #include "../managers/RoomManager.h"
+#include "../renders/MiniMapRenderer.h"
 
 
 class GameplayScene : public Core::Scene {
@@ -28,7 +29,7 @@ private:
     bool debugMode = false;
     Renderer::HudRenderer* hudRenderer = nullptr;
     Manager::RoomManager* roomManager = nullptr;
-
+    Renderer::MiniMapRenderer* miniMapRenderer = nullptr;
     TileSet tileSet;
 
 public:

@@ -56,9 +56,10 @@ namespace Manager {
         void setEntityPositionByPixels(Entities::Body* entity, Vector2f position);
         void setEntityPositionByTiles(Entities::Body* entity, Vector2f position);
 
-        Map::Room* getCurrentRoom();
+        const Map::Room* getCurrentRoom() const;
         Map::Room* getRoomByPosition(int x, int y);
-        const std::vector<Map::Room>& getRooms();
+        const std::vector<Map::Room>& getRooms() const;
+        const bool wasRoomVisited(int roomId) const;
 
         Entities::PlayerBody* getPlayer() const { return this->player; }
 

@@ -218,7 +218,7 @@ void RoomManager::loadRoomByType(Map::ERoomType type) {
     }
 }
 
-Map::Room* RoomManager::getCurrentRoom() {
+const Map::Room* RoomManager::getCurrentRoom() const{
     return this->currentRoom;
 }
 
@@ -230,8 +230,13 @@ Map::Room* RoomManager::getRoomByPosition(int x, int y) {
     return nullptr;
 }
 
-const std::vector<Map::Room>& RoomManager::getRooms() {
+const std::vector<Map::Room>& RoomManager::getRooms() const{
     return this->floor.rooms;
+}
+
+const bool RoomManager::wasRoomVisited(int roomId) const {
+    auto it = roomStates.find(roomId);
+    return it != roomStates.end() && it->second.wasVisited;
 }
 
 
@@ -250,10 +255,34 @@ void RoomManager::moveToRoomInDirection(EDirection direction) {
     if (nextRoom) {
         this->saveCurrentRoomState();
         this->loadRoom(nextRoom);
+
+        int cols = static_cast<int>(nextRoom->layout[0].size());
+        int rows = static_cast<int>(nextRoom->layout.size());
+
+        this->player->setScale(virtualRenderer()->normalizeVector({1, 1}));
+        switch (direction) {
+            case EDirection::Right:
+                this->player->setPosition(virtualRenderer()->tileToScreenPosition(1, rows / 2));
+                break;
+        
+            case EDirection::Left:
+                this->player->setPosition(virtualRenderer()->tileToScreenPosition(cols - 2, rows / 2));
+                break;
+        
+            case EDirection::Up:
+                this->player->setPosition(virtualRenderer()->tileToScreenPosition(cols / 2, rows - 2));
+                break;
+        
+            case EDirection::Down:
+                this->player->setPosition(virtualRenderer()->tileToScreenPosition(cols / 2, 1));
+                break;
+        }
+        
     } else {
         std::cout << "Nenhuma sala conectada nessa direção.\n";
     }
 }
+
 
 
 void RoomManager::checkAndMovePlayerBetweenRooms() {
@@ -270,19 +299,15 @@ void RoomManager::checkAndMovePlayerBetweenRooms() {
 
     if (tileX >= cols) {
         moveToRoomInDirection(EDirection::Right);
-        tempMovePlayer(cols, rows);
     }
     else if (tileX < 0) {
         moveToRoomInDirection(EDirection::Left);
-        tempMovePlayer(cols, rows);
     }
     else if (tileY < 0) {
         moveToRoomInDirection(EDirection::Up);
-        tempMovePlayer(cols, rows);
     }
     else if (tileY >= rows) {
         moveToRoomInDirection(EDirection::Down);
-        tempMovePlayer(cols, rows);
     }
 }
 
@@ -361,10 +386,6 @@ void RoomManager::saveCurrentRoomState() {
     state.doorsOpened = this->currentRoom->doorsOpen;
 }
 
-#pragma region "temp"
-void RoomManager::tempMovePlayer(int cols, int rows) {
-    this->player->setPosition(virtualRenderer()->tileToScreenPosition(cols / 2, rows - 2));
-}
 #pragma endregion
 
 void RoomManager::setEntityPositionByPixels(Entities::Body* entity, Vector2f position) {

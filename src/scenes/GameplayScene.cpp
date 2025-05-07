@@ -25,6 +25,7 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screen
     this->player = this->roomManager->getPlayer();
     std::cout << "Player position: " << this->player->getPosition().x << ", " << this->player->getPosition().y << std::endl;
 
+    this->miniMapRenderer = new Renderer::MiniMapRenderer(renderer, this->roomManager);
     this->hudRenderer = new Renderer::HudRenderer(renderer);
 }
 
@@ -219,6 +220,7 @@ void GameplayScene::render(SDL_Renderer* renderer) {
         }
     }
     this->hudRenderer->render(renderer, this->player);
+    this->miniMapRenderer->render(renderer);
     SDL_RenderPresent(renderer);
 }
 
@@ -270,4 +272,7 @@ GameplayScene::~GameplayScene() {
 
     delete this->roomManager;
     this->roomManager = nullptr;
+
+    delete this->miniMapRenderer;
+    this->miniMapRenderer = nullptr;
 }

@@ -2,6 +2,7 @@
 #define PLAYER_BODY_H
 
 #include <list>
+#include <memory>
 
 #include "CharacterBody.h"
 #include "ItemBody.h"

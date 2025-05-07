@@ -260,6 +260,8 @@ void RoomManager::moveToRoomInDirection(EDirection direction) {
         int rows = static_cast<int>(nextRoom->layout.size());
 
         this->player->setScale(virtualRenderer()->normalizeVector({1, 1}));
+        this->player->setAcceleration(virtualRenderer()->normalizeValue(3));
+
         switch (direction) {
             case EDirection::Right:
                 this->player->setPosition(virtualRenderer()->tileToScreenPosition(1, rows / 2));

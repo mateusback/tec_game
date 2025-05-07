@@ -1,5 +1,7 @@
 #include "../../include/entities/ItemBody.h"
 #include "../../include/entities/PlayerBody.h"
+#include "../../include/utils/GlobalAccess.h"
+#include "../../include/managers/AnimationLoader.h"
 #include <SDL2/SDL.h>
 
 namespace Entities
@@ -13,5 +15,25 @@ namespace Entities
             this->setVisible(false);
             this->setCollision(false);
         }
+    }
+
+    void ItemBody::update(float deltaTime)
+    {
+        if (this->active == false) return;
+        if (this->is_animated) {
+            this->animationManager.update(deltaTime);
+        }
+    }
+
+    void ItemBody::loadAnimations()
+    {
+        SDL_Texture* texture = textures()->Get(this->item.getSpritePath());
+        this->is_animated = true;
+    
+        Manager::AnimationLoader::loadNamedAnimations(texture, {
+            { "idle", 0, 30 }
+        }, this->animationManager);
+    
+        this->animationManager.setAnimation("idle");
     }
 }

@@ -3,16 +3,20 @@
 
 #include <list>
 #include <memory>
-#include "../../include/core/Scene.h"
-#include "../../include/entities/PlayerBody.h"
-#include "../../include/entities/ItemBody.h"
-#include "../../include/entities/TileBody.h"
-#include "../../include/entities/EnemyBody.h"
-#include "../../include/managers/ItemManager.h"
-#include "../../include/managers/EnemyManager.h"
-#include "../../include/map/Floor.h"
-#include "../../include/map/TileSet.h"
-#include "../../include/renders/VirtualRenderer.h"
+#include "../core/Scene.h"
+#include "../entities/PlayerBody.h"
+#include "../entities/ItemBody.h"
+#include "../entities/TileBody.h"
+#include "../entities/EnemyBody.h"
+#include "../managers/ItemManager.h"
+#include "../managers/EnemyManager.h"
+#include "../map/Floor.h"
+#include "../map/TileSet.h"
+#include "../renders/VirtualRenderer.h"
+#include "../renders/HudRenderer.h"
+#include "../managers/RoomManager.h"
+#include "../renders/MiniMapRenderer.h"
+
 
 class GameplayScene : public Core::Scene {
 private:
@@ -23,19 +27,20 @@ private:
     Map::Room* currentRoom = nullptr;
     Manager::EntityManager entityManager;
     bool debugMode = false;
-
+    Renderer::HudRenderer* hudRenderer = nullptr;
+    Manager::RoomManager* roomManager = nullptr;
+    Renderer::MiniMapRenderer* miniMapRenderer = nullptr;
     TileSet tileSet;
-
-    void loadFloor(int index);
-    void loadCurrentRoom(SDL_Renderer* renderer);
 
 public:
     GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight);
+    ~GameplayScene() override;
 
     void update(float deltaTime, const Manager::PlayerInput& input);
     void handleEvent(const SDL_Event& event) override;
     void render(SDL_Renderer* renderer) override;
-    void addDestroyEffect(Vector position, Vector scale);
+    void addDestroyEffect(Vector2f position, Vector2f scale);
+    void loadResources(SDL_Renderer* renderer);
     
     void setItemManager(const Manager::ItemManager& itemManager) { this->itemManager = itemManager; }
     Manager::ItemManager getItemManager() { return itemManager; }

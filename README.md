@@ -41,7 +41,7 @@ pacman -Syu
 
 ```bash
 pacman -Su
-pacman -S mingw-w64-ucrt-x86_64-SDL2 mingw-w64-ucrt-x86_64-SDL2_gfx mingw-w64-ucrt-x86_64-SDL2_image mingw-w64-ucrt-x86_64-SDL2_mixer mingw-w64-ucrt-x86_64-SDL2_ttf
+pacman -S mingw-w64-ucrt-x86_64-SDL2 mingw-w64-ucrt-x86_64-SDL2_gfx mingw-w64-ucrt-x86_64-SDL2_image mingw-w64-ucrt-x86_64-SDL2_mixer mingw-w64-ucrt-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
 pacman -S make
 pacman -S mingw-w64-ucrt-x86_64-toolchain
 pacman -S mingw-w64-ucrt-x86_64-nlohmann-json

@@ -1,46 +1,34 @@
 #include "../../include/scenes/GameplayScene.h"
 #include "../../include/physics/CollisionManager.h"
-#include "../../include/managers/TextureManager.h"
 #include "../../include/renders/TextRenderer.h"
 #include "../../include/managers/FontManager.h"
 #include "../../include/serializers/FloorSerialization.h"
 #include "../../include/utils/DebugUtils.h"
 #include "../../include/utils/GlobalAccess.h"
+#include "../../include/utils/Types.h"
 #include "../../include/entities/EffectBody.h"
 #include "../../include/entities/BombBody.h"
+
 #include <SDL2/SDL_image.h>
 #include <fstream>
 
-
 GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight) {
-   textures()->Load(renderer, "player_b", "assets/player/personagem_B.png");
-   textures()->Load(renderer, "player_f", "assets/player/personagem_F.png");
-   textures()->Load(renderer, "player_l", "assets/player/personagem_L.png");
-   textures()->Load(renderer, "player_r", "assets/player/personagem_R.png");
-        
-   textures()->Load(renderer, "player_with_item", "assets/player_with_item.png");
-   textures()->Load(renderer, "attack", "assets/attack.png");
-   textures()->Load(renderer, "attack_destroy", "assets/attack_fade.png");
+    this->loadResources(renderer);
+
+    this->roomManager = new Manager::RoomManager(renderer, 
+        &this->entityManager, &this->tileSet, 
+        &this->itemManager, &this->enemyManager);
 
 
-    //todo, depois colocar isso na lista do inimigo
-    textures()->Load(renderer, "shell_hidden", "assets/enemies/shell_hidden.png");
-    textures()->Load(renderer, "bomb", "assets/bomb.png");
-    textures()->Load(renderer, "bomb_explosion", "assets/bomb_explosion.png");
-    textures()->Load(renderer, "rock_destroyed", "assets/tiles/rock-destroyed.png");
+    this->roomManager->loadFloor(1);
+    this->roomManager->loadRoomByType(Map::ERoomType::Start);
+    this->player = this->roomManager->getPlayer();
+    std::cout << "Player position: " << this->player->getPosition().x << ", " << this->player->getPosition().y << std::endl;
 
-    Manager::FontManager::load("default", "assets/fonts/Montserrat-Bold.ttf", 16);
-    enemyManager.loadFromFile("assets/data/enemies.json");
-    tileSet.loadFromFile("assets/data/tileset.json");
-    itemManager.loadFromFile("assets/data/items.json");
-
-    for (const auto& [id, tile] : tileSet.getAllTiles()) {
-       textures()->Load(renderer, tile.spritePath, tile.spritePath);
-    }
-
-    loadFloor(1);
-    loadCurrentRoom(renderer);
+    this->miniMapRenderer = new Renderer::MiniMapRenderer(renderer, this->roomManager);
+    this->hudRenderer = new Renderer::HudRenderer(renderer);
 }
+
 
 void GameplayScene::handleEvent(const SDL_Event& event) {
     if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
@@ -61,9 +49,11 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
 
     //TODO - Depois passar para o player
     if (input.putBomb && player->getBombCooldown() <= 0.0f) {
-        Vector pos = player->getPosition();
+        if (player->getBombs() <= 0) return;
+        player->setBombs(player->getBombs() - 1);
+        Vector2f pos = player->getPosition();
         auto bomb = std::make_unique<Entities::BombBody>(
-            Vector4{
+            Vector4f{
                 pos.x,
                 pos.y,
                 virtualRenderer()->getTileSize(),
@@ -92,7 +82,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     auto attacks = entityManager.getEntitiesByType<Entities::AttackBody>();
     auto effects = entityManager.getEntitiesByType<Entities::EffectBody>();
     auto bombs = entityManager.getEntitiesByType<Entities::BombBody>();
-    Vector totalDisplacement = {0.f, 0.f};
+    Vector2f totalDisplacement = {0.f, 0.f};
 
     for (auto* bomb : bombs) {
         bomb->update(deltaTime);
@@ -109,6 +99,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     player->setPosition(player->getPosition().x + totalDisplacement.x, player->getPosition().y + totalDisplacement.y);
     
     for (auto* item : items) {
+        item->update(deltaTime);
         if (item->hasCollision() &&
             Physics::CollisionManager::checkCollision(player->getHitbox(), item->getHitbox())) {
             player->onCollision(item);
@@ -121,6 +112,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
         if (attack->getOrigin() != this->player && player->hasCollision() && attack->hasCollision() &&
         Physics::CollisionManager::checkCollision(attack->getHitbox(), player->getHitbox())) {
             player->takeDamage(attack->getAttackDamage());
+            audio()->playSoundEffect("hit-player", 0);
             attack->setActive(false);
 
             addDestroyEffect(attack->getPosition(), attack->getScale());
@@ -133,11 +125,15 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
                     Physics::CollisionManager::checkCollision(enemy->getHitbox(), attack->getHitbox())) {
     
                     enemy->takeDamage(attack->getAttackDamage());
+                    audio()->playSoundEffect("hit-enemy", 0);
                     attack->setActive(false);
     
                     addDestroyEffect(attack->getPosition(), attack->getScale());
-                    if (enemy->getHealth() <= 0)
+                    if (enemy->getHealth() <= 0){
+                        //TODO - TALVEZ COLOCAR O SCORE NO JSON
+                        score()->add(20);
                         enemy->setActive(false);
+                    }
                     break;
                 }
             }
@@ -164,6 +160,13 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
 
     this->entityManager.removeInactive();
     this->entityManager.addAll();
+    
+    this->roomManager->update(deltaTime);
+    this->roomManager->checkAndMovePlayerBetweenRooms();
+
+    if(!this->player->isActive()) {
+        //TODO - Implementar tela de game over
+    }
 }
 
 void GameplayScene::render(SDL_Renderer* renderer) {
@@ -178,8 +181,8 @@ void GameplayScene::render(SDL_Renderer* renderer) {
         SDL_FRect barBg, barFill;
     
         float healthPercent = enemy->getHealthPercent();
-        Vector pos = enemy->getPosition();
-        Vector size = enemy->getScale();
+        Vector2f pos = enemy->getPosition();
+        Vector2f size = enemy->getScale();
     
         barBg = {
             pos.x,
@@ -216,144 +219,41 @@ void GameplayScene::render(SDL_Renderer* renderer) {
             Utils::DebugUtils::drawCollider(renderer, rect, {255, 0, 0, 255});
         }
     }
-
+    this->hudRenderer->render(renderer, this->player);
+    this->miniMapRenderer->render(renderer);
     SDL_RenderPresent(renderer);
 }
 
-void GameplayScene::loadFloor(int index) {
-    std::string path = "assets/data/floor" + std::to_string(index) + ".json";
-    std::ifstream file(path);
-    if (!file.is_open()) {
-        std::cerr << "Erro ao abrir floor: " << path << std::endl;
-        return;
-    }
 
-    nlohmann::json j;
-    file >> j;
-    from_json(j, floor);
+void GameplayScene::loadResources(SDL_Renderer* renderer){
+    textures()->Load(renderer, "player_b", "assets/player/personagem_B.png");
+    textures()->Load(renderer, "player_f", "assets/player/personagem_F.png");
+    textures()->Load(renderer, "player_l", "assets/player/personagem_L.png");
+    textures()->Load(renderer, "player_r", "assets/player/personagem_R.png");
+    textures()->Load(renderer, "player_sheet", "assets/animations/player.png");
 
-    for (auto& room : floor.rooms) {
-        if (room.type == Map::ERoomType::Start) {
-            currentRoom = &room;
-            break;
-        }
-    }
+    textures()->Load(renderer, "player_with_item", "assets/player_with_item.png");
+    textures()->Load(renderer, "attack", "assets/attack.png");
+    textures()->Load(renderer, "attack_destroy", "assets/attack_fade.png");
 
-    if (!currentRoom) {
-        std::cerr << "Sala inicial não encontrada no andar " << index << std::endl;
-    }
+    textures()->Load(renderer, "shell_hidden", "assets/enemies/shell_hidden.png");
+    textures()->Load(renderer, "bomb", "assets/bomb.png");
+    textures()->Load(renderer, "bomb_explosion", "assets/bomb_explosion.png");
+    textures()->Load(renderer, "hudsheet", "assets/hudsheet.png");
+
+    audio()->loadSoundEffect("bomb_explosion", "assets/audio/explosion.mp3");
+    audio()->loadSoundEffect("shoot", "assets/audio/shoot.mp3");
+    audio()->loadSoundEffect("hit-enemy", "assets/audio/hit-enemy.mp3");
+    audio()->loadSoundEffect("hit-player", "assets/audio/hit-player.mp3");
+    audio()->loadSoundEffect("pickup-item", "assets/audio/pickup-item.mp3");
+
+    this->enemyManager.loadFromFile("assets/data/enemies.json");
+    this->tileSet.loadFromFile("assets/data/tileset.json");
+    this->itemManager.loadFromFile("assets/data/items.json");
+    textures()->Load(renderer, "tileset", tileSet.getSpriteSheetPath());
 }
 
-void GameplayScene::loadCurrentRoom(SDL_Renderer* renderer) {
-    if (!currentRoom) return;
-
-    int tileCols = currentRoom->layout[0].size();
-    int tileRows = currentRoom->layout.size();
-
-    virtualRenderer()->updateLayout(tileCols, tileRows);
-
-    for (int row = 0; row < tileRows; ++row) {
-        for (int col = 0; col < tileCols; ++col) {
-            int tileId = currentRoom->layout[row][col];
-            const Tile* tile = tileSet.getTile(tileId);
-            if (!tile) continue;
-
-            SDL_Texture* texture = Manager::TextureManager::Get(tile->spritePath);
-            SDL_Rect screenRect = virtualRenderer()->tileToScreenRect(col, row);
-
-            auto tileBody = std::make_unique<Entities::TileBody>(
-                Vector4{
-                    static_cast<float>(screenRect.x),
-                    static_cast<float>(screenRect.y),
-                    static_cast<float>(screenRect.w),
-                    static_cast<float>(screenRect.h)
-                },
-                texture,
-                tile->solid
-            );
-            tileBody->setTileId(tileId);
-            tileBody->setTileData(tile);
-
-            this->entityManager.add(std::move(tileBody));
-        }
-    }
-
-    Vector4 playerVect = virtualRenderer()->mapToScreen(4, 4, 1, 1);
-    player = new Entities::PlayerBody(
-        playerVect,
-        true,
-        true
-    );
-
-    player->setAttackRate(1.0f);
-    player->setAttackSpeed(3.5f);
-    player->setTexture(Manager::TextureManager::Get("player_f"));
-    player->setAcceleration(virtualRenderer()->normalizeValue(3));
-    player->setHitboxMargin(0.2f, 0.2f);
-    this->player = player;
-
-    for (const auto& e : currentRoom->entities) {
-        std::string type = e.at("type");
-
-        if (type == "Item") {
-            int itemId = e.at("id");
-            int x = e.at("x");
-            int y = e.at("y");
-        
-            const Items::Item* itemData = itemManager.getItemById(itemId);
-            if (itemData) {
-               textures()->Load(renderer, itemData->getSpritePath(), itemData->getSpritePath());
-        
-                SDL_Rect screenRect = virtualRenderer()->tileToScreenRect(x, y);
-        
-                auto item = std::make_unique<Entities::ItemBody>(
-                    Vector4{
-                        static_cast<float>(screenRect.x),
-                        static_cast<float>(screenRect.y),
-                        static_cast<float>(screenRect.w),
-                        static_cast<float>(screenRect.h)
-                    },
-                    *itemData
-                );
-                item->setTexture(textures()->Get(itemData->getSpritePath()));
-        
-                this->entityManager.add(std::move(item));
-            }
-        }
-        if (type == "Enemy") {
-            int enemyId = e.at("id");
-            int x = e.at("x");
-            int y = e.at("y");
-            std::cout << "Enemy ID: " << enemyId << std::endl;
-        
-            const Enemies::Enemy* enemyData = enemyManager.getEnemyById(enemyId);
-            if (enemyData) {
-               textures()->Load(renderer, enemyData->getSpritePath(), enemyData->getSpritePath());
-                
-                SDL_Rect screenRect = virtualRenderer()->tileToScreenRect(x, y);
-        
-                auto enemy = std::make_unique<Entities::EnemyBody>(
-                    Vector4{
-                        static_cast<float>(screenRect.x),
-                        static_cast<float>(screenRect.y),
-                        static_cast<float>(screenRect.w),
-                        static_cast<float>(screenRect.h)
-                    },
-                    *enemyData,
-                    this->entityManager
-                );
-        
-                enemy->setTexture(textures()->Get(enemyData->getSpritePath()));
-                enemy->setTarget(this->player);
-        
-                this->entityManager.add(std::move(enemy));
-                std::cout << "Enemy added: " << enemyData->getName() << std::endl;
-            }
-        }
-    }
-}
-
-void GameplayScene::addDestroyEffect(Vector position, Vector scale) {
+void GameplayScene::addDestroyEffect(Vector2f position, Vector2f scale) {
     auto effect = std::make_unique<Entities::EffectBody>(
         position,
         scale,
@@ -361,4 +261,18 @@ void GameplayScene::addDestroyEffect(Vector position, Vector scale) {
         0.2f
     );
     entityManager.add(std::move(effect));
+}
+
+GameplayScene::~GameplayScene() {
+    delete this->hudRenderer;
+    this->hudRenderer = nullptr;
+
+    delete this->player;
+    this->player = nullptr;
+
+    delete this->roomManager;
+    this->roomManager = nullptr;
+
+    delete this->miniMapRenderer;
+    this->miniMapRenderer = nullptr;
 }

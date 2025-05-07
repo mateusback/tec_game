@@ -21,6 +21,10 @@ namespace Manager {
 
 		void addAll();
 		void removeInactive();
+		void clear() { this->entities.clear(); }
+		void clearAll() { this->entities.clear(); this->toAdd.clear(); }
+
+		bool hasAnyAliveEnemy() const;
 
 		#pragma region Getters
 		std::vector<std::unique_ptr<Entities::Entity>>& getEntities() { return this->entities; }
@@ -38,6 +42,15 @@ namespace Manager {
 			}
 		
 			return filtered;
+		}
+
+		template <typename T>
+		void deactivateEntitiesOfType() {
+			for (const auto& entity : this->entities) {
+				if (auto* ptr = dynamic_cast<T*>(entity.get())) {
+					ptr->setActive(false);
+				}
+			}
 		}
 		#pragma endregion
 	};

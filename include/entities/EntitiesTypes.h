@@ -9,7 +9,15 @@ namespace Entities {
         Hidden,
         CoolingDown,
         Dead
-        };
+    };
+
+    enum class EDirection {
+        Down,
+        Up,
+        Left,
+        Right
+    };
+    
 }
 
 #endif

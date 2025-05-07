@@ -2,6 +2,7 @@
 #define ENTITY_H
 
 #include <SDL2/SDL.h>
+#include "EntitiesTypes.h"
 
 namespace Entities {
 	class Entity {

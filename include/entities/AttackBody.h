@@ -19,7 +19,7 @@ namespace Entities
 
     public:
 		#pragma region Constructors
-		AttackBody(Vector position, Vector scale, bool collision = false, bool visible = true, 
+		AttackBody(Vector2f position, Vector2f scale, bool collision = false, bool visible = true, 
 			float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
 			: MovingBody(position.x, position.y, scale.x, scale.y, collision, visible, 0.0f),
 			attackDamage(dmg),
@@ -39,7 +39,7 @@ namespace Entities
 			criticalChance(crit_chance),
 			criticalDamage(crit_dmg) {}
 
-		AttackBody(Vector4 collider, bool collision = false, bool visible = true, 
+		AttackBody(Vector4f collider, bool collision = false, bool visible = true, 
 			float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
 			: MovingBody(collider.x, collider.y, collider.w, collider.z, collision, visible, 0.0f),
 			attackDamage(dmg),
@@ -51,6 +51,11 @@ namespace Entities
 		#pragma endregion
 
         void update(float deltaTime);
+
+
+		void loadAnimations() override {
+		}
+		
 
 		#pragma region Getters
 		float getAttackDamage() { return this->attackDamage; }

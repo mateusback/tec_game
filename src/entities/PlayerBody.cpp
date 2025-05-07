@@ -3,6 +3,7 @@
 #include "../../include/items/ItemTypes.h"
 #include "../../include/physics/CollisionManager.h"
 #include "../../include/utils/GlobalAccess.h"
+#include "../../include/managers/AnimationLoader.h"
 
 #include <SDL2/SDL.h>
 #include <cmath>
@@ -12,13 +13,26 @@ namespace Entities
 
     void PlayerBody::handleInput(const Manager::PlayerInput& input)
     {
-        Vector playerDirection = input.moveDirection;
-        Vector spriteDirection;
+        Vector2f playerDirection = input.moveDirection;
+        Vector2f spriteDirection;
 
         if (input.moveDirection.x != 0.f || input.moveDirection.y != 0.f) {
             spriteDirection = input.moveDirection;
-        } else if (input.shootDirection.x != 0.f || input.shootDirection.y != 0.f) {
-            spriteDirection = input.shootDirection;
+    
+            if (state != EntityState::Attacking) {
+                this->animationManager.setAnimation("walk");
+                this->setState(EntityState::Moving);
+            }
+    
+        } else {
+            if (input.shootDirection.x != 0.f || input.shootDirection.y != 0.f) {
+                spriteDirection = input.shootDirection;
+            }
+    
+            if (state == EntityState::Moving) {
+                this->animationManager.setAnimation("idle");
+                this->setState(EntityState::Idle);
+            }
         }
         
         updateDirectionSprite(spriteDirection);
@@ -28,15 +42,18 @@ namespace Entities
 
     void PlayerBody::update(float deltaTime)
     {
+        this->animationManager.update(deltaTime);
         if(this->active == false) return;
         this->move(deltaTime);
 
         if (this->attackTimer > 0.0f)
         this->attackTimer -= deltaTime;
 
-        if(this->health <= 0.0f) {
-            this->setActive(false);
-            std::cout << "Player morreu!" << std::endl;
+        if (this->health <= 0.0f) {
+            this->animationManager.setAnimation("death", [this]() {
+                this->state = EntityState::Dead;
+                this->setActive(false);
+            });
         }
 
         if (this->bombCooldown > 0.0f) {
@@ -44,12 +61,17 @@ namespace Entities
         }
     }
 
-    std::unique_ptr<Entities::AttackBody> PlayerBody::attack(Point characterCenter, Vector direction)
+    std::unique_ptr<Entities::AttackBody> PlayerBody::attack(Pointf characterCenter, Vector2f direction)
     {
-        //TODO - DEPOIS AJUSTAR A FORMA DE INSTANCIAR O TAMANHO
         if(this->attackTimer > 0.0f) return nullptr;
         float width = 16.f;
         float height = 16.f;
+        this->setState(EntityState::Attacking);
+        this->animationManager.setAnimation("attack", [this]() {
+            this->animationManager.setAnimation("idle");
+            this->setState(EntityState::Idle);
+        });
+        audio()->playSoundEffect("shoot", 0);
     
         if (direction.x != 0 || direction.y != 0) {
             float len = std::sqrt(direction.x * direction.x + direction.y * direction.y);
@@ -88,6 +110,7 @@ namespace Entities
 
     //TODO - DÁ PRA COLOCAR NO ITEM MANAGER
     void PlayerBody::pickUpItem(ItemBody* item){
+        audio()->playSoundEffect("pickup-item", 0);
         for (const auto& effect : item->getItem().getEffects()) {
             switch (effect.target) {
 				using enum Items::EEffectTarget;
@@ -123,16 +146,32 @@ namespace Entities
         this->setTexture(Manager::TextureManager::Get("player_with_item"));
     }
 
-    void PlayerBody::updateDirectionSprite(const Vector& direction) {
-        if (direction.y < 0) {
-            this->setTexture(Manager::TextureManager::Get("player_b"));
-        } else if (direction.y > 0) {
-            this->setTexture(Manager::TextureManager::Get("player_f"));
-        } else if (direction.x < 0) {
-            this->setTexture(Manager::TextureManager::Get("player_l"));
-        } else if (direction.x > 0) {
-            this->setTexture(Manager::TextureManager::Get("player_r"));
-        }
+    void PlayerBody::loadAnimations() {
+        SDL_Texture* texture = Manager::TextureManager::Get("player_sheet");
+        this->is_animated = true;
+    
+        Manager::AnimationLoader::loadNamedAnimations(texture, {
+            {"idle",   4, 5},
+            {"walk",   3, 7},
+            {"attack", 8, 7, false},
+            {"death",  7, 7, false}
+        }, this->animationManager);
+    
+        this->animationManager.setAnimation("idle");
+    }
+
+    //TODO - COLOCAR UMA CLASSE SPRITE QUE É UM VETOR DE TEXTURAS, E DEPOIS UM VETOR DE ANIMAÇÕES
+    //TODO - CRIAR UMA CLASSE DE ANIMAÇÃO QUE TEM UM VETOR DE TEXTURAS E UM VETOR DE TEMPOS
+    void PlayerBody::updateDirectionSprite(const Vector2f& direction) {
+        // if (direction.y < 0) {
+        //     this->setTexture(Manager::TextureManager::Get("player_b"));
+        // } else if (direction.y > 0) {
+        //     this->setTexture(Manager::TextureManager::Get("player_f"));
+        // } else if (direction.x < 0) {
+        //     this->setTexture(Manager::TextureManager::Get("player_l"));
+        // } else if (direction.x > 0) {
+        //     this->setTexture(Manager::TextureManager::Get("player_r"));
+        // }
     }
 
 }

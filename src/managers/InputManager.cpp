@@ -13,8 +13,8 @@ namespace Manager {
     void InputManager::updateKeyboardState() {
         keyboard = SDL_GetKeyboardState(nullptr);
 
-        Vector playerDirection = {0.f, 0.f};
-        Vector shootDirection = {0.f, 0.f};
+        Vector2f playerDirection = {0.f, 0.f};
+        Vector2f shootDirection = {0.f, 0.f};
         this->currentInput.shoot = false;
         this->currentInput.putBomb = false;
 
@@ -53,8 +53,8 @@ namespace Manager {
     void InputManager::updateControllerState() {
         if (!controller || !SDL_GameControllerGetAttached(controller)) return;
     
-        Vector playerDirection = {0.f, 0.f};
-        Vector shootDirection = {0.f, 0.f};
+        Vector2f playerDirection = {0.f, 0.f};
+        Vector2f shootDirection = {0.f, 0.f};
         this->currentInput.shoot = false;
         this->currentInput.putBomb = false;
     

@@ -11,16 +11,19 @@ bool TileSet::loadFromFile(const std::string& path) {
     json j;
     file >> j;
 
+    this->tileSize = j["tileSize"];
+    this->spriteSheetPath = j["spriteSheet"];
+
     for (auto& [key, value] : j["tiles"].items()) {
         int id = std::stoi(key);
         Tile tile;
         tile.id = id;
         tile.name = value["name"].get<std::string>();
-        tile.spritePath = value["sprite"].get<std::string>();;
-        tile.solid = value.contains("solid") && value["solid"].get<bool>();
-        tile.destructible = value.contains("destructible") && value["destructible"].get<bool>();
-        tile.destroyedId = value.contains("destroyedId") ? value["destroyedId"].get<int>() : -1;
-        
+        tile.index = value["index"].get<int>();
+        tile.solid = value.value("solid", false);
+        tile.destructible = value.value("destructible", false);
+        tile.destroyedId = value.value("destroyedId", -1);
+
         tileMap[id] = tile;
     }
 

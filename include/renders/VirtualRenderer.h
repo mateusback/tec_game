@@ -5,9 +5,7 @@
 #include <algorithm>
 
 #include <my-lib/math-vector.h>
-using Vector = Mylib::Math::Vector<float, 2>;
-using Vector4 = Mylib::Math::Vector<float, 4>;
-using Point = Vector;
+#include "../utils/Types.h"
 
 namespace Renderer {
     class VirtualRenderer {
@@ -15,6 +13,7 @@ namespace Renderer {
         float tileSize;
         int screenWidth;
         int screenHeight;
+        Vector2f cameraOffset = {0, 0};
 
     public:
         VirtualRenderer(int screenWidth, int screenHeight, int tileCols, int tileRows)
@@ -24,14 +23,20 @@ namespace Renderer {
             this->tileSize = std::min(w, h);
         }
 
-        SDL_Rect tileToScreenRect(int tileX, int tileY, int tileW = 1, int tileH = 1) const;
-        Vector4 mapToScreen(float x, float y, float w = 1.0f, float h = 1.0f) const;
+        Vector4f mapToScreen(float x, float y, float w = 1.0f, float h = 1.0f) const;
+        Vector4f mapToScreen(Vector2i position, float w = 1.0f, float h = 1.0f) const;
         void updateLayout(int tileCols, int tileRows);
 
-        float normalizeValue(float size) const { return size * this->tileSize; }
-        float denormalizeValue(float size) const { return size / this->tileSize; }
-        Vector normalizeVector(const Vector& vector) const { return Vector{ vector.x * this->tileSize, vector.y * this->tileSize }; }
-        Vector denormalizeVector(const Vector& vector) const { return Vector{ vector.x / this->tileSize, vector.y / this->tileSize }; }
+        float getVirtualWidth() const;
+        float getVirtualHeight() const;
+
+        Vector2f tileToScreenPosition(int col, int row) const;
+        Vector2i screenToTilePosition(Vector2f position) const;
+
+        float normalizeValue(float value) const { return value * this->tileSize; }
+        float denormalizeValue(float value) const { return value / this->tileSize; }
+        Vector2f normalizeVector(const Vector2f& vector) const { return Vector2f{ vector.x * this->tileSize, vector.y * this->tileSize }; }
+        Vector2f denormalizeVector(const Vector2f& vector) const { return Vector2f{ vector.x / this->tileSize, vector.y / this->tileSize }; }
 
         float getTileSize() const { return this->tileSize; }
         int getScreenWidth() const { return this->screenWidth; }
@@ -41,6 +46,8 @@ namespace Renderer {
         float getTileSizeSubtractedBy(float value) const { return this->tileSize - value; }
         float getTileSizeAddedBy(float value) const { return this->tileSize + value; }
         float getTileSizeDividedBy(float value) const { return this->tileSize / value; }
+        void setCameraOffset(Vector2f offset) { this->cameraOffset = offset; }
+        Vector2f getCameraOffset() const { return this->cameraOffset; }
     };
 }
 #endif

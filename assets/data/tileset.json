@@ -1,13 +1,15 @@
 {
+  "spriteSheet": "assets/tileset.png",
+  "tileSize": 32,
   "tiles": {
-    "0": { "name": "Floor", "sprite": "assets/tiles/floor.png", "solid": false},
-    "1": { "name": "Rock", "sprite": "assets/tiles/rock.png", "solid": true, "destructible": true, "destroyedId": 8},
-    "2": { "name": "Hole", "sprite": "assets/tiles/hole.png", "solid": false },
-    "3": { "name": "Wall-Top", "sprite": "assets/tiles/wall-top.png", "solid": true },
-    "4": { "name": "Wall-Bottom", "sprite": "assets/tiles/wall-bot.png", "solid": true },
-    "5": { "name": "Wall-Left", "sprite": "assets/tiles/wall-left.png", "solid": true },
-    "6": { "name": "Wall-Right", "sprite": "assets/tiles/wall-right.png", "solid": true },
-    "7": { "name": "Door-PlaceHolder", "sprite": "assets/tiles/wall.png", "solid": true },
-    "8": { "name": "Rock-Destroyed", "sprite": "assets/tiles/rock-destroyed.png", "solid": false }
+    "0": { "name": "Floor", "index": 0, "solid": false },
+    "1": { "name": "Rock", "index": 1, "solid": true, "destructible": true, "destroyedId": 8 },
+    "2": { "name": "Hole", "index": 2, "solid": false },
+    "3": { "name": "Wall-Top", "index": 3, "solid": true },
+    "4": { "name": "Wall-Bottom", "index": 4, "solid": true },
+    "5": { "name": "Wall-Left", "index": 5, "solid": true },
+    "6": { "name": "Wall-Right", "index": 6, "solid": true },
+    "7": { "name": "Door-PlaceHolder", "index": 7, "solid": true },
+    "8": { "name": "Rock-Destroyed", "index": 8, "solid": false }
   }
 }

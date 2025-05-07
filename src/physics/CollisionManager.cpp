@@ -2,7 +2,7 @@
 
 namespace Physics {
 	//resolver colisao junto
-    bool CollisionManager::checkCollision(const Vector4& a, const Vector4& b) {
+    bool CollisionManager::checkCollision(const Vector4f& a, const Vector4f& b) {
         return (
             a.x < b.x + b.z &&
             a.x + a.z > b.x &&
@@ -12,8 +12,8 @@ namespace Physics {
     }
 
     void CollisionManager::resolveCollision(Entities::Body* a, const Entities::Body* b) {
-        Vector4 aHitbox = a->getHitbox();
-        Vector4 bHitbox = b->getHitbox();
+        Vector4f aHitbox = a->getHitbox();
+        Vector4f bHitbox = b->getHitbox();
 
         float aCenterX = aHitbox.x + aHitbox.z / 2.0f;
         float aCenterY = aHitbox.y + aHitbox.w / 2.0f;
@@ -30,7 +30,7 @@ namespace Physics {
         float overlapY = combinedHalfHeight - std::abs(dy);
 
         if (overlapX > 0 && overlapY > 0) {
-            Vector pos = a->getPosition();
+            Vector2f pos = a->getPosition();
 
             if (overlapX < overlapY) {
                 pos.x += (dx > 0) ? overlapX : -overlapX;

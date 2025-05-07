@@ -10,10 +10,13 @@ namespace Entities {
         float duration;
 
     public:
-        EffectBody(Vector position, Vector scale, SDL_Texture* texture, float durationSeconds = 0.3f)
+        EffectBody(Vector2f position, Vector2f scale, SDL_Texture* texture, float durationSeconds = 0.3f)
             : Body(position.x, position.y, scale.x, scale.y, false, true),
               duration(durationSeconds) {
             this->setTexture(texture);
+        }
+
+        void loadAnimations() override {
         }
 
         void update(float deltaTime) override {

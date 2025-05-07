@@ -3,7 +3,7 @@
 #include "../../include/managers/SceneManager.h"
 
 namespace Entities {
-    EnemyBody::EnemyBody(Vector4 collider, const Enemies::Enemy& data, Manager::EntityManager& entityManager)
+    EnemyBody::EnemyBody(Vector4f collider, const Enemies::Enemy& data, Manager::EntityManager& entityManager)
     : CharacterBody(collider.x, collider.y, collider.z, collider.w, true, true, 0.f),
       enemyData(data),
       entityManager(entityManager) {
@@ -76,7 +76,7 @@ namespace Entities {
         }
     }
 
-    std::unique_ptr<AttackBody> EnemyBody::attack(Point origin, Vector direction) {
+    std::unique_ptr<AttackBody> EnemyBody::attack(Pointf origin, Vector2f direction) {
         float width = 16.f;
         float height = 16.f;
         float speed = 2;

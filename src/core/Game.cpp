@@ -2,9 +2,13 @@
 #include "../../include/core/GameLoop.h"
 #include "../../include/managers/SceneManager.h"
 #include "../../include/scenes/GameplayScene.h"
+#include "../../include/scenes/MenuScene.h"
 #include "../../include/renders/TextRenderer.h"
 #include "../../include/renders/VirtualRendererGlobal.h"
 #include "../../include/managers/TextureManagerGlobal.h"
+#include "../../include/managers/AudioManagerGlobal.h"
+#include "../../include/managers/ScoreManagerGlobal.h"
+#include "../../include/managers/FontManager.h"
 
 #include <iostream>
 
@@ -30,6 +34,11 @@ namespace Core
             return;
         }    
 
+        if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+            std::cout << "Erro SDL_Init: " << SDL_GetError() << "\n";
+            return;
+        }
+
         this->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                 width, height, SDL_WINDOW_SHOWN);
         if (!this->window) 
@@ -44,12 +53,15 @@ namespace Core
             std::cerr << "Erro ao criar renderer: " << SDL_GetError() << std::endl;
             return;
         }
+
         #pragma endregion
 
         Renderer::VirtualRendererGlobal::init(width, height, 1, 1);
         Manager::TextureManagerGlobal::init();
+        Manager::AudioManagerGlobal::init();
+        Manager::ScoreManagerGlobal::init();
 
-        Manager::SceneManager::setScene(new GameplayScene(renderer, width, height));
+        Manager::SceneManager::setScene(new MenuScene(renderer, width, height));
 
         this->loop = new GameLoop(renderer);
     }
@@ -69,6 +81,8 @@ namespace Core
     {
         Renderer::VirtualRendererGlobal::destroy();
         Manager::TextureManagerGlobal::destroy();
+        Manager::AudioManagerGlobal::destroy();
+        Manager::ScoreManagerGlobal::destroy();
         delete this->loop;
         SDL_DestroyRenderer(this->renderer);
         SDL_DestroyWindow(this->window);

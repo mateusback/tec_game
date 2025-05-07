@@ -13,7 +13,7 @@ namespace Utils {
             for (auto& e : manager.getEntities()) {
                 if (auto* body = dynamic_cast<T*>(e.get())) {
                     if (body->hasCollision()) {
-                        Vector4 hitbox = body->getHitbox();
+                        Vector4f hitbox = body->getHitbox();
                         SDL_FRect rect = {
                             hitbox.x, hitbox.y,
                             hitbox.z, hitbox.w

@@ -2,15 +2,12 @@
 #define INPUT_MANAGER_H
 
 #include <SDL2/SDL.h>
-#include <my-lib/math-vector.h>
-
-using Vector = Mylib::Math::Vector<float, 2>;
-using Vector4 = Mylib::Math::Vector<float, 4>;
+#include "../utils/Types.h"
 
 namespace Manager {
     struct PlayerInput {
-        Vector moveDirection = {0.f, 0.f};
-        Vector shootDirection = {0.f, 0.f};
+        Vector2f moveDirection = {0.f, 0.f};
+        Vector2f shootDirection = {0.f, 0.f};
         bool shoot = false;
         bool pause = false;
         bool putBomb = false;

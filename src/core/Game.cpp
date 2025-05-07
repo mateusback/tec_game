@@ -2,10 +2,13 @@
 #include "../../include/core/GameLoop.h"
 #include "../../include/managers/SceneManager.h"
 #include "../../include/scenes/GameplayScene.h"
+#include "../../include/scenes/MenuScene.h"
 #include "../../include/renders/TextRenderer.h"
 #include "../../include/renders/VirtualRendererGlobal.h"
 #include "../../include/managers/TextureManagerGlobal.h"
 #include "../../include/managers/AudioManagerGlobal.h"
+#include "../../include/managers/ScoreManagerGlobal.h"
+#include "../../include/managers/FontManager.h"
 
 #include <iostream>
 
@@ -58,7 +61,7 @@ namespace Core
         Manager::AudioManagerGlobal::init();
         Manager::ScoreManagerGlobal::init();
 
-        Manager::SceneManager::setScene(new GameplayScene(renderer, width, height));
+        Manager::SceneManager::setScene(new MenuScene(renderer, width, height));
 
         this->loop = new GameLoop(renderer);
     }

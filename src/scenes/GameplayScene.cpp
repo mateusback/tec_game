@@ -48,6 +48,8 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
 
     //TODO - Depois passar para o player
     if (input.putBomb && player->getBombCooldown() <= 0.0f) {
+        if (player->getBombs() <= 0) return;
+        player->setBombs(player->getBombs() - 1);
         Vector2f pos = player->getPosition();
         auto bomb = std::make_unique<Entities::BombBody>(
             Vector4f{
@@ -243,7 +245,6 @@ void GameplayScene::loadResources(SDL_Renderer* renderer){
     audio()->loadSoundEffect("hit-player", "assets/audio/hit-player.mp3");
     audio()->loadSoundEffect("pickup-item", "assets/audio/pickup-item.mp3");
 
-    Manager::FontManager::load("default", "assets/fonts/Montserrat-Bold.ttf", 16);
     this->enemyManager.loadFromFile("assets/data/enemies.json");
     this->tileSet.loadFromFile("assets/data/tileset.json");
     this->itemManager.loadFromFile("assets/data/items.json");

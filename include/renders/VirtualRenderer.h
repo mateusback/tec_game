@@ -27,6 +27,9 @@ namespace Renderer {
         Vector4f mapToScreen(Vector2i position, float w = 1.0f, float h = 1.0f) const;
         void updateLayout(int tileCols, int tileRows);
 
+        float getVirtualWidth() const;
+        float getVirtualHeight() const;
+
         Vector2f tileToScreenPosition(int col, int row) const;
         Vector2i screenToTilePosition(Vector2f position) const;
 

@@ -41,4 +41,12 @@ namespace Renderer {
             static_cast<int>(position.y / tileSize)
         };
     }
+
+    float VirtualRenderer::getVirtualWidth() const {
+        return static_cast<float>(this->screenWidth) / this->tileSize;
+    }
+    
+    float VirtualRenderer::getVirtualHeight() const {
+        return static_cast<float>(this->screenHeight) / this->tileSize;
+    }
 }

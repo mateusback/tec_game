@@ -72,6 +72,17 @@ void HudRenderer::drawBombs(SDL_Renderer* renderer, int bombs) {
         static_cast<int>(size)
     };
 
+    TTF_Font* font = Manager::FontManager::get("default");
+    if (font) {
+        SDL_Color color = {255, 255, 255};
+        std::string text = "x " + std::to_string(bombs);
+
+        int textX = dst.x + dst.w + static_cast<int>(virtualRenderer()->normalizeValue(0.05f));
+        int textY = dst.y;
+
+        Core::TextRenderer::render(renderer, font, text, textX, textY, color);
+    }
+
     SDL_RenderCopy(renderer, texture, &src, &dst);
 }
 
@@ -90,6 +101,17 @@ void HudRenderer::drawCoins(SDL_Renderer* renderer, int coins) {
         static_cast<int>(size)
     };
 
+    TTF_Font* font = Manager::FontManager::get("default");
+    if (font) {
+    SDL_Color color = {255, 255, 255};
+    std::string text = "x " + std::to_string(coins);
+
+    int textX = dst.x + dst.w + static_cast<int>(virtualRenderer()->normalizeValue(0.05f));
+    int textY = dst.y;
+
+    Core::TextRenderer::render(renderer, font, text, textX, textY, color);
+    }
+
     SDL_RenderCopy(renderer, texture, &src, &dst);
 }
 
@@ -100,9 +122,12 @@ void HudRenderer::drawScore(SDL_Renderer* renderer) {
     SDL_Color color = {255, 255, 255};
     std::string scoreText = "Score: " + std::to_string(score()->getScore());
 
-    int x = static_cast<int>(virtualRenderer()->normalizeValue(4.2f));
+    int textWidth = 0, textHeight = 0;
+    TTF_SizeText(font, scoreText.c_str(), &textWidth, &textHeight);
+
+    int screenWidth = virtualRenderer()->getScreenWidth();
+    int x = screenWidth - textWidth - static_cast<int>(virtualRenderer()->normalizeValue(0.2f));
     int y = static_cast<int>(virtualRenderer()->normalizeValue(0.2f));
 
-    //TODO - TROCAR ISSO DEPOIS
     Core::TextRenderer::render(renderer, font, scoreText, x, y, color);
 }

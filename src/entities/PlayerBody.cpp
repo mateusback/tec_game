@@ -18,15 +18,21 @@ namespace Entities
 
         if (input.moveDirection.x != 0.f || input.moveDirection.y != 0.f) {
             spriteDirection = input.moveDirection;
-            if(state != EntityState::Attacking) {
+    
+            if (state != EntityState::Attacking) {
                 this->animationManager.setAnimation("walk");
+                this->setState(EntityState::Moving);
             }
-        } else if (input.shootDirection.x != 0.f || input.shootDirection.y != 0.f) {
-            spriteDirection = input.shootDirection;
-        } 
-
-        if(this->state == EntityState::Idle) {
-            this->setState(EntityState::Idle);
+    
+        } else {
+            if (input.shootDirection.x != 0.f || input.shootDirection.y != 0.f) {
+                spriteDirection = input.shootDirection;
+            }
+    
+            if (state == EntityState::Moving) {
+                this->animationManager.setAnimation("idle");
+                this->setState(EntityState::Idle);
+            }
         }
         
         updateDirectionSprite(spriteDirection);

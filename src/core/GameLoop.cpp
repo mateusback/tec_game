@@ -8,6 +8,8 @@ namespace Core
 {
     GameLoop::GameLoop(SDL_Renderer* renderer) : isRunning(true), lastFrameTime(0), renderer(renderer) {
         this->inputManager = Manager::InputManager();
+        Manager::FontManager::load("default", "assets/fonts/Montserrat-Bold.ttf", 16);
+        this->fpsSamples.reserve(fpsSampleSize);
         if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) < 0) {
             std::cerr << "Erro ao inicializar SDL GameController: " << SDL_GetError() << std::endl;
         }
@@ -69,10 +71,26 @@ namespace Core
         if (scene) 
             scene->render(renderer);
 
-        auto currentFPS = (deltaTime > 0.0f) ? static_cast<int>(1.0f / deltaTime) : 0;
+        float fps = (deltaTime > 0.0f) ? 1.0f / deltaTime : 0.0f;
+        fpsSamples.push_back(fps);
+        if (fpsSamples.size() > fpsSampleSize)
+            fpsSamples.erase(fpsSamples.begin());
+        
+        float fpsAvg = 0.0f;
+        for (float f : fpsSamples) fpsAvg += f;
+        fpsAvg /= fpsSamples.size();
+        
+        fpsDisplayAccumulator += deltaTime;
+        if (fpsDisplayAccumulator >= 0.25f) {
+            smoothedFPS = static_cast<int>(fpsAvg);
+            fpsDisplayAccumulator = 0.0f;
+        }
+
         TTF_Font* font = Manager::FontManager::get("default");
-        std::string fpsText = "FPS: " + std::to_string(currentFPS);
-        Core::TextRenderer::render(renderer, font, fpsText, 10, 10);
+        if (font) {
+            std::string fpsText = "FPS: " + std::to_string(smoothedFPS);
+            Core::TextRenderer::render(renderer, font, fpsText, 10, 10);
+        }
 
         SDL_RenderPresent(renderer);
     }

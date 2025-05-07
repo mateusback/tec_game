@@ -144,7 +144,7 @@ void RoomManager::loadEntities(Map::Room* room) {
             const Items::Item* itemData = this->itemManager->getItemById(id);
             if (itemData) {
                 textures()->Load(this->renderer, itemData->getSpritePath(), itemData->getSpritePath());
-                Vector4f screenVect = virtualRenderer()->mapToScreen(x, y, 0.5f, 0.5f);
+                Vector4f screenVect = virtualRenderer()->mapToScreen(x, y, 1.0f, 1.0f);
 
                 auto item = std::make_unique<Entities::ItemBody>(
                     screenVect,
@@ -199,6 +199,7 @@ void RoomManager::createPlayerInStartRoom() {
     this->player->loadAnimations();
     this->player->setAcceleration(virtualRenderer()->normalizeValue(3));
     this->player->setHitboxMargin(0.2f, 0.2f);
+    this->player->setBombs(3);
 }
 
 void RoomManager::updateVirutalRenderer(Map::Room* room) {
@@ -291,16 +292,32 @@ bool RoomManager::areAllEnemiesDefeated() const {
 void RoomManager::openDoorsOfCurrentRoom() {
     auto& layout = this->currentRoom->layout;
 
-    this->entityManager->deactivateEntitiesOfType<Entities::TileBody>();
-    for (auto& row : layout) {
-        for (auto& tile : row) {
-            if (tile == 7) tile = 0;
+    // 1. Coletar posições das portas
+    std::vector<Vector2i> portasFechadas;
+
+    for (auto* tile : entityManager->getEntitiesByType<Entities::TileBody>()) {
+        if (tile->getTileId() == 7) {
+            portasFechadas.push_back(virtualRenderer()->screenToTilePosition(tile->getPosition()));
+            tile->setActive(false);
         }
     }
 
-    this->currentRoom->doorsOpen = true;
+    for (const auto& pos : portasFechadas) {
+        layout[pos.y][pos.x] = 0;
 
-    this->loadTiles(this->currentRoom);
+        const Tile* tileData = this->tileSet->getTile(0);
+        if (!tileData) continue;
+
+        Vector4f screenPos = virtualRenderer()->mapToScreen(pos);
+        auto tile = std::make_unique<Entities::TileBody>(screenPos, textures()->Get("tileset"), tileData->solid);
+        tile->initStaticTile(textures()->Get("tileset"), tileData->index);
+        tile->setTileId(0);
+        tile->setTileData(tileData);
+
+        this->entityManager->add(std::move(tile));
+    }
+
+    this->currentRoom->doorsOpen = true;
 }
 
 void RoomManager::saveCurrentRoomState() {

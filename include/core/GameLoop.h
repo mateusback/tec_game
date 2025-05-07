@@ -2,6 +2,8 @@
 #define GAMELOOP_H
 #include <SDL2/SDL.h>
 #include "../managers/InputManager.h"
+#include <vector>
+
 
 namespace Core {
     class GameLoop {
@@ -10,6 +12,10 @@ namespace Core {
         Uint32 lastFrameTime;
         SDL_Renderer* renderer;
         float deltaTime;
+        std::vector<float> fpsSamples;
+        const size_t fpsSampleSize = 30;
+        float fpsDisplayAccumulator = 0.0f;
+        int smoothedFPS = 0;
         
         Manager::InputManager inputManager;
 

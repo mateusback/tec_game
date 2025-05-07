@@ -45,8 +45,9 @@ namespace Entities
         void setItem(const Item& item) { this->item = item; }
         #pragma endregion
     
-        void update(float deltaTime) override {};
+        void update(float deltaTime) override;
         void onCollision(Body* other) override;
+        void loadAnimations() override;
     };
 }
 

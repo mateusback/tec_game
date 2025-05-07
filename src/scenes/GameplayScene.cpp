@@ -96,6 +96,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     player->setPosition(player->getPosition().x + totalDisplacement.x, player->getPosition().y + totalDisplacement.y);
     
     for (auto* item : items) {
+        item->update(deltaTime);
         if (item->hasCollision() &&
             Physics::CollisionManager::checkCollision(player->getHitbox(), item->getHitbox())) {
             player->onCollision(item);

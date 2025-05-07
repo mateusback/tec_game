@@ -6,7 +6,7 @@
       "description": "Uma lâmina sagrada que brilha.",
       "quality": 5,
       "type": "Passive",
-      "sprite": "assets/espada_sagrada.png",
+      "sprite": "assets/animations/item.png",
       "effects": [
         { "target": "AttackDamage", "value": 5.0 },
         { "target": "AttackSpeed", "value": 0.1 }

@@ -150,8 +150,7 @@ void RoomManager::loadEntities(Map::Room* room) {
                     screenVect,
                     *itemData
                 );
-                //TODO - TROCAR PARA ANIMATED
-                item->setTexture(textures()->Get(itemData->getSpritePath()));
+                item->loadAnimations();
                 this->entityManager->add(std::move(item));
             }
         }

@@ -17,17 +17,6 @@ namespace Entities {
 
     public:
         EnemyBody(Vector4f collider, const Enemies::Enemy& data, Manager::EntityManager& entityManager);
-        EnemyBody(const EnemyBody& other)
-        : CharacterBody(other),
-        enemyData(other.enemyData),
-        target(other.target),
-        agrroRange(other.agrroRange),
-        entityManager(other.entityManager) {
-            
-            this->setTexture(other.getTexture());
-            this->setPosition(other.getPosition());
-            this->EnemyBody::loadAnimations();
-        }
 
         std::unique_ptr<AttackBody> attack(Pointf origin, Vector2f direction);
 
@@ -36,12 +25,13 @@ namespace Entities {
 
         void update(float deltaTime) override {
             applyEnemyBehavior(deltaTime);
+            Body::update(deltaTime);
         }
 
         void applyEnemyBehavior(float deltaTime);
         void loadAnimations() override;
         void onCollision(Body* other) override;
-        
+        void setAnimationByState();
         const Enemies::Enemy& getEnemyData() const { return enemyData; }
         void setEnemyData(const Enemies::Enemy& data) { this->enemyData = data; }
         float getAggroRange() const { return this->agrroRange; }

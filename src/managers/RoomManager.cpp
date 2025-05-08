@@ -170,7 +170,6 @@ void RoomManager::loadEntities(Map::Room* room) {
                 );
 
                 //TODO - TROCAR PARA ANIMATED
-                enemy->setTexture(textures()->Get(enemyData->getSpritePath()));
                 enemy->setTarget(this->player);
                 this->entityManager->add(std::move(enemy));
                 hasEnemies = true;

@@ -24,23 +24,20 @@ namespace Entities {
     void EnemyBody::applyEnemyBehavior(float deltaTime) {
         const EEnemyBehavior behavior = this->getEnemyData().getBehavior();
         auto* player = this->getTarget();
-        Body::update(deltaTime);
         //if (!player) [[unlikely]] return;
     
         auto toPlayer = player->getPosition() - this->getPosition();
         float distance = toPlayer.length();
-    
+        
         if (behavior == EEnemyBehavior::Shell) {
             switch (this->state) {
                 case EntityState::Idle:
-                    this->animationManager.setAnimation("idle");
                     this->setCollision(true);
                     if (distance < this->getAggroRange()) {
                         this->state = EntityState::Hidden;
                     }
                     break;
                 case EntityState::Hidden:
-                    this->animationManager.setAnimation("hidden");
                     this->setCollision(false);
                     if (distance < this->getAggroRange()) {
                         this->state = EntityState::Attacking;
@@ -48,10 +45,8 @@ namespace Entities {
                     break;
     
                 case EntityState::Attacking:
-                    this->animationManager.setAnimation("attack");
                     toPlayer.normalize();
                     this->setCollision(true);
-                    this->texture = textures()->Get(this->getEnemyData().getSpritePath());
                     this->state = EntityState::CoolingDown;
                     this->stateTimer = this->getAttackRate();
                 {
@@ -65,11 +60,9 @@ namespace Entities {
                 case EntityState::CoolingDown:
                     this->stateTimer -= deltaTime;
                     if(this->stateTimer <= this->getAttackRate() / 2) {
-                        this->animationManager.setAnimation("hidden");
                         this->setCollision(false);
                     } else {
                         this->setCollision(true);
-                        this->animationManager.setAnimation("idle");
                     }
                     if (stateTimer <= 0.0f) {
                         this->state = EntityState::Hidden;
@@ -83,45 +76,79 @@ namespace Entities {
                 case EntityState::Idle:
                     if (distance < this->getAggroRange()) {
                         this->state = EntityState::Attacking;
-                        this->stateTimer = 0.2f;
+                        this->stateTimer = 0.5f; 
                     }
-                    this->animationManager.setAnimation("idle");
                     break;
-
+        
                 case EntityState::Attacking:
                     this->stateTimer -= deltaTime;
+                    this->setSpeed({0.f, 0.f});
                     if (this->stateTimer <= 0.f) {
-                        toPlayer.normalize();
-                        this->setSpeed(toPlayer * 150.0f);
+                        if (distance > 0.f)
+                            toPlayer.normalize();
+                        this->setSpeed(toPlayer * virtualRenderer()->normalizeValue(6));
                         this->state = EntityState::Jumping;
-                        this->stateTimer = 0.6f;
+                        this->stateTimer = 0.4f;
                     }
-                    this->animationManager.setAnimation("prep");
                     break;
-
+        
                 case EntityState::Jumping:
                     this->stateTimer -= deltaTime;
                     if (this->stateTimer <= 0.f) {
-                        this->setSpeed({0, 0});
+                        this->setSpeed({0.f, 0.f});
                         this->state = EntityState::CoolingDown;
                         this->stateTimer = this->getAttackRate();
                     }
-                    this->animationManager.setAnimation("jump");
                     break;
-
+        
                 case EntityState::CoolingDown:
                     this->stateTimer -= deltaTime;
                     if (this->stateTimer <= 0.f) {
                         this->state = EntityState::Idle;
                     }
-                    this->animationManager.setAnimation("idle");
                     break;
-
+        
                 default:
-                    this->animationManager.setAnimation("idle");
                     break;
             }
         }
+        this->setAnimationByState();
+        if(this->speed.x > 0 || this->speed.y > 0) this->move(deltaTime);
+    }
+
+    void EnemyBody::setAnimationByState() {
+        std::string desiredAnimation;
+    
+        switch (this->state) {
+            case EntityState::Idle:
+                desiredAnimation = "idle";
+                break;
+            case EntityState::Hidden:
+                desiredAnimation = "hidden";
+                break;
+            case EntityState::Attacking:
+                if (this->getEnemyData().getBehavior() == EEnemyBehavior::Shell) {
+                    desiredAnimation = "attack";
+                } else {
+                    desiredAnimation = "prep";
+                }
+                break;
+            case EntityState::Jumping:
+                desiredAnimation = "jump";
+                break;
+            case EntityState::CoolingDown:
+                if (this->getEnemyData().getBehavior() == EEnemyBehavior::Shell) {
+                    desiredAnimation = (this->stateTimer <= this->getAttackRate() / 2.f)
+                                       ? "hidden" : "idle";
+                } else {
+                    desiredAnimation = "idle";
+                }
+                break;
+            default:
+                desiredAnimation = "idle";
+                break;
+        }
+        this->animationManager.setAnimation(desiredAnimation);
     }
 
     std::unique_ptr<AttackBody> EnemyBody::attack(Pointf origin, Vector2f direction) {
@@ -157,11 +184,11 @@ namespace Entities {
     }
 
     void EnemyBody::loadAnimations() {
+        this->is_animated = true;
         if (this->enemyData.getBehavior() == EEnemyBehavior::Jumper) {
         SDL_Texture* texture = Manager::TextureManager::Get(this->enemyData.getSpritePath());
-        this->is_animated = true;
 
-        Manager::AnimationLoader::loadNamedAnimations(texture, {
+        Manager::AnimationLoader::loadStaticAnimations(texture, {
             {"idle",   0, 0},
             {"prep",   0, 1},
             {"jump", 0, 2},
@@ -170,10 +197,9 @@ namespace Entities {
         this->animationManager.setAnimation("idle");
         }
         if (this->enemyData.getBehavior() == EEnemyBehavior::Shell) {
-            SDL_Texture* texture = Manager::TextureManager::Get("shell");
-            this->is_animated = true;
+            SDL_Texture* texture = Manager::TextureManager::Get(this->enemyData.getSpritePath());
 
-            Manager::AnimationLoader::loadNamedAnimations(texture, {
+            Manager::AnimationLoader::loadStaticAnimations(texture, {
                 {"hidden",   0, 0},
                 {"attack", 0, 1},
                 {"idle",   0, 2},
@@ -181,6 +207,7 @@ namespace Entities {
 
             this->animationManager.setAnimation("idle");
         }
+        std::cout << "Enemy animations loaded: " << this->enemyData.getName() << std::endl;
     }
 
     void EnemyBody::onCollision(Body* other) {

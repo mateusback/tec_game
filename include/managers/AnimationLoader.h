@@ -17,6 +17,12 @@ namespace Manager {
         bool loop = true;
     };
 
+    struct StaticAnimationInfo {
+        std::string name;
+        int row;
+        int column;
+    };
+
     class AnimationLoader {
     public:
         static constexpr int SPRITE_WIDTH  = 32;
@@ -26,6 +32,7 @@ namespace Manager {
         static std::vector<Renderer::Sprite> loadRange(SDL_Texture* texture, int startFrame, int frameCount);
         static Renderer::Sprite loadSingleFrame(SDL_Texture* texture, int frameIndex);
         static void loadNamedAnimations(SDL_Texture* texture, const std::vector<AnimationInfo>& animations, AnimationManager& manager, float frameDuration = 0.15f);
+        static void loadStaticAnimations(SDL_Texture* texture, const std::vector<StaticAnimationInfo>& animations, AnimationManager& manager);
         static int calculateStartIndex(SDL_Texture* texture, int row);
         
         private:

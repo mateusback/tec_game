@@ -45,7 +45,7 @@ namespace Entities
 		experience(0) {}
 		#pragma endregion
 	
-
+		void takeDamage(float damage) override;
 		void onCollision(Body* other) override;
 		void update(float deltaTime) override;
 		void loadAnimations() override;

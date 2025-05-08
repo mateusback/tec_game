@@ -49,6 +49,13 @@ namespace Entities
         if (this->attackTimer > 0.0f)
         this->attackTimer -= deltaTime;
 
+        if (this->invencible) {
+            this->invencibleTimer -= deltaTime;
+            if (this->invencibleTimer <= 0.0f) {
+                this->invencible = false;
+            }
+        }
+
         if (this->health <= 0.0f) {
             this->animationManager.setAnimation("death", [this]() {
                 this->state = EntityState::Dead;
@@ -106,6 +113,14 @@ namespace Entities
     {
         other->onCollision(this);
         Physics::CollisionManager::resolveCollision(this, other);
+    }
+
+    void PlayerBody::takeDamage(float damage) {
+        if (this->invencible) return;
+        this->health -= damage; //TODO - USAR DEFESA
+        this->invencible = true;
+        this->invencibleTimer = 1.0f;
+        audio()->playSoundEffect("hit-player", 0);
     }
 
     //TODO - DÁ PRA COLOCAR NO ITEM MANAGER

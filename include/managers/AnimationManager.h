@@ -56,7 +56,7 @@ namespace Manager {
         return currentAnimation->getFrame(index);
     }
     
-    SDL_Texture* getTexture() const {
+     SDL_Texture* getTexture() const{
         return currentAnimation->getFrame(0).getTexture();
     }
     

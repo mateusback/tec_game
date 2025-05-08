@@ -45,8 +45,9 @@ void RoomManager::loadFloor(int index) {
 }
 
 void RoomManager::loadRoom(Map::Room* room) {
-    if (!room) return;
+    if (!room) [[unlikely]] return;
 
+        //todo - separar mapa de level, inimigos no level    this->currentRoom = room;
     this->currentRoom = room;
     this->entityManager->clearAll();
     this->updateVirutalRenderer(room);

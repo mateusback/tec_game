@@ -8,6 +8,7 @@ namespace Renderer {
     private:
         SDL_Texture* texture = nullptr;
         SDL_Rect srcRect{};
+        //todo - adicionar deslocamento, vetor de deslocamento
 
     public:
         Sprite(SDL_Texture* texture, const SDL_Rect& srcRect)

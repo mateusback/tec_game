@@ -15,10 +15,10 @@
 GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight) {
     this->loadResources(renderer);
 
+    //
     this->roomManager = new Manager::RoomManager(renderer, 
         &this->entityManager, &this->tileSet, 
         &this->itemManager, &this->enemyManager);
-
 
     this->roomManager->loadFloor(1);
     this->roomManager->loadRoomByType(Map::ERoomType::Start);
@@ -236,7 +236,6 @@ void GameplayScene::loadResources(SDL_Renderer* renderer){
     textures()->Load(renderer, "attack", "assets/attack.png");
     textures()->Load(renderer, "attack_destroy", "assets/attack_fade.png");
 
-    textures()->Load(renderer, "shell_hidden", "assets/enemies/shell_hidden.png");
     textures()->Load(renderer, "bomb", "assets/bomb.png");
     textures()->Load(renderer, "bomb_explosion", "assets/bomb_explosion.png");
     textures()->Load(renderer, "hudsheet", "assets/hudsheet.png");

@@ -8,14 +8,13 @@ namespace Entities {
         Attacking,
         Hidden,
         CoolingDown,
-        Dead
+        Dead,
+        Jumping
     };
 
-    enum class EDirection {
-        Down,
-        Up,
-        Left,
-        Right
+    enum class EEnemyBehavior {
+        Shell,
+        Jumper
     };
     
 }

@@ -26,6 +26,7 @@ namespace Entities {
             
             this->setTexture(other.getTexture());
             this->setPosition(other.getPosition());
+            this->EnemyBody::loadAnimations();
         }
 
         std::unique_ptr<AttackBody> attack(Pointf origin, Vector2f direction);
@@ -38,6 +39,8 @@ namespace Entities {
         }
 
         void applyEnemyBehavior(float deltaTime);
+        void loadAnimations() override;
+        void onCollision(Body* other) override;
         
         const Enemies::Enemy& getEnemyData() const { return enemyData; }
         void setEnemyData(const Enemies::Enemy& data) { this->enemyData = data; }

@@ -5,6 +5,7 @@ namespace Manager
     Mylib::unordered_map_string_key<SDL_Texture*> TextureManager::textures;
     
     void TextureManager::Load(SDL_Renderer* renderer, const std::string& id, const std::string& path) {
+        if (textures.contains(id)) return;
         SDL_Texture* tex = IMG_LoadTexture(renderer, path.c_str());
         if (!tex) {
             printf("Erro ao carregar textura '%s': %s\n", path.c_str(), IMG_GetError());

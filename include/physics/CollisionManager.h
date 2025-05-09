@@ -12,6 +12,13 @@ namespace Physics
         static bool checkCollision(const Vector4f& a, const Vector4f& b);
         static void resolveCollision(Entities::Body* a, const Entities::Body* b);
     };
+
+    template <typename A, typename B>
+    inline bool isColliding(A* a, B* b) {
+        return a->hasCollision() &&
+               b->hasCollision() &&
+               CollisionManager::checkCollision(a->getHitbox(), b->getHitbox());
+    }
 }
 
 

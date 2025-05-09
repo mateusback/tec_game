@@ -20,7 +20,7 @@ namespace Entities
             SDL_RenderCopyF(renderer, sprite->getTexture(), &sprite->getSourceRect(), &rect);
             return;
         }
-        if (this->texture) 
+        if (this->texture)
         {
             SDL_FRect rect = { fullSize.x, fullSize.y, fullSize.w, fullSize.z };
             SDL_RenderCopyF(renderer, this->texture, nullptr, &rect);

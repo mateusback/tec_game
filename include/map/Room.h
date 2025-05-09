@@ -6,11 +6,17 @@
 #include "MapTypes.h"
 
 namespace Map {
+    struct EntityInstance {
+        EEntityType type;
+        int id;
+        int x, y;
+    };
+
     struct Room {
         int id;
         int x, y;
         ERoomType type;
-        std::vector<nlohmann::json> entities;
+        std::vector<EntityInstance> entities;
         std::vector<std::vector<int>> layout;
         bool doorsOpen = true;
     

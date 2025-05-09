@@ -64,8 +64,24 @@ namespace Manager
             manager.addAnimation(anim.name, animation);
         }
     }
-    
 
+    void AnimationLoader::loadStaticAnimations(SDL_Texture* texture, const std::vector<StaticAnimationInfo>& animations, AnimationManager& manager) {
+        for (const auto& anim : animations) {
+            SDL_Rect rect = {
+                anim.column * SPRITE_WIDTH,
+                anim.row * SPRITE_HEIGHT,
+                SPRITE_WIDTH,
+                SPRITE_HEIGHT
+            };
+    
+            std::vector<Renderer::Sprite> frames;
+            frames.emplace_back(texture, rect);
+    
+            Renderer::Animation animation(frames, 1.0f, false);
+            manager.addAnimation(anim.name, animation);
+        }
+    }
+    
     int AnimationLoader::calculateStartIndex(SDL_Texture* texture, int row) {
         int textureWidth = 0;
         SDL_QueryTexture(texture, nullptr, nullptr, &textureWidth, nullptr);

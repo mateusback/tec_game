@@ -14,8 +14,6 @@ namespace Entities
         float timeToExplode = 0.0f;
         float explosionRadius = 0.0f;
         float explosionDamage = 0.0f;
-        Manager::EntityManager& entityManager;
-        const TileSet& tileSet;
         
         public:
         BombBody(Vector4f rect,
@@ -23,19 +21,14 @@ namespace Entities
             bool visible,
             float time,
             float radius,
-            float damage,
-            Manager::EntityManager& entityManager,
-            const TileSet& tileSet)
+            float damage)
        : Body(rect, collision, visible),
          timeToExplode(time),
          explosionRadius(radius),
-         explosionDamage(damage),
-         entityManager(entityManager),
-         tileSet(tileSet) {}
-   
+         explosionDamage(damage) {}
+
         virtual void update(float deltaTime) override;
         void explode();
-        void addDestroyEffect(Vector2f position, Vector2f scale);
         
 		#pragma region Getters
         float getTimeToExplode() const { return this->timeToExplode; }

@@ -4,6 +4,8 @@
 #include "../../include/physics/CollisionManager.h"
 #include "../../include/utils/GlobalAccess.h"
 #include "../../include/managers/AnimationLoader.h"
+#include "../../include/managers/EventManager.h"
+#include "../../include/core/Events.h"
 
 #include <SDL2/SDL.h>
 #include <cmath>
@@ -34,8 +36,11 @@ namespace Entities
                 this->setState(EntityState::Idle);
             }
         }
+
+        if(input.putBomb) {
+            this->tryPlaceBomb();
+        }
         
-        updateDirectionSprite(spriteDirection);
         playerDirection *= this->getAcceleration();
         this->setSpeed(playerDirection);
     }
@@ -102,7 +107,7 @@ namespace Entities
             1.5f 
         );
 
-        attack->setScale(virtualRenderer()->getTileSizeDividedBy(3), virtualRenderer()->getTileSizeDividedBy(3));
+        attack->setScale(virtualRenderer()->normalizeVector({0.3f, 0.3f}));
         attack->setSpeed(direction * virtualRenderer()->normalizeValue(this->attackSpeed));
         attack->setOrigin(this);
         attack->setTexture(Manager::TextureManager::Get("attack"));
@@ -175,18 +180,21 @@ namespace Entities
         this->animationManager.setAnimation("idle");
     }
 
-    //TODO - COLOCAR UMA CLASSE SPRITE QUE É UM VETOR DE TEXTURAS, E DEPOIS UM VETOR DE ANIMAÇÕES
-    //TODO - CRIAR UMA CLASSE DE ANIMAÇÃO QUE TEM UM VETOR DE TEXTURAS E UM VETOR DE TEMPOS
-    void PlayerBody::updateDirectionSprite(const Vector2f& direction) {
-        // if (direction.y < 0) {
-        //     this->setTexture(Manager::TextureManager::Get("player_b"));
-        // } else if (direction.y > 0) {
-        //     this->setTexture(Manager::TextureManager::Get("player_f"));
-        // } else if (direction.x < 0) {
-        //     this->setTexture(Manager::TextureManager::Get("player_l"));
-        // } else if (direction.x > 0) {
-        //     this->setTexture(Manager::TextureManager::Get("player_r"));
-        // }
+    void PlayerBody::tryPlaceBomb() {
+        if (this->getBombs() > 0 && this->getBombCooldown() <= 0.0f) {
+            this->consumeBomb();
+    
+            EventManager::Emit(Event::PlayerPlacedBomb{
+                .position = this->getPosition()
+            });
+        }
+    }
+
+    void PlayerBody::consumeBomb() {
+        if (this->getBombs() > 0) {
+            this->setBombs(this->getBombs() - 1);
+            this->setBombCooldown(5.0f);
+        }
     }
 
 }

@@ -5,36 +5,38 @@
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
+
 namespace Map {
 
+    inline void from_json(const json& j, EntityInstance& e) {
+        e.type = entityTypeFromString(j.at("type").get<std::string>());
+        e.id   = j.at("id").get<int>();
+        e.x    = j.at("x").get<int>();
+        e.y    = j.at("y").get<int>();
+    }
+
     inline void from_json(const json& j, Room& room) {
-        std::string typeStr = j.at("type").get<std::string>();
-        Map::ERoomType type;
-        if (typeStr == "Start") type =  Map::ERoomType::Start;
-        else if (typeStr == "Treasure") type =  Map::ERoomType::Treasure;
-        else if (typeStr == "Boss") type =  Map::ERoomType::Boss;
-        else type =  Map::ERoomType::Normal;
+        room.id   = j.at("id").get<int>();
+        room.type = roomTypeFromString(j.at("type").get<std::string>());
 
-        room = Room{
-            j.at("id").get<int>(),
-            j.at("x").get<int>(),
-            j.at("y").get<int>(),
-            type
-        };
-
-        if (j.contains("entities")) {
-            room.entities = j.at("entities").get<std::vector<json>>();
-        }
-
-        if (j.contains("layout")) {
+        if (j.contains("layout"))
             room.layout = j.at("layout").get<std::vector<std::vector<int>>>();
-        }
+
+        if (j.contains("entities"))
+            room.entities = j.at("entities").get<std::vector<EntityInstance>>();
     }
 
-    inline void from_json(const nlohmann::json& j, Map::Floor& floor) {
-        floor.index = j.at("floor").get<int>();
-        floor.rooms = j.at("rooms").get<std::vector<Room>>();
+    inline void from_json(const json& j, RoomInfo& info) {
+        info.id = j.at("id").get<int>();
+        info.x  = j.at("x").get<int>();
+        info.y  = j.at("y").get<int>();
     }
+
+    inline void from_json(const json& j, Floor& floor) {
+        floor.index     = j.at("floor").get<int>();
+        floor.roomInfos = j.at("rooms").get<std::vector<RoomInfo>>();
+    }
+
 }
 
 #endif

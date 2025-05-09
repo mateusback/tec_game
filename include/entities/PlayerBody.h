@@ -53,7 +53,8 @@ namespace Entities
 		void handleInput(const Manager::PlayerInput& input);
 		std::unique_ptr<Entities::AttackBody> attack(Pointf characterCenter, Vector2f direction);
 		void pickUpItem(Entities::ItemBody* item);
-		void updateDirectionSprite(const Vector2f& direction);
+		void tryPlaceBomb();
+		void consumeBomb();
 
 		#pragma region Getters
 		const std::list<Items::Item>& getInventory() const { return this->inventory; }

@@ -69,11 +69,7 @@ namespace Entities
 			level(1) {}
 		#pragma endregion
 
-		virtual void takeDamage(float dmg) {
-			this->health -= dmg;
-			if (this->health < 0) this->health = 0;
-		}
-
+		virtual void takeDamage(float dmg);
 		float getHealthPercent() const { return this->health / this->maxHealth; }
 		bool isDead() const { return this->health <= 0; }
 

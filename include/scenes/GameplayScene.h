@@ -16,6 +16,8 @@
 #include "../renders/HudRenderer.h"
 #include "../managers/RoomManager.h"
 #include "../renders/MiniMapRenderer.h"
+#include "../handlers/BombHandler.h"
+
 
 
 class GameplayScene : public Core::Scene {
@@ -31,6 +33,7 @@ private:
     Manager::RoomManager* roomManager = nullptr;
     Renderer::MiniMapRenderer* miniMapRenderer = nullptr;
     TileSet tileSet;
+    std::unique_ptr<BombHandler> bombHandler;
 
 public:
     GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight);

@@ -20,16 +20,43 @@ namespace Manager {
           enemyManager(enemyManager) {}
 
 void RoomManager::loadFloor(int index) {
-    std::string path = "assets/data/floor" + std::to_string(index) + ".json";
-    std::ifstream file(path);
-    if (!file.is_open()) {
-        std::cerr << "Erro ao abrir floor: " << path << std::endl;
+    std::string floorPath = "assets/data/floor" + std::to_string(index) + ".json";
+    std::ifstream floorFile(floorPath);
+    if (!floorFile.is_open()) {
+        std::cerr << "Erro ao abrir floor: " << floorPath << std::endl;
         return;
     }
 
-    nlohmann::json j;
-    file >> j;
-    from_json(j, this->floor);
+    nlohmann::json floorJson;
+    floorFile >> floorJson;
+    from_json(floorJson, this->floor);
+
+    std::ifstream roomsFile("assets/data/rooms.json");
+    if (!roomsFile.is_open()) {
+        std::cerr << "Erro ao abrir rooms.json" << std::endl;
+        return;
+    }
+
+    nlohmann::json roomsJson;
+    roomsFile >> roomsJson;
+
+    std::vector<Map::Room> allRooms = roomsJson.at("rooms").get<std::vector<Map::Room>>();
+
+    this->floor.rooms.clear();
+    for (const auto& info : this->floor.roomInfos) {
+        auto it = std::find_if(allRooms.begin(), allRooms.end(), [&](const Map::Room& r) {
+            return r.id == info.id;
+        });
+
+        if (it != allRooms.end()) {
+            Map::Room room = *it;
+            room.x = info.x;
+            room.y = info.y;
+            this->floor.rooms.push_back(std::move(room));
+        } else {
+            std::cerr << "Sala com ID " << info.id << " não encontrada no rooms.json\n";
+        }
+    }
 
     this->currentRoom = nullptr;
     for (auto& room : this->floor.rooms) {
@@ -41,6 +68,33 @@ void RoomManager::loadFloor(int index) {
 
     if (!this->currentRoom) {
         std::cerr << "Sala inicial não encontrada no andar " << index << std::endl;
+    }
+}
+
+void RoomManager::loadRequiredAssets(SDL_Renderer* renderer) {
+    for (const auto& room : this->floor.rooms) {
+        for (const auto& e : room.entities) {
+            switch (e.type) {
+                case Map::EEntityType::Enemy: {
+                    const auto* enemy = enemyManager->getEnemyById(e.id);
+                    if (enemy) {
+                        const std::string& path = enemy->getSpritePath();
+                        textures()->Load(renderer, path, path);
+                    }
+                    break;
+                }
+                case Map::EEntityType::Item: {
+                    const auto* item = itemManager->getItemById(e.id);
+                    if (item) {
+                        const std::string& path = item->getSpritePath();
+                        textures()->Load(renderer, path, path);
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
     }
 }
 
@@ -137,49 +191,45 @@ void RoomManager::loadEntities(Map::Room* room) {
     bool hasEnemies = false;
 
     for (const auto& e : room->entities) {
-        std::string type = e.at("type");
-        int id = e.at("id");
-        int x = e.at("x");
-        int y = e.at("y");
+        switch (e.type) {
+            case Map::EEntityType::Item: {
+                if (!this->itemManager) break;
 
-        if (type == "Item" && this->itemManager) {
-            const Items::Item* itemData = this->itemManager->getItemById(id);
-            if (itemData) {
-                textures()->Load(this->renderer, itemData->getSpritePath(), itemData->getSpritePath());
-                Vector4f screenVect = virtualRenderer()->mapToScreen(x, y, 1.0f, 1.0f);
-
-                auto item = std::make_unique<Entities::ItemBody>(
-                    screenVect,
-                    *itemData
-                );
-                item->loadAnimations();
-                this->entityManager->add(std::move(item));
+                const Items::Item* itemData = this->itemManager->getItemById(e.id);
+                if (itemData) {
+                    Vector4f screenVect = virtualRenderer()->mapToScreen(e.x, e.y, 1.0f, 1.0f);
+                    auto item = std::make_unique<Entities::ItemBody>(screenVect, *itemData);
+                    item->setTexture(textures()->Get(itemData->getSpritePath()));
+                    item->loadAnimations();
+                    this->entityManager->add(std::move(item));
+                }
+                break;
             }
-        }
 
-        if (type == "Enemy" && this->enemyManager) {
-            const Enemies::Enemy* enemyData = this->enemyManager->getEnemyById(id);
-            if (enemyData) {
-                textures()->Load(this->renderer, enemyData->getSpritePath(), enemyData->getSpritePath());
-                Vector4f screenVect = virtualRenderer()->mapToScreen(x, y);
+            case Map::EEntityType::Enemy: {
+                if (!this->enemyManager) break;
 
-                auto enemy = std::make_unique<Entities::EnemyBody>(
-                    screenVect,
-                    *enemyData,
-                    *this->entityManager
-                );
-
-                //TODO - TROCAR PARA ANIMATED
-                enemy->setTarget(this->player);
-                this->entityManager->add(std::move(enemy));
-                hasEnemies = true;
+                const Enemies::Enemy* enemyData = this->enemyManager->getEnemyById(e.id);
+                if (enemyData) {
+                    Vector4f screenVect = virtualRenderer()->mapToScreen(e.x, e.y);
+                    auto enemy = std::make_unique<Entities::EnemyBody>(
+                        screenVect, *enemyData, *this->entityManager
+                    );
+                    enemy->setTexture(textures()->Get(enemyData->getSpritePath()));
+                    enemy->setTarget(this->player);
+                    this->entityManager->add(std::move(enemy));
+                    hasEnemies = true;
+                }
+                break;
             }
+
+            default:
+                break;
         }
     }
 
     room->doorsOpen = !hasEnemies;
 }
-
 
 void RoomManager::update(float deltaTime) {
     if (!this->currentRoom || this->currentRoom->doorsOpen) return;

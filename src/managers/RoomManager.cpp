@@ -58,6 +58,21 @@ void RoomManager::loadFloor(int index) {
         }
     }
 
+    for (auto& room : this->floor.rooms) {
+        if (room.type == Map::ERoomType::Secret) continue;
+
+        auto setConn = [&](EDirection dir, int dx, int dy) {
+            Map::Room* neighbor = getRoomByPosition(room.x + dx, room.y + dy);
+            room.connections[directionToString(dir)] = neighbor && neighbor->type != Map::ERoomType::Secret;
+        };
+
+        setConn(EDirection::Right, 1, 0);
+        setConn(EDirection::Left, -1, 0);
+        setConn(EDirection::Up, 0, -1);
+        setConn(EDirection::Down, 0, 1);
+    }
+
+
     this->currentRoom = nullptr;
     for (auto& room : this->floor.rooms) {
         if (room.type == Map::ERoomType::Start) {
@@ -101,7 +116,6 @@ void RoomManager::loadRequiredAssets(SDL_Renderer* renderer) {
 void RoomManager::loadRoom(Map::Room* room) {
     if (!room) [[unlikely]] return;
 
-        //todo - separar mapa de level, inimigos no level    this->currentRoom = room;
     this->currentRoom = room;
     this->entityManager->clearAll();
     this->updateVirutalRenderer(room);
@@ -160,9 +174,77 @@ void RoomManager::loadRoom(Map::Room* room) {
 }
 
 void RoomManager::loadTiles(Map::Room* room) {
-    if (!room) return;
+    if (!room || room->layout.empty() || room->layout[0].empty()) return;
 
     SDL_Texture* tileSheet = textures()->Get("tileset");
+
+    for (const auto& [dirStr, connected] : room->connections) {
+        if (!connected) continue;
+
+        EDirection dir = stringToDirection(dirStr);
+        int rows = static_cast<int>(room->layout.size());
+        int cols = static_cast<int>(room->layout[0].size());
+
+        int dx = 0, dy = 0;
+        switch (dir) {
+            case EDirection::Up: dy = -1; break;
+            case EDirection::Down: dy = 1; break;
+            case EDirection::Left: dx = -1; break;
+            case EDirection::Right: dx = 1; break;
+            default: break;
+        }
+
+        Map::Room* neighbor = getRoomByPosition(room->x + dx, room->y + dy);
+        if (!neighbor || neighbor->type == Map::ERoomType::Secret) continue;
+
+        std::vector<Vector2i> doorPositions;
+
+        switch (dir) {
+            case EDirection::Up:
+                if (cols % 2 == 0) {
+                    doorPositions.push_back({cols / 2, 0});
+                    doorPositions.push_back({(cols / 2) - 1, 0});
+                } else {
+                    doorPositions.push_back({cols / 2, 0});
+                }
+                break;
+            case EDirection::Down:
+                if (cols % 2 == 0) {
+                    doorPositions.push_back({cols / 2, rows - 1});
+                    doorPositions.push_back({(cols / 2) - 1, rows - 1});
+                } else {
+                    doorPositions.push_back({cols / 2, rows - 1});
+                }
+                break;
+            case EDirection::Left:
+                if (rows % 2 == 0) {
+                    doorPositions.push_back({0, rows / 2});
+                    doorPositions.push_back({0, (rows / 2) - 1});
+                } else {
+                    doorPositions.push_back({0, rows / 2});
+                }
+                break;
+            case EDirection::Right:
+                if (rows % 2 == 0) {
+                    doorPositions.push_back({cols - 1, rows / 2});
+                    doorPositions.push_back({cols - 1, (rows / 2) - 1});
+                } else {
+                    doorPositions.push_back({cols - 1, rows / 2});
+                }
+                break;
+            default:
+                break;
+        }
+
+        for (const auto& pos : doorPositions) {
+            if (pos.y >= 0 && pos.y < rows && pos.x >= 0 && pos.x < cols) {
+                int currentTileId = room->layout[pos.y][pos.x];
+                const Tile* currentTile = this->tileSet->getTile(currentTileId);
+                if (!currentTile || !currentTile->solid) continue; 
+                room->layout[pos.y][pos.x] = 7;
+            }
+        }
+    }
 
     for (size_t row = 0; row < room->layout.size(); ++row) {
         for (size_t col = 0; col < room->layout[row].size(); ++col) {

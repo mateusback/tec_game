@@ -24,6 +24,9 @@ namespace Map {
 
         if (j.contains("entities"))
             room.entities = j.at("entities").get<std::vector<EntityInstance>>();
+
+        if (j.contains("connections")) 
+            room.connections = j.at("connections").get<Mylib::unordered_map_string_key<bool>>();
     }
 
     inline void from_json(const json& j, RoomInfo& info) {

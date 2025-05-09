@@ -14,7 +14,6 @@ namespace Entities {
 
     void BombBody::explode() {
         audio()->playSoundEffect("bomb_explosion", 0);
-        Vector2f explosionScale = { this->explosionRadius, this->explosionRadius };
 
         EventManager::Emit(Event::BombExploded{
             .position = this->getPosition(),

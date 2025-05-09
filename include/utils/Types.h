@@ -18,4 +18,22 @@ enum class EDirection {
     Right
 };
 
+inline std::string directionToString(EDirection dir) {
+    switch (dir) {
+        case EDirection::Up: return "up";
+        case EDirection::Down: return "down";
+        case EDirection::Left: return "left";
+        case EDirection::Right: return "right";
+        default: return "unknown";
+    }
+}
+
+inline EDirection stringToDirection(const std::string& str) {
+    if (str == "up") return EDirection::Up;
+    if (str == "down") return EDirection::Down;
+    if (str == "left") return EDirection::Left;
+    if (str == "right") return EDirection::Right;
+    throw std::invalid_argument("Direção inválida: " + str);
+}
+
 #endif

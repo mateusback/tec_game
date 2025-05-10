@@ -73,45 +73,10 @@ namespace Entities
         }
     }
 
-    std::unique_ptr<Entities::AttackBody> PlayerBody::attack(Pointf characterCenter, Vector2f direction)
+    void PlayerBody::attack(Pointf characterCenter, Vector2f direction)
     {
-        if(this->attackTimer > 0.0f) return nullptr;
-        float width = 16.f;
-        float height = 16.f;
-        this->setState(EntityState::Attacking);
-        this->animationManager.setAnimation("attack", [this]() {
-            this->animationManager.setAnimation("idle");
-            this->setState(EntityState::Idle);
-        });
-        audio()->playSoundEffect("shoot", 0);
-    
-        if (direction.x != 0 || direction.y != 0) {
-            float len = std::sqrt(direction.x * direction.x + direction.y * direction.y);
-            direction.x /= len;
-            direction.y /= len;
-        }
-        this->attackTimer = this->attackRate;
-
-        auto attack = std::make_unique<Entities::AttackBody>(
-            characterCenter.x - width / 2,
-            characterCenter.y - height / 2,
-            width,
-            height,
-            true,
-            true,
-            10.f,
-            200.f,
-            4.2f,
-            0.f,
-            0.1f,
-            1.5f 
-        );
-
-        attack->setScale(virtualRenderer()->normalizeVector({0.3f, 0.3f}));
-        attack->setSpeed(direction * virtualRenderer()->normalizeValue(this->attackSpeed));
-        attack->setOrigin(this);
-        attack->setTexture(Manager::TextureManager::Get("attack"));
-        return attack;
+        std::cout << "Attack" << std::endl;
+       this->weaponHandler.attack(characterCenter, direction);
     }
 
     void PlayerBody::onCollision(Body* other)
@@ -126,6 +91,12 @@ namespace Entities
         this->invencible = true;
         this->invencibleTimer = 1.0f;
         audio()->playSoundEffect("hit-player", 0);
+    }
+
+    void PlayerBody::setWeapon(std::shared_ptr<Weapon> weapon, Manager::EntityManager* entityManager) {
+        weapon->setEntityManager(entityManager);
+        weaponHandler.setWeapon(std::move(weapon));
+        weaponHandler.getWeapon()->setOwner(this);
     }
 
     //TODO - DÁ PRA COLOCAR NO ITEM MANAGER

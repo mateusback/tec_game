@@ -4,6 +4,7 @@
 #include "../../include/entities/TileBody.h"
 #include "../../include/entities/ItemBody.h"
 #include "../../include/entities/EnemyBody.h"
+
 #include <fstream>
 #include <iostream>
 
@@ -324,7 +325,7 @@ void RoomManager::update(float deltaTime) {
 
 void RoomManager::createPlayerInStartRoom() {
     Vector4f playerVect = virtualRenderer()->mapToScreen(4, 4, 1, 1);
-    this->player = new Entities::PlayerBody(playerVect, true, true);
+    this->player = new Entities::PlayerBody(playerVect, this->entityManager, true, true);
 
     this->player->setAttackRate(1.0f);
     this->player->setAttackSpeed(3.5f);
@@ -416,8 +417,6 @@ void RoomManager::moveToRoomInDirection(EDirection direction) {
         std::cout << "Nenhuma sala conectada nessa direção.\n";
     }
 }
-
-
 
 void RoomManager::checkAndMovePlayerBetweenRooms() {
     if (!this->player || !this->currentRoom) return;

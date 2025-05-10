@@ -15,6 +15,7 @@
 
 GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight) {
     this->loadResources(renderer);
+    notificationHandler.setFont(Manager::FontManager::get("default"));
 
     //
     this->roomManager = new Manager::RoomManager(renderer, 
@@ -47,12 +48,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     this->player->handleInput(input);
 
     if (input.shootDirection.x != 0 || input.shootDirection.y != 0)
-    {
-        auto attack = player->attack(player->getCenterPoint(), input.shootDirection);
-        if(attack){
-            entityManager.add(std::move(attack));
-        }
-    }
+        player->attack(player->getCenterPoint(), input.shootDirection);
     
     this->player->update(deltaTime);
     //this->entityManager.updateAll(deltaTime);
@@ -78,6 +74,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     for (auto* item : items) {
         item->update(deltaTime);
         if (Physics::isColliding(this->player, item)) {
+            notificationHandler.show(item->getItem().getName(), item->getItem().getDescription());
             player->onCollision(item);
         }
     }
@@ -87,8 +84,8 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
 
         if (attack->getOrigin() != this->player && Physics::isColliding(attack, player)) {
             player->takeDamage(attack->getAttackDamage());
-
             addDestroyEffect(attack->getPosition(), attack->getScale());
+            attack->setActive(false);
             continue;
         }
 
@@ -122,11 +119,17 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
 
     for (auto* enemy : enemies) {
         enemy->update(deltaTime);
+        if (Physics::isColliding(this->player, enemy)) {
+            player->onCollision(enemy);
+            continue;
+        }
     }
 
     for (auto* effect : effects) {
         effect->update(deltaTime);
     }
+
+    notificationHandler.update(deltaTime);
 
     this->entityManager.removeInactive();
     this->entityManager.addAll();
@@ -185,6 +188,9 @@ void GameplayScene::render(SDL_Renderer* renderer) {
             Utils::DebugUtils::drawCollider(renderer, rect, {255, 0, 0, 255});
         }
     }
+
+    notificationHandler.render(renderer, virtualRenderer()->getScreenWidth(), virtualRenderer()->getScreenHeight());
+
     this->hudRenderer->render(renderer, this->player);
     this->miniMapRenderer->render(renderer);
     SDL_RenderPresent(renderer);

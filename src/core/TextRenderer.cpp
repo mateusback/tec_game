@@ -9,7 +9,7 @@ namespace Core {
             return;
         }
 
-        SDL_Surface* surface = TTF_RenderText_Blended(font, text.c_str(), color);
+        SDL_Surface* surface = TTF_RenderUTF8_Blended(font, text.c_str(), color);
         if (!surface) {
             std::cerr << "Erro ao renderizar texto: " << TTF_GetError() << std::endl;
             return;

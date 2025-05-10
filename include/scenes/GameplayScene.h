@@ -17,6 +17,7 @@
 #include "../managers/RoomManager.h"
 #include "../renders/MiniMapRenderer.h"
 #include "../handlers/BombHandler.h"
+#include "../handlers/NotificationHandler.h"
 
 
 
@@ -34,6 +35,7 @@ private:
     Renderer::MiniMapRenderer* miniMapRenderer = nullptr;
     TileSet tileSet;
     std::unique_ptr<BombHandler> bombHandler;
+    NotificationHandler notificationHandler;
 
 public:
     GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight);

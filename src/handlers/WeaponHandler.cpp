@@ -7,9 +7,9 @@ void WeaponHandler::setWeapon(std::shared_ptr<Weapon> weapon) {
     this->currentWeapon = std::move(weapon);
 }
 
-void WeaponHandler::attack(const Vector2f& origin, const Vector2f& direction) {
+void WeaponHandler::attack(const Vector2f& direction) {
     if (this->currentWeapon)
-        this->currentWeapon->attack(origin, direction);
+        this->currentWeapon->attack(direction);
 }
 
 void WeaponHandler::update(float deltaTime) {

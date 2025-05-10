@@ -16,10 +16,8 @@ namespace Entities
     void PlayerBody::handleInput(const Manager::PlayerInput& input)
     {
         Vector2f playerDirection = input.moveDirection;
-        Vector2f spriteDirection;
 
         if (input.moveDirection.x != 0.f || input.moveDirection.y != 0.f) {
-            spriteDirection = input.moveDirection;
     
             if (state != EntityState::Attacking) {
                 this->animationManager.setAnimation("walk");
@@ -28,7 +26,7 @@ namespace Entities
     
         } else {
             if (input.shootDirection.x != 0.f || input.shootDirection.y != 0.f) {
-                spriteDirection = input.shootDirection;
+                this->attack(input.shootDirection);
             }
     
             if (state == EntityState::Moving) {
@@ -73,10 +71,13 @@ namespace Entities
         }
     }
 
-    void PlayerBody::attack(Pointf characterCenter, Vector2f direction)
+    void PlayerBody::attack(Vector2f direction)
     {
-        std::cout << "Attack" << std::endl;
-       this->weaponHandler.attack(characterCenter, direction);
+        this->setState(EntityState::Attacking);
+        this->animationManager.setAnimation("attack", [this]() {
+            this->setState(EntityState::Idle);
+        });
+        this->weaponHandler.attack(direction);
     }
 
     void PlayerBody::onCollision(Body* other)
@@ -140,13 +141,15 @@ namespace Entities
     void PlayerBody::loadAnimations() {
         SDL_Texture* texture = Manager::TextureManager::Get("player_sheet");
         this->is_animated = true;
-    
+
         Manager::AnimationLoader::loadNamedAnimations(texture, {
             {"idle",   4, 5},
             {"walk",   3, 7},
             {"attack", 8, 7, false},
             {"death",  7, 7, false}
         }, this->animationManager);
+
+        this->animationManager.setFrameTime("attack", 0.05f);
     
         this->animationManager.setAnimation("idle");
     }

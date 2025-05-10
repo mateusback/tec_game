@@ -13,7 +13,7 @@ public:
 
     void setEntityManager(Manager::EntityManager* em) { this->entityManager = em; }
 
-    virtual void attack(const Vector2f& origin, const Vector2f& direction) = 0;
+    virtual void attack(const Vector2f& direction) = 0;
     virtual void update(float deltaTime) = 0;
     virtual void render(SDL_Renderer* renderer) = 0;
 
@@ -27,6 +27,8 @@ public:
 protected:
     Entities::CharacterBody* owner = nullptr;
     Manager::EntityManager* entityManager = nullptr;
+
+    constexpr static float DEFAULT_BULLET_SIZE = 0.33f;
 };
 
 #endif

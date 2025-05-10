@@ -46,6 +46,9 @@ namespace Renderer {
             return frames.at(index);
         }
         
+        void setFrameTime(float newFrameTime) {
+            this->frameTime = newFrameTime;
+        }
     };
 }
 

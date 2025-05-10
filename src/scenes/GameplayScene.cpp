@@ -47,8 +47,6 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     }
     this->player->handleInput(input);
 
-    if (input.shootDirection.x != 0 || input.shootDirection.y != 0)
-        player->attack(player->getCenterPoint(), input.shootDirection);
     
     this->player->update(deltaTime);
     //this->entityManager.updateAll(deltaTime);

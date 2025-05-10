@@ -46,7 +46,7 @@ namespace Entities
 		void loadAnimations() override;
 		
 		void handleInput(const Manager::PlayerInput& input);
-		void attack(Pointf characterCenter, Vector2f direction);
+		void attack(Vector2f direction);
 		void pickUpItem(Entities::ItemBody* item);
 		void tryPlaceBomb();
 		void consumeBomb();

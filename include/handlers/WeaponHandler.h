@@ -9,7 +9,7 @@ public:
     explicit WeaponHandler(Manager::EntityManager* entityManager);
 
     void setWeapon(std::shared_ptr<Weapon> weapon);
-    void attack(const Vector2f& origin, const Vector2f& direction);
+    void attack(const Vector2f& direction);
     void update(float deltaTime);
     void render(SDL_Renderer* renderer);
 

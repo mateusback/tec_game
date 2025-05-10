@@ -5,7 +5,7 @@
 
 class MagicHandsWeapon : public Weapon {
 public:
-    void attack(const Vector2f& origin, const Vector2f& direction) override;
+    void attack(const Vector2f& direction) override;
     void update(float deltaTime) override;
     void render(SDL_Renderer* renderer) override;
 

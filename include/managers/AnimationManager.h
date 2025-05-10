@@ -47,6 +47,12 @@ namespace Manager {
         animations.clear();
         currentAnimation = nullptr;
     }
+
+    void setFrameTime(const std::string& name, float frameTime) {
+        if (animations.contains(name)) {
+            animations[name].setFrameTime(frameTime);
+        }
+    }    
         
     const Renderer::Sprite& getFrame(const std::string& animationName, int index) const {
         return animations.at(animationName).getFrame(index);

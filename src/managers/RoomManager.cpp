@@ -332,7 +332,7 @@ void RoomManager::createPlayerInStartRoom() {
     this->player->setTexture(Manager::TextureManager::Get("player_f"));
     this->player->loadAnimations();
     this->player->setAcceleration(virtualRenderer()->normalizeValue(3));
-    this->player->setHitboxMargin(0.2f, 0.2f);
+    this->player->setHitboxMargin(0.7f, 0.3f);
     this->player->setBombs(3);
 }
 

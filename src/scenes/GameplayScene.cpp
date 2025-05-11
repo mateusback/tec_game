@@ -14,6 +14,7 @@
 #include <fstream>
 
 GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight) {
+    this->debugMode = true;
     this->loadResources(renderer);
     notificationHandler.setFont(Manager::FontManager::get("default"));
 
@@ -172,16 +173,17 @@ void GameplayScene::render(SDL_Renderer* renderer) {
         SDL_RenderFillRectF(renderer, &barFill);
     }
 
-    if (true) {
+    if (this->debugMode) {
         Utils::DebugUtils::drawCollidersOfType<Entities::ItemBody>(renderer, entityManager, {0, 0, 255, 255});
         Utils::DebugUtils::drawCollidersOfType<Entities::TileBody>(renderer, entityManager, {0, 255, 0, 255});
         Utils::DebugUtils::drawCollidersOfType<Entities::AttackBody>(renderer, entityManager, {255, 0, 255, 255});
         Utils::DebugUtils::drawCollidersOfType<Entities::EnemyBody>(renderer, entityManager, {255, 255, 0, 255});
     
         if (player->hasCollision()) {
+            Vector4f hb = player->getHitbox();
             SDL_FRect rect = {
-                player->getHitbox().x, player->getHitbox().y,
-                player->getHitbox().w, player->getHitbox().z
+                hb.x, hb.y,
+                hb.z, hb.w 
             };
             Utils::DebugUtils::drawCollider(renderer, rect, {255, 0, 0, 255});
         }
@@ -201,6 +203,7 @@ void GameplayScene::loadResources(SDL_Renderer* renderer){
     textures()->Load(renderer, "player_l", "assets/player/personagem_L.png");
     textures()->Load(renderer, "player_r", "assets/player/personagem_R.png");
     textures()->Load(renderer, "player_sheet", "assets/animations/player.png");
+    textures()->Load(renderer, "swing", "assets/animations/swing.png");
 
     textures()->Load(renderer, "player_with_item", "assets/player_with_item.png");
     textures()->Load(renderer, "attack", "assets/attack.png");

@@ -29,7 +29,7 @@ private:
     Map::Floor floor;
     Map::Room* currentRoom = nullptr;
     Manager::EntityManager entityManager;
-    bool debugMode = false;
+    bool debugMode = true;
     Renderer::HudRenderer* hudRenderer = nullptr;
     Manager::RoomManager* roomManager = nullptr;
     Renderer::MiniMapRenderer* miniMapRenderer = nullptr;

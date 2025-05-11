@@ -16,12 +16,13 @@ namespace Items {
 		EItemType type;
 		std::vector<ItemEffect> effects;
 		std::string spritePath;
+		std::string weaponId = "";
 
 	public:
 		Item(int id = -1, EItemPool pool = EItemPool::Room, std::string name = "", std::string description = "",
-			int quality = 0, EItemType type = EItemType::Passive, std::vector<ItemEffect> effects = {}, std::string spritePath = "")
+			int quality = 0, EItemType type = EItemType::Passive, std::vector<ItemEffect> effects = {}, std::string spritePath = "", std::string weaponId = "")
 		: id(id), pool(pool), name(name), description(description), quality(quality),
-			type(type), effects(effects), spritePath(spritePath) {}
+			type(type), effects(effects), spritePath(spritePath), weaponId(weaponId) {}
 
 		#pragma region Getters
 		int getId() const { return this->id; }
@@ -32,6 +33,7 @@ namespace Items {
 		EItemType getType() const { return this->type; }
 		const std::vector<ItemEffect>& getEffects() const { return this->effects; }
 		const std::string& getSpritePath() const { return this->spritePath; }
+		const std::string& getWeaponId() const { return this->weaponId; }
 		#pragma endregion
 
 		#pragma region Setters
@@ -43,6 +45,7 @@ namespace Items {
 		void setType(EItemType type) {this->type = type; }
 		void setEffects(std::vector<ItemEffect> effects) { this->effects = effects; }
 		void setSpritePath(std::string spritePath) { this->spritePath = spritePath; }
+		void setWeaponId(std::string weaponId) { this->weaponId = weaponId; }
 		#pragma endregion
 	};
 }

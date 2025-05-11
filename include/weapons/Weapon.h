@@ -23,12 +23,14 @@ public:
         std::cout << "Weapon::setOwner" << std::endl;
         this->owner = owner; 
     }
+    Manager::EntityManager* getEntityManager() { return this->entityManager; }
 
 protected:
     Entities::CharacterBody* owner = nullptr;
     Manager::EntityManager* entityManager = nullptr;
 
     constexpr static float DEFAULT_BULLET_SIZE = 0.33f;
+    constexpr static float DEFAULT_SWING_SIZE = 1.5f;
 };
 
 #endif

@@ -25,7 +25,6 @@ void MagicHandsWeapon::attack(const Vector2f& direction) {
     attack->setTexture(textures()->Get("attack"));
     attack->setOrigin(this->owner);
     attack->setSpeed(direction * virtualRenderer()->normalizeValue(this->owner->getAttackSpeed()));
-    std::cout << "Attack created" << std::endl;
     entityManager->add(std::move(attack));
 }
 

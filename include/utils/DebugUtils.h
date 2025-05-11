@@ -25,6 +25,7 @@ namespace Utils {
         }
 
         static void drawCollider(SDL_Renderer* renderer, const SDL_FRect& rect, SDL_Color color) {
+            SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
             SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
             SDL_RenderDrawRectF(renderer, &rect);
         }

@@ -6,6 +6,7 @@
 #include "../../include/managers/AnimationLoader.h"
 #include "../../include/managers/EventManager.h"
 #include "../../include/core/Events.h"
+#include "../../include/weapons/SwordWeapon.h"
 
 #include <SDL2/SDL.h>
 #include <cmath>
@@ -103,13 +104,17 @@ namespace Entities
     //TODO - DÁ PRA COLOCAR NO ITEM MANAGER
     void PlayerBody::pickUpItem(ItemBody* item){
         audio()->playSoundEffect("pickup-item", 0);
+
+        if(item->getItem().getWeaponId() != "" && item->getItem().getWeaponId() == "sword") {
+            auto newWeapon = std::make_shared<SwordWeapon>();
+            this->setWeapon(newWeapon, this->weaponHandler.getWeapon()->getEntityManager());
+            return;
+        }
         for (const auto& effect : item->getItem().getEffects()) {
             switch (effect.target) {
 				using enum Items::EEffectTarget;
                 case AttackDamage:
-                    std::cout << "Attack Damage Antigo: " << this->getAttackDamage() << std::endl;
                     this->setAttackDamage(this->getAttackDamage() + effect.value);
-                    std::cout << "Attack Damage Novo: " << this->getAttackDamage() << std::endl;
                     break;
                 case AttackSpeed:
                     this->setAttackSpeed(this->getAttackSpeed() + effect.value);

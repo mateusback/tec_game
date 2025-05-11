@@ -5,8 +5,9 @@
       "name": "Espada do Destino",
       "description": "A última espada sagrada, capaz de derrotar qualquer inimigo.",
       "quality": 5,
-      "type": "Passive",
+      "type": "Weapon",
       "sprite": "assets/animations/item.png",
+      "weapon": "sword",
       "effects": [
         { "target": "AttackDamage", "value": 5.0 },
         { "target": "AttackSpeed", "value": 0.1 }

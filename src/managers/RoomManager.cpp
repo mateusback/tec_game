@@ -4,9 +4,11 @@
 #include "../../include/entities/TileBody.h"
 #include "../../include/entities/ItemBody.h"
 #include "../../include/entities/EnemyBody.h"
+#include "../../include/generators/ProceduralFloorGenerator.h"
 
 #include <fstream>
 #include <iostream>
+#include <nlohmann/json.hpp>
 
 namespace Manager {
     RoomManager::RoomManager(SDL_Renderer* renderer,
@@ -261,7 +263,28 @@ void RoomManager::loadTiles(Map::Room* room) {
                 tile->solid
             );
 
-            tileBody->initStaticTile(tileSheet, tile->index);
+            if (tileId == 7) {
+                double angle = 0.0;
+                SDL_RendererFlip flip = SDL_FLIP_NONE;
+
+                if (row == 0) {
+                    angle = 0.0;
+                    flip = SDL_FLIP_NONE;
+                } else if (row == room->layout.size() - 1) {
+                    angle = 0.0;
+                    flip = SDL_FLIP_VERTICAL;
+                } else if (col == 0) {
+                    angle = 270.0;
+                    flip = SDL_FLIP_NONE;
+                } else if (col == room->layout[0].size() - 1) {
+                    angle = 90.0;
+                    flip = SDL_FLIP_NONE;
+                }
+
+                tileBody->initFlippedStaticTile(tileSheet, tile->index, angle, flip);
+            } else {
+                tileBody->initStaticTile(tileSheet, tile->index);
+            }
             tileBody->setTileId(tileId);
             tileBody->setTileData(tile);
 
@@ -527,6 +550,48 @@ void RoomManager::setEntityPositionByPixels(Entities::Body* entity, Vector2f pos
 
 void RoomManager::setEntityPositionByTiles(Entities::Body* entity, Vector2f position) {
     entity->setPosition(virtualRenderer()->denormalizeVector(position));
+}
+
+std::vector<json> RoomManager::loadAvailableRoomTemplates(const std::string& path) {
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        std::cerr << "Erro ao abrir " << path << std::endl;
+        return {};
+    }
+
+    json roomTemplatesJson;
+    file >> roomTemplatesJson;
+
+    std::vector<json> rooms = roomTemplatesJson.at("rooms").get<std::vector<json>>();
+    return rooms;
+}
+
+void RoomManager::generateFloor(int index, int seed) {
+    std::vector<json> templates = this->loadAvailableRoomTemplates("assets/data/rooms.json");
+
+    std::ifstream itemFile("assets/data/items.json");
+    if (!itemFile.is_open()) {
+        std::cerr << "Erro ao abrir items.json" << std::endl;
+        return;
+    }
+
+    json itemJson;
+    itemFile >> itemJson;
+
+    std::vector<json> itemPool;
+    for (const auto& item : itemJson) {
+        if (item.value("pool", "") == "Room") {
+            itemPool.push_back(item);
+        }
+    }
+
+    Generator::ProceduralFloorGenerator generator(seed);
+    json floorJson = generator.generate(templates, itemPool);
+
+    std::string path = "assets/data/floor" + std::to_string(index) + ".json";
+    std::ofstream out(path);
+    out << floorJson.dump(2);
+    out.close();
 }
 
 Manager::RoomManager::~RoomManager()

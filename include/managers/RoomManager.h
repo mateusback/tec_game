@@ -54,6 +54,10 @@ namespace Manager {
         void openDoorsOfCurrentRoom();
         void saveCurrentRoomState();
 
+        //Procedural Generation
+        std::vector<json> loadAvailableRoomTemplates(const std::string& path);
+        void generateFloor(int index, int seed);
+
         void setEntityPositionByPixels(Entities::Body* entity, Vector2f position);
         void setEntityPositionByTiles(Entities::Body* entity, Vector2f position);
 

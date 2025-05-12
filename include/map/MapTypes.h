@@ -8,6 +8,7 @@ namespace Map
 		Treasure,
 		Boss,
 		Secret,
+		Item
 	};
 
 	enum class EEntityType {
@@ -43,7 +44,8 @@ namespace Map
 			{"Normal", ERoomType::Normal},
 			{"Treasure", ERoomType::Treasure},
 			{"Boss", ERoomType::Boss},
-			{"Secret", ERoomType::Secret}
+			{"Secret", ERoomType::Secret},
+			{"Item", ERoomType::Item}
 		};
 
 		auto it = map.find(str);
@@ -56,7 +58,8 @@ namespace Map
 			{ERoomType::Normal, "Normal"},
 			{ERoomType::Treasure, "Treasure"},
 			{ERoomType::Boss, "Boss"},
-			{ERoomType::Secret, "Secret"}
+			{ERoomType::Secret, "Secret"},
+			{ERoomType::Item, "Item"}
 		};
 
 		auto it = map.find(type);

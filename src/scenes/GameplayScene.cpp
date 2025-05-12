@@ -23,6 +23,7 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screen
         &this->entityManager, &this->tileSet, 
         &this->itemManager, &this->enemyManager);
 
+    this->roomManager->generateFloor(1, 1234);
     this->roomManager->loadFloor(1);
     this->roomManager->loadRequiredAssets(renderer);
     this->roomManager->loadRoomByType(Map::ERoomType::Start);
@@ -65,7 +66,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
 
     for (auto* tile : tiles) {
         if (Physics::isColliding(this->player, tile)) {
-            this->player->onCollision(tile);
+            Physics::CollisionManager::resolveCollision(this->player, tile);
             break;
         }
     }

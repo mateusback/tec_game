@@ -84,7 +84,6 @@ namespace Entities
     void PlayerBody::onCollision(Body* other)
     {
         other->onCollision(this);
-        Physics::CollisionManager::resolveCollision(this, other);
     }
 
     void PlayerBody::takeDamage(float damage) {

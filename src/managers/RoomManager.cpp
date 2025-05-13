@@ -4,8 +4,11 @@
 #include "../../include/entities/TileBody.h"
 #include "../../include/entities/ItemBody.h"
 #include "../../include/entities/EnemyBody.h"
+#include "../../include/generators/ProceduralFloorGenerator.h"
+
 #include <fstream>
 #include <iostream>
+#include <nlohmann/json.hpp>
 
 namespace Manager {
     RoomManager::RoomManager(SDL_Renderer* renderer,
@@ -20,16 +23,58 @@ namespace Manager {
           enemyManager(enemyManager) {}
 
 void RoomManager::loadFloor(int index) {
-    std::string path = "assets/data/floor" + std::to_string(index) + ".json";
-    std::ifstream file(path);
-    if (!file.is_open()) {
-        std::cerr << "Erro ao abrir floor: " << path << std::endl;
+    std::string floorPath = "assets/data/floor" + std::to_string(index) + ".json";
+    std::ifstream floorFile(floorPath);
+    if (!floorFile.is_open()) {
+        std::cerr << "Erro ao abrir floor: " << floorPath << std::endl;
         return;
     }
 
-    nlohmann::json j;
-    file >> j;
-    from_json(j, this->floor);
+    nlohmann::json floorJson;
+    floorFile >> floorJson;
+    from_json(floorJson, this->floor);
+
+    std::ifstream roomsFile("assets/data/rooms.json");
+    if (!roomsFile.is_open()) {
+        std::cerr << "Erro ao abrir rooms.json" << std::endl;
+        return;
+    }
+
+    nlohmann::json roomsJson;
+    roomsFile >> roomsJson;
+
+    std::vector<Map::Room> allRooms = roomsJson.at("rooms").get<std::vector<Map::Room>>();
+
+    this->floor.rooms.clear();
+    for (const auto& info : this->floor.roomInfos) {
+        auto it = std::find_if(allRooms.begin(), allRooms.end(), [&](const Map::Room& r) {
+            return r.id == info.id;
+        });
+
+        if (it != allRooms.end()) {
+            Map::Room room = *it;
+            room.x = info.x;
+            room.y = info.y;
+            this->floor.rooms.push_back(std::move(room));
+        } else {
+            std::cerr << "Sala com ID " << info.id << " não encontrada no rooms.json\n";
+        }
+    }
+
+    for (auto& room : this->floor.rooms) {
+        if (room.type == Map::ERoomType::Secret) continue;
+
+        auto setConn = [&](EDirection dir, int dx, int dy) {
+            Map::Room* neighbor = getRoomByPosition(room.x + dx, room.y + dy);
+            room.connections[directionToString(dir)] = neighbor && neighbor->type != Map::ERoomType::Secret;
+        };
+
+        setConn(EDirection::Right, 1, 0);
+        setConn(EDirection::Left, -1, 0);
+        setConn(EDirection::Up, 0, -1);
+        setConn(EDirection::Down, 0, 1);
+    }
+
 
     this->currentRoom = nullptr;
     for (auto& room : this->floor.rooms) {
@@ -44,8 +89,35 @@ void RoomManager::loadFloor(int index) {
     }
 }
 
+void RoomManager::loadRequiredAssets(SDL_Renderer* renderer) {
+    for (const auto& room : this->floor.rooms) {
+        for (const auto& e : room.entities) {
+            switch (e.type) {
+                case Map::EEntityType::Enemy: {
+                    const auto* enemy = enemyManager->getEnemyById(e.id);
+                    if (enemy) {
+                        const std::string& path = enemy->getSpritePath();
+                        textures()->Load(renderer, path, path);
+                    }
+                    break;
+                }
+                case Map::EEntityType::Item: {
+                    const auto* item = itemManager->getItemById(e.id);
+                    if (item) {
+                        const std::string& path = item->getSpritePath();
+                        textures()->Load(renderer, path, path);
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+    }
+}
+
 void RoomManager::loadRoom(Map::Room* room) {
-    if (!room) return;
+    if (!room) [[unlikely]] return;
 
     this->currentRoom = room;
     this->entityManager->clearAll();
@@ -105,9 +177,77 @@ void RoomManager::loadRoom(Map::Room* room) {
 }
 
 void RoomManager::loadTiles(Map::Room* room) {
-    if (!room) return;
+    if (!room || room->layout.empty() || room->layout[0].empty()) return;
 
     SDL_Texture* tileSheet = textures()->Get("tileset");
+
+    for (const auto& [dirStr, connected] : room->connections) {
+        if (!connected) continue;
+
+        EDirection dir = stringToDirection(dirStr);
+        int rows = static_cast<int>(room->layout.size());
+        int cols = static_cast<int>(room->layout[0].size());
+
+        int dx = 0, dy = 0;
+        switch (dir) {
+            case EDirection::Up: dy = -1; break;
+            case EDirection::Down: dy = 1; break;
+            case EDirection::Left: dx = -1; break;
+            case EDirection::Right: dx = 1; break;
+            default: break;
+        }
+
+        Map::Room* neighbor = getRoomByPosition(room->x + dx, room->y + dy);
+        if (!neighbor || neighbor->type == Map::ERoomType::Secret) continue;
+
+        std::vector<Vector2i> doorPositions;
+
+        switch (dir) {
+            case EDirection::Up:
+                if (cols % 2 == 0) {
+                    doorPositions.push_back({cols / 2, 0});
+                    doorPositions.push_back({(cols / 2) - 1, 0});
+                } else {
+                    doorPositions.push_back({cols / 2, 0});
+                }
+                break;
+            case EDirection::Down:
+                if (cols % 2 == 0) {
+                    doorPositions.push_back({cols / 2, rows - 1});
+                    doorPositions.push_back({(cols / 2) - 1, rows - 1});
+                } else {
+                    doorPositions.push_back({cols / 2, rows - 1});
+                }
+                break;
+            case EDirection::Left:
+                if (rows % 2 == 0) {
+                    doorPositions.push_back({0, rows / 2});
+                    doorPositions.push_back({0, (rows / 2) - 1});
+                } else {
+                    doorPositions.push_back({0, rows / 2});
+                }
+                break;
+            case EDirection::Right:
+                if (rows % 2 == 0) {
+                    doorPositions.push_back({cols - 1, rows / 2});
+                    doorPositions.push_back({cols - 1, (rows / 2) - 1});
+                } else {
+                    doorPositions.push_back({cols - 1, rows / 2});
+                }
+                break;
+            default:
+                break;
+        }
+
+        for (const auto& pos : doorPositions) {
+            if (pos.y >= 0 && pos.y < rows && pos.x >= 0 && pos.x < cols) {
+                int currentTileId = room->layout[pos.y][pos.x];
+                const Tile* currentTile = this->tileSet->getTile(currentTileId);
+                if (!currentTile || !currentTile->solid) continue; 
+                room->layout[pos.y][pos.x] = 7;
+            }
+        }
+    }
 
     for (size_t row = 0; row < room->layout.size(); ++row) {
         for (size_t col = 0; col < room->layout[row].size(); ++col) {
@@ -123,7 +263,28 @@ void RoomManager::loadTiles(Map::Room* room) {
                 tile->solid
             );
 
-            tileBody->initStaticTile(tileSheet, tile->index);
+            if (tileId == 7) {
+                double angle = 0.0;
+                SDL_RendererFlip flip = SDL_FLIP_NONE;
+
+                if (row == 0) {
+                    angle = 0.0;
+                    flip = SDL_FLIP_NONE;
+                } else if (row == room->layout.size() - 1) {
+                    angle = 0.0;
+                    flip = SDL_FLIP_VERTICAL;
+                } else if (col == 0) {
+                    angle = 270.0;
+                    flip = SDL_FLIP_NONE;
+                } else if (col == room->layout[0].size() - 1) {
+                    angle = 90.0;
+                    flip = SDL_FLIP_NONE;
+                }
+
+                tileBody->initFlippedStaticTile(tileSheet, tile->index, angle, flip);
+            } else {
+                tileBody->initStaticTile(tileSheet, tile->index);
+            }
             tileBody->setTileId(tileId);
             tileBody->setTileData(tile);
 
@@ -136,50 +297,45 @@ void RoomManager::loadEntities(Map::Room* room) {
     bool hasEnemies = false;
 
     for (const auto& e : room->entities) {
-        std::string type = e.at("type");
-        int id = e.at("id");
-        int x = e.at("x");
-        int y = e.at("y");
+        switch (e.type) {
+            case Map::EEntityType::Item: {
+                if (!this->itemManager) break;
 
-        if (type == "Item" && this->itemManager) {
-            const Items::Item* itemData = this->itemManager->getItemById(id);
-            if (itemData) {
-                textures()->Load(this->renderer, itemData->getSpritePath(), itemData->getSpritePath());
-                Vector4f screenVect = virtualRenderer()->mapToScreen(x, y, 1.0f, 1.0f);
-
-                auto item = std::make_unique<Entities::ItemBody>(
-                    screenVect,
-                    *itemData
-                );
-                item->loadAnimations();
-                this->entityManager->add(std::move(item));
+                const Items::Item* itemData = this->itemManager->getItemById(e.id);
+                if (itemData) {
+                    Vector4f screenVect = virtualRenderer()->mapToScreen(e.x, e.y, 1.0f, 1.0f);
+                    auto item = std::make_unique<Entities::ItemBody>(screenVect, *itemData);
+                    item->setTexture(textures()->Get(itemData->getSpritePath()));
+                    item->loadAnimations();
+                    this->entityManager->add(std::move(item));
+                }
+                break;
             }
-        }
 
-        if (type == "Enemy" && this->enemyManager) {
-            const Enemies::Enemy* enemyData = this->enemyManager->getEnemyById(id);
-            if (enemyData) {
-                textures()->Load(this->renderer, enemyData->getSpritePath(), enemyData->getSpritePath());
-                Vector4f screenVect = virtualRenderer()->mapToScreen(x, y);
+            case Map::EEntityType::Enemy: {
+                if (!this->enemyManager) break;
 
-                auto enemy = std::make_unique<Entities::EnemyBody>(
-                    screenVect,
-                    *enemyData,
-                    *this->entityManager
-                );
-
-                //TODO - TROCAR PARA ANIMATED
-                enemy->setTexture(textures()->Get(enemyData->getSpritePath()));
-                enemy->setTarget(this->player);
-                this->entityManager->add(std::move(enemy));
-                hasEnemies = true;
+                const Enemies::Enemy* enemyData = this->enemyManager->getEnemyById(e.id);
+                if (enemyData) {
+                    Vector4f screenVect = virtualRenderer()->mapToScreen(e.x, e.y);
+                    auto enemy = std::make_unique<Entities::EnemyBody>(
+                        screenVect, *enemyData, *this->entityManager
+                    );
+                    enemy->setTexture(textures()->Get(enemyData->getSpritePath()));
+                    enemy->setTarget(this->player);
+                    this->entityManager->add(std::move(enemy));
+                    hasEnemies = true;
+                }
+                break;
             }
+
+            default:
+                break;
         }
     }
 
     room->doorsOpen = !hasEnemies;
 }
-
 
 void RoomManager::update(float deltaTime) {
     if (!this->currentRoom || this->currentRoom->doorsOpen) return;
@@ -192,14 +348,14 @@ void RoomManager::update(float deltaTime) {
 
 void RoomManager::createPlayerInStartRoom() {
     Vector4f playerVect = virtualRenderer()->mapToScreen(4, 4, 1, 1);
-    this->player = new Entities::PlayerBody(playerVect, true, true);
+    this->player = new Entities::PlayerBody(playerVect, this->entityManager, true, true);
 
     this->player->setAttackRate(1.0f);
     this->player->setAttackSpeed(3.5f);
     this->player->setTexture(Manager::TextureManager::Get("player_f"));
     this->player->loadAnimations();
     this->player->setAcceleration(virtualRenderer()->normalizeValue(3));
-    this->player->setHitboxMargin(0.2f, 0.2f);
+    this->player->setHitboxMargin(0.7f, 0.3f);
     this->player->setBombs(3);
 }
 
@@ -284,8 +440,6 @@ void RoomManager::moveToRoomInDirection(EDirection direction) {
         std::cout << "Nenhuma sala conectada nessa direção.\n";
     }
 }
-
-
 
 void RoomManager::checkAndMovePlayerBetweenRooms() {
     if (!this->player || !this->currentRoom) return;
@@ -396,6 +550,48 @@ void RoomManager::setEntityPositionByPixels(Entities::Body* entity, Vector2f pos
 
 void RoomManager::setEntityPositionByTiles(Entities::Body* entity, Vector2f position) {
     entity->setPosition(virtualRenderer()->denormalizeVector(position));
+}
+
+std::vector<json> RoomManager::loadAvailableRoomTemplates(const std::string& path) {
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        std::cerr << "Erro ao abrir " << path << std::endl;
+        return {};
+    }
+
+    json roomTemplatesJson;
+    file >> roomTemplatesJson;
+
+    std::vector<json> rooms = roomTemplatesJson.at("rooms").get<std::vector<json>>();
+    return rooms;
+}
+
+void RoomManager::generateFloor(int index, int seed) {
+    std::vector<json> templates = this->loadAvailableRoomTemplates("assets/data/rooms.json");
+
+    std::ifstream itemFile("assets/data/items.json");
+    if (!itemFile.is_open()) {
+        std::cerr << "Erro ao abrir items.json" << std::endl;
+        return;
+    }
+
+    json itemJson;
+    itemFile >> itemJson;
+
+    std::vector<json> itemPool;
+    for (const auto& item : itemJson) {
+        if (item.value("pool", "") == "Room") {
+            itemPool.push_back(item);
+        }
+    }
+
+    Generator::ProceduralFloorGenerator generator(seed);
+    json floorJson = generator.generate(templates, itemPool);
+
+    std::string path = "assets/data/floor" + std::to_string(index) + ".json";
+    std::ofstream out(path);
+    out << floorJson.dump(2);
+    out.close();
 }
 
 Manager::RoomManager::~RoomManager()

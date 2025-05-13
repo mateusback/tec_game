@@ -34,6 +34,7 @@ namespace Entities {
         void onCollision(Body* other) override {}
 
         void initStaticTile(SDL_Texture* tileSheet, int tileIndex);
+        void initFlippedStaticTile(SDL_Texture* texture, int tileIndex, double angle = 0.0, SDL_RendererFlip flip = SDL_FLIP_NONE);
         
 		#pragma region Getters
         int getTileId() const { return tileId; }

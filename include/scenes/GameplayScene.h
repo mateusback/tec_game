@@ -16,6 +16,9 @@
 #include "../renders/HudRenderer.h"
 #include "../managers/RoomManager.h"
 #include "../renders/MiniMapRenderer.h"
+#include "../handlers/BombHandler.h"
+#include "../handlers/NotificationHandler.h"
+
 
 
 class GameplayScene : public Core::Scene {
@@ -26,11 +29,13 @@ private:
     Map::Floor floor;
     Map::Room* currentRoom = nullptr;
     Manager::EntityManager entityManager;
-    bool debugMode = false;
+    bool debugMode = true;
     Renderer::HudRenderer* hudRenderer = nullptr;
     Manager::RoomManager* roomManager = nullptr;
     Renderer::MiniMapRenderer* miniMapRenderer = nullptr;
     TileSet tileSet;
+    std::unique_ptr<BombHandler> bombHandler;
+    NotificationHandler notificationHandler;
 
 public:
     GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight);

@@ -2,29 +2,35 @@
 #include "../../include/physics/CollisionManager.h"
 #include "../../include/renders/TextRenderer.h"
 #include "../../include/managers/FontManager.h"
-#include "../../include/serializers/FloorSerialization.h"
 #include "../../include/utils/DebugUtils.h"
 #include "../../include/utils/GlobalAccess.h"
 #include "../../include/utils/Types.h"
 #include "../../include/entities/EffectBody.h"
 #include "../../include/entities/BombBody.h"
+#include "../../include/managers/EventManager.h"
+#include "../../include/core/Events.h"
 
 #include <SDL2/SDL_image.h>
 #include <fstream>
 
 GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight) {
+    this->debugMode = true;
     this->loadResources(renderer);
+    notificationHandler.setFont(Manager::FontManager::get("default"));
 
+    //
     this->roomManager = new Manager::RoomManager(renderer, 
         &this->entityManager, &this->tileSet, 
         &this->itemManager, &this->enemyManager);
 
-
+    this->roomManager->generateFloor(1, 1234);
     this->roomManager->loadFloor(1);
+    this->roomManager->loadRequiredAssets(renderer);
     this->roomManager->loadRoomByType(Map::ERoomType::Start);
     this->player = this->roomManager->getPlayer();
     std::cout << "Player position: " << this->player->getPosition().x << ", " << this->player->getPosition().y << std::endl;
 
+    this->bombHandler = std::make_unique<BombHandler>(&this->entityManager, &this->tileSet);
     this->miniMapRenderer = new Renderer::MiniMapRenderer(renderer, this->roomManager);
     this->hudRenderer = new Renderer::HudRenderer(renderer);
 }
@@ -37,40 +43,11 @@ void GameplayScene::handleEvent(const SDL_Event& event) {
 }
 
 void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
+
+    if(!this->player->isActive()) {
+        return;
+    }
     this->player->handleInput(input);
-
-    if (input.shootDirection.x != 0 || input.shootDirection.y != 0)
-    {
-        auto attack = player->attack(player->getCenterPoint(), input.shootDirection);
-        if(attack){
-            entityManager.add(std::move(attack));
-        }
-    }
-
-    //TODO - Depois passar para o player
-    if (input.putBomb && player->getBombCooldown() <= 0.0f) {
-        if (player->getBombs() <= 0) return;
-        player->setBombs(player->getBombs() - 1);
-        Vector2f pos = player->getPosition();
-        auto bomb = std::make_unique<Entities::BombBody>(
-            Vector4f{
-                pos.x,
-                pos.y,
-                virtualRenderer()->getTileSize(),
-                virtualRenderer()->getTileSize()  
-            },
-            true,
-            true,
-            2.0f,
-            virtualRenderer()->getTileSize() * 3.0f,
-            60.0f,
-            entityManager,
-            tileSet
-        );
-        player->setBombCooldown(5.0f);
-        bomb->setTexture(Manager::TextureManager::Get("bomb"));
-        entityManager.add(std::move(bomb));
-    }
 
     
     this->player->update(deltaTime);
@@ -82,26 +59,22 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     auto attacks = entityManager.getEntitiesByType<Entities::AttackBody>();
     auto effects = entityManager.getEntitiesByType<Entities::EffectBody>();
     auto bombs = entityManager.getEntitiesByType<Entities::BombBody>();
-    Vector2f totalDisplacement = {0.f, 0.f};
 
     for (auto* bomb : bombs) {
         bomb->update(deltaTime);
     }
 
     for (auto* tile : tiles) {
-        if (tile->hasCollision() &&
-            Physics::CollisionManager::checkCollision(player->getHitbox(), tile->getHitbox())) {
-            player->onCollision(tile);
+        if (Physics::isColliding(this->player, tile)) {
+            Physics::CollisionManager::resolveCollision(this->player, tile);
             break;
         }
     }
 
-    player->setPosition(player->getPosition().x + totalDisplacement.x, player->getPosition().y + totalDisplacement.y);
-    
     for (auto* item : items) {
         item->update(deltaTime);
-        if (item->hasCollision() &&
-            Physics::CollisionManager::checkCollision(player->getHitbox(), item->getHitbox())) {
+        if (Physics::isColliding(this->player, item)) {
+            notificationHandler.show(item->getItem().getName(), item->getItem().getDescription());
             player->onCollision(item);
         }
     }
@@ -109,28 +82,22 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     for (auto* attack : attacks) {
         attack->update(deltaTime);
 
-        if (attack->getOrigin() != this->player && player->hasCollision() && attack->hasCollision() &&
-        Physics::CollisionManager::checkCollision(attack->getHitbox(), player->getHitbox())) {
+        if (attack->getOrigin() != this->player && Physics::isColliding(attack, player)) {
             player->takeDamage(attack->getAttackDamage());
-            audio()->playSoundEffect("hit-player", 0);
-            attack->setActive(false);
-
             addDestroyEffect(attack->getPosition(), attack->getScale());
+            attack->setActive(false);
             continue;
         }
 
         if (attack->getOrigin() == this->player) {
             for (auto* enemy : enemies) {
-                if (enemy->hasCollision() && attack->hasCollision() &&
-                    Physics::CollisionManager::checkCollision(enemy->getHitbox(), attack->getHitbox())) {
-    
+                if (Physics::isColliding(attack, enemy)) {
                     enemy->takeDamage(attack->getAttackDamage());
                     audio()->playSoundEffect("hit-enemy", 0);
                     attack->setActive(false);
     
                     addDestroyEffect(attack->getPosition(), attack->getScale());
                     if (enemy->getHealth() <= 0){
-                        //TODO - TALVEZ COLOCAR O SCORE NO JSON
                         score()->add(20);
                         enemy->setActive(false);
                     }
@@ -152,21 +119,23 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
 
     for (auto* enemy : enemies) {
         enemy->update(deltaTime);
+        if (Physics::isColliding(this->player, enemy)) {
+            player->onCollision(enemy);
+            continue;
+        }
     }
 
     for (auto* effect : effects) {
         effect->update(deltaTime);
     }
 
+    notificationHandler.update(deltaTime);
+
     this->entityManager.removeInactive();
     this->entityManager.addAll();
     
     this->roomManager->update(deltaTime);
     this->roomManager->checkAndMovePlayerBetweenRooms();
-
-    if(!this->player->isActive()) {
-        //TODO - Implementar tela de game over
-    }
 }
 
 void GameplayScene::render(SDL_Renderer* renderer) {
@@ -205,20 +174,24 @@ void GameplayScene::render(SDL_Renderer* renderer) {
         SDL_RenderFillRectF(renderer, &barFill);
     }
 
-    if (true) {
+    if (this->debugMode) {
         Utils::DebugUtils::drawCollidersOfType<Entities::ItemBody>(renderer, entityManager, {0, 0, 255, 255});
         Utils::DebugUtils::drawCollidersOfType<Entities::TileBody>(renderer, entityManager, {0, 255, 0, 255});
         Utils::DebugUtils::drawCollidersOfType<Entities::AttackBody>(renderer, entityManager, {255, 0, 255, 255});
         Utils::DebugUtils::drawCollidersOfType<Entities::EnemyBody>(renderer, entityManager, {255, 255, 0, 255});
     
         if (player->hasCollision()) {
+            Vector4f hb = player->getHitbox();
             SDL_FRect rect = {
-                player->getHitbox().x, player->getHitbox().y,
-                player->getHitbox().w, player->getHitbox().z
+                hb.x, hb.y,
+                hb.z, hb.w 
             };
             Utils::DebugUtils::drawCollider(renderer, rect, {255, 0, 0, 255});
         }
     }
+
+    notificationHandler.render(renderer, virtualRenderer()->getScreenWidth(), virtualRenderer()->getScreenHeight());
+
     this->hudRenderer->render(renderer, this->player);
     this->miniMapRenderer->render(renderer);
     SDL_RenderPresent(renderer);
@@ -231,12 +204,12 @@ void GameplayScene::loadResources(SDL_Renderer* renderer){
     textures()->Load(renderer, "player_l", "assets/player/personagem_L.png");
     textures()->Load(renderer, "player_r", "assets/player/personagem_R.png");
     textures()->Load(renderer, "player_sheet", "assets/animations/player.png");
+    textures()->Load(renderer, "swing", "assets/animations/swing.png");
 
     textures()->Load(renderer, "player_with_item", "assets/player_with_item.png");
     textures()->Load(renderer, "attack", "assets/attack.png");
     textures()->Load(renderer, "attack_destroy", "assets/attack_fade.png");
 
-    textures()->Load(renderer, "shell_hidden", "assets/enemies/shell_hidden.png");
     textures()->Load(renderer, "bomb", "assets/bomb.png");
     textures()->Load(renderer, "bomb_explosion", "assets/bomb_explosion.png");
     textures()->Load(renderer, "hudsheet", "assets/hudsheet.png");
@@ -251,6 +224,7 @@ void GameplayScene::loadResources(SDL_Renderer* renderer){
     this->tileSet.loadFromFile("assets/data/tileset.json");
     this->itemManager.loadFromFile("assets/data/items.json");
     textures()->Load(renderer, "tileset", tileSet.getSpriteSheetPath());
+    //Load 
 }
 
 void GameplayScene::addDestroyEffect(Vector2f position, Vector2f scale) {

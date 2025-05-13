@@ -37,6 +37,7 @@ namespace Manager {
         ~RoomManager();
     
         void loadFloor(int index);
+        void loadRequiredAssets(SDL_Renderer* renderer);
         void loadRoom(Map::Room* room);
         void loadRoomByType(Map::ERoomType type);
 
@@ -52,6 +53,10 @@ namespace Manager {
         bool areAllEnemiesDefeated() const;
         void openDoorsOfCurrentRoom();
         void saveCurrentRoomState();
+
+        //Procedural Generation
+        std::vector<json> loadAvailableRoomTemplates(const std::string& path);
+        void generateFloor(int index, int seed);
 
         void setEntityPositionByPixels(Entities::Body* entity, Vector2f position);
         void setEntityPositionByTiles(Entities::Body* entity, Vector2f position);

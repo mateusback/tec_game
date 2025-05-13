@@ -17,6 +17,7 @@ namespace Renderer {
         
     public:
         std::function<void()> onComplete = nullptr;
+        //functor
 
         Animation(const std::vector<Sprite>& frames, float frameTime, bool loop = true)
             : frames(frames), frameTime(frameTime), loop(loop), finished(false) {}
@@ -45,6 +46,9 @@ namespace Renderer {
             return frames.at(index);
         }
         
+        void setFrameTime(float newFrameTime) {
+            this->frameTime = newFrameTime;
+        }
     };
 }
 

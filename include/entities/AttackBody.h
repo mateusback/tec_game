@@ -27,7 +27,9 @@ namespace Entities
 			attackDuration(duration),
 			lifeSteal(lifesteal),
 			criticalChance(crit_chance),
-			criticalDamage(crit_dmg) {}
+			criticalDamage(crit_dmg) {
+				this->loadAnimations();
+			}
 
 		AttackBody(float x, float y, float w, float h, bool collision = false, bool visible = true, 
 			float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
@@ -37,7 +39,9 @@ namespace Entities
 			attackDuration(duration),
 			lifeSteal(lifesteal),
 			criticalChance(crit_chance),
-			criticalDamage(crit_dmg) {}
+			criticalDamage(crit_dmg) {
+				this->loadAnimations();
+			}
 
 		AttackBody(Vector4f collider, bool collision = false, bool visible = true, 
 			float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
@@ -47,14 +51,15 @@ namespace Entities
 			attackDuration(duration),
 			lifeSteal(lifesteal),
 			criticalChance(crit_chance),
-			criticalDamage(crit_dmg) {}
+			criticalDamage(crit_dmg) {
+				this->loadAnimations();
+			}
 		#pragma endregion
 
         void update(float deltaTime);
 
 
-		void loadAnimations() override {
-		}
+		void loadAnimations() override;
 		
 
 		#pragma region Getters

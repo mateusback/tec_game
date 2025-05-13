@@ -11,6 +11,7 @@ namespace Manager {
 
     class AudioManager {
     private:
+        //trocar para map de mylib
         std::unordered_map<std::string, Mix_Chunk*> soundEffects;
         std::unordered_map<std::string, Mix_Music*> musics;
 

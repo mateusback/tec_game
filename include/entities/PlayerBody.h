@@ -8,6 +8,9 @@
 #include "ItemBody.h"
 #include "../items/Item.h"
 #include "../managers/InputManager.h"
+#include "../handlers/WeaponHandler.h"
+#include "../managers/EntityManager.h"
+#include "../weapons/MagicHandsWeapon.h"
 
 namespace Entities
 {
@@ -20,40 +23,33 @@ namespace Entities
 		float bombCooldown = 5.0f;
 		float experience;
 		EDirection currentDirection = EDirection::Down;
+		WeaponHandler weaponHandler;
 
 	public:
 		#pragma region Constructors
-		PlayerBody(float x = 0, float y = 0, float w = 50, float h = 50, bool collision = false, bool visible = true)
-		: CharacterBody(x, y, w, h, collision, visible), 
-		coins(0), 
-		keys(0), 
-		bombs(0), 
-		experience(0) {}
-
-		PlayerBody(Vector2f pos, Vector2f scl, bool collision = false, bool visible = true)
-		: CharacterBody(pos.x, pos.y, scl.x, scl.y, collision, visible), 
-		coins(0), 
-		keys(0), 
-		bombs(0), 
-		experience(0) {}
-
-		PlayerBody(Vector4f collider, bool collision = false, bool visible = true)
+		PlayerBody(Vector4f collider, Manager::EntityManager* entityManager, bool collision = false, bool visible = true)
 		: CharacterBody(collider.x, collider.y, collider.z, collider.w, collision, visible), 
-		coins(0), 
-		keys(0), 
-		bombs(0), 
-		experience(0) {}
+		coins(0), keys(0), bombs(0), experience(0),
+		weaponHandler(entityManager)
+		{
+			auto weapon = std::make_shared<MagicHandsWeapon>();
+			weapon->setEntityManager(entityManager);
+			weaponHandler.setWeapon(weapon);
+			weaponHandler.getWeapon()->setOwner(this);
+		}
+
 		#pragma endregion
 	
-
+		void takeDamage(float damage) override;
 		void onCollision(Body* other) override;
 		void update(float deltaTime) override;
 		void loadAnimations() override;
 		
 		void handleInput(const Manager::PlayerInput& input);
-		std::unique_ptr<Entities::AttackBody> attack(Pointf characterCenter, Vector2f direction);
+		void attack(Vector2f direction);
 		void pickUpItem(Entities::ItemBody* item);
-		void updateDirectionSprite(const Vector2f& direction);
+		void tryPlaceBomb();
+		void consumeBomb();
 
 		#pragma region Getters
 		const std::list<Items::Item>& getInventory() const { return this->inventory; }
@@ -69,6 +65,7 @@ namespace Entities
 		void setKeys(uint8_t value) { this->keys = value; }
 		void setBombs(uint8_t value) { this->bombs = value; }
 		void setBombCooldown(float cooldown) { this->bombCooldown = cooldown; }
+		void setWeapon(std::shared_ptr<Weapon> weapon, Manager::EntityManager* entityManager);
 		#pragma endregion
 	};
 }

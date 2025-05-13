@@ -10,6 +10,10 @@
     "5": { "name": "Wall-Left", "index": 5, "solid": true },
     "6": { "name": "Wall-Right", "index": 6, "solid": true },
     "7": { "name": "Door-PlaceHolder", "index": 7, "solid": true },
-    "8": { "name": "Rock-Destroyed", "index": 8, "solid": false }
+    "8": { "name": "Rock-Destroyed", "index": 8, "solid": false },
+    "12": { "name": "Wall-Top-Right", "index": 12, "solid": true },
+    "13": { "name": "Wall-Top-Left", "index": 13, "solid": true },
+    "14": { "name": "Wall-Bottom-Right", "index": 14, "solid": true },
+    "15": { "name": "Wall-Bottom-Left", "index": 15, "solid": true }
   }
 }

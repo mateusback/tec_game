@@ -20,6 +20,7 @@ namespace Entities
 		Vector2f position;
 		Vector2f scale;
         Vector2f hitboxOffset = {0.f, 0.f};
+        Vector2f hitboxSize = {0.f, 0.f};
         bool has_collision;
         bool is_visible;
         bool is_animated = false;
@@ -64,15 +65,19 @@ namespace Entities
         Pointf getCenterPoint() const { return Pointf(this->position.x + this->scale.x / 2, this->position.y + this->scale.y / 2); } 
         Vector4f getHitbox() const {
             if (this->hitboxOffset == Vector2f{0.f, 0.f}) return getFullSize();
-        
-            float marginX = scale.x * hitboxOffset.x * 0.5f;
-            float marginY = scale.y * hitboxOffset.y * 0.5f;
-        
+
+            float offsetX = std::min(hitboxOffset.x, 0.98f);
+            float offsetY = std::min(hitboxOffset.y, 0.98f);
+
+            float marginX = scale.x * offsetX * 0.5f;
+            float marginY = scale.y * offsetY * 0.5f;
+
             float newW = scale.x - (2 * marginX);
             float newH = scale.y - (2 * marginY);
-        
+
             return Vector4f(position.x + marginX, position.y + marginY, newW, newH);
         }
+
         
 		#pragma region Getters
         bool hasCollision() const { return this->has_collision; }

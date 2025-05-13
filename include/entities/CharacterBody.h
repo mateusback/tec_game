@@ -24,6 +24,8 @@ namespace Entities
 		uint8_t level;
 		float stateTimer = 0.0f;
 		EntityState state = EntityState::Idle;
+		bool invencible = false;
+		float invencibleTimer = 0.0f;
 
 	public:
 		#pragma region Constructors
@@ -67,11 +69,7 @@ namespace Entities
 			level(1) {}
 		#pragma endregion
 
-		void takeDamage(float dmg) {
-			this->health -= dmg;
-			if (this->health < 0) this->health = 0;
-		}
-
+		virtual void takeDamage(float dmg);
 		float getHealthPercent() const { return this->health / this->maxHealth; }
 		bool isDead() const { return this->health <= 0; }
 
@@ -89,6 +87,8 @@ namespace Entities
 		int getLevel() const { return this->level; }
 		float getStateTimer() const { return this->stateTimer; }
 		EntityState getState() const { return this->state; }
+		bool isInvencible() const { return this->invencible; }
+		float getInvencibleTimer() const { return this->invencibleTimer; }
 		#pragma endregion
 
 		#pragma region Setters
@@ -105,6 +105,8 @@ namespace Entities
 		void setLevel(int level) { this->level = level; }
 		void setStateTimer(float stateTimer) { this->stateTimer = stateTimer; }
 		void setState(EntityState state) { this->state = state; }
+		void setInvencible(bool invencible) { this->invencible = invencible; }
+		void setInvencibleTimer(float invencibleTimer) { this->invencibleTimer = invencibleTimer; }
 		#pragma endregion
 	};
 }

@@ -40,9 +40,5 @@ namespace Entities
             SDL_RenderCopyF(renderer, this->texture, nullptr, &rect);
             return;
         } 
-
-        // SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        // SDL_FRect rect = { fullSize.x, fullSize.y, fullSize.z, fullSize.w };
-        // SDL_RenderFillRectF(renderer, &rect);
     }
 }

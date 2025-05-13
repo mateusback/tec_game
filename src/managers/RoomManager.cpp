@@ -166,8 +166,10 @@ void RoomManager::loadRoom(Map::Room* room) {
         this->currentRoom->doorsOpen = state.doorsOpened;
         return;
     }
-    if (room->type == Map::ERoomType::Start)
-        this->createPlayerInStartRoom();
+    if (room->type == Map::ERoomType::Start){
+        Vector4f playerVect = virtualRenderer()->mapToScreen(4, 4, 1, 1);
+        this->player = new Entities::PlayerBody(playerVect, this->entityManager, true, true);
+    }
     
     this->loadTiles(room); 
     this->loadEntities(room);
@@ -344,19 +346,6 @@ void RoomManager::update(float deltaTime) {
         std::cout << "Todas as ameaças eliminadas. Abrindo portas..." << std::endl;
         this->openDoorsOfCurrentRoom();
     }
-}
-
-void RoomManager::createPlayerInStartRoom() {
-    Vector4f playerVect = virtualRenderer()->mapToScreen(4, 4, 1, 1);
-    this->player = new Entities::PlayerBody(playerVect, this->entityManager, true, true);
-
-    this->player->setAttackRate(1.0f);
-    this->player->setAttackSpeed(3.5f);
-    this->player->setTexture(Manager::TextureManager::Get("player_f"));
-    this->player->loadAnimations();
-    this->player->setAcceleration(virtualRenderer()->normalizeValue(3));
-    this->player->setHitboxMargin(0.7f, 0.3f);
-    this->player->setBombs(3);
 }
 
 void RoomManager::updateVirutalRenderer(Map::Room* room) {
@@ -540,16 +529,6 @@ void RoomManager::saveCurrentRoomState() {
     }
 
     state.doorsOpened = this->currentRoom->doorsOpen;
-}
-
-#pragma endregion
-
-void RoomManager::setEntityPositionByPixels(Entities::Body* entity, Vector2f position) {
-    entity->setPosition(virtualRenderer()->normalizeVector(position));
-}
-
-void RoomManager::setEntityPositionByTiles(Entities::Body* entity, Vector2f position) {
-    entity->setPosition(virtualRenderer()->denormalizeVector(position));
 }
 
 std::vector<json> RoomManager::loadAvailableRoomTemplates(const std::string& path) {

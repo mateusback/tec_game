@@ -38,6 +38,7 @@ void SwordWeapon::attack(const Vector2f& direction) {
 
     attack->setTexture(textures()->Get("swing"));
     attack->setAnimated(true);
+    attack->loadAnimations();
     attack->setOrigin(this->owner);
     entityManager->add(std::move(attack));
 }

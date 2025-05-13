@@ -32,6 +32,14 @@ namespace Entities
 		coins(0), keys(0), bombs(0), experience(0),
 		weaponHandler(entityManager)
 		{
+			this->loadAnimations();
+			this->setAttackRate(1.0f);
+			this->setAttackSpeed(3.5f);
+			this->loadAnimations();
+			this->setAcceleration(virtualRenderer()->normalizeValue(3));
+			this->setHitboxMargin(0.7f, 0.3f);
+			this->setBombs(3);
+
 			auto weapon = std::make_shared<MagicHandsWeapon>();
 			weapon->setEntityManager(entityManager);
 			weaponHandler.setWeapon(weapon);

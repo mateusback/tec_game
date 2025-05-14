@@ -1,7 +1,7 @@
 [
     {
       "id": 1,
-      "pool": "Boss",
+      "pool": "Room",
       "name": "Espada do Destino",
       "description": "A última espada sagrada, capaz de derrotar qualquer inimigo.",
       "quality": 5,

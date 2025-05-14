@@ -22,45 +22,7 @@ namespace Manager {
           itemManager(itemManager),
           enemyManager(enemyManager) {}
 
-void RoomManager::loadFloor(int index) {
-    std::string floorPath = "assets/data/floor" + std::to_string(index) + ".json";
-    std::ifstream floorFile(floorPath);
-    if (!floorFile.is_open()) {
-        std::cerr << "Erro ao abrir floor: " << floorPath << std::endl;
-        return;
-    }
-
-    nlohmann::json floorJson;
-    floorFile >> floorJson;
-    from_json(floorJson, this->floor);
-
-    std::ifstream roomsFile("assets/data/rooms.json");
-    if (!roomsFile.is_open()) {
-        std::cerr << "Erro ao abrir rooms.json" << std::endl;
-        return;
-    }
-
-    nlohmann::json roomsJson;
-    roomsFile >> roomsJson;
-
-    std::vector<Map::Room> allRooms = roomsJson.at("rooms").get<std::vector<Map::Room>>();
-
-    this->floor.rooms.clear();
-    for (const auto& info : this->floor.roomInfos) {
-        auto it = std::find_if(allRooms.begin(), allRooms.end(), [&](const Map::Room& r) {
-            return r.id == info.id;
-        });
-
-        if (it != allRooms.end()) {
-            Map::Room room = *it;
-            room.x = info.x;
-            room.y = info.y;
-            this->floor.rooms.push_back(std::move(room));
-        } else {
-            std::cerr << "Sala com ID " << info.id << " não encontrada no rooms.json\n";
-        }
-    }
-
+void RoomManager::connectFloorRooms() {
     for (auto& room : this->floor.rooms) {
         if (room.type == Map::ERoomType::Secret) continue;
 
@@ -75,7 +37,6 @@ void RoomManager::loadFloor(int index) {
         setConn(EDirection::Down, 0, 1);
     }
 
-
     this->currentRoom = nullptr;
     for (auto& room : this->floor.rooms) {
         if (room.type == Map::ERoomType::Start) {
@@ -85,9 +46,18 @@ void RoomManager::loadFloor(int index) {
     }
 
     if (!this->currentRoom) {
-        std::cerr << "Sala inicial não encontrada no andar " << index << std::endl;
+        std::cerr << "Sala inicial não encontrada no andar " << this->floor.index << std::endl;
     }
 }
+
+const Map::Room* RoomManager::getRoomByPosition(int x, int y) const {
+    for (const auto& room : this->floor.rooms) {
+        if (room.x == x && room.y == y)
+            return &room;
+    }
+    return nullptr;
+}
+
 
 void RoomManager::loadRequiredAssets(SDL_Renderer* renderer) {
     for (const auto& room : this->floor.rooms) {
@@ -118,12 +88,12 @@ void RoomManager::loadRequiredAssets(SDL_Renderer* renderer) {
 
 void RoomManager::loadRoom(Map::Room* room) {
     if (!room) [[unlikely]] return;
-
     this->currentRoom = room;
     this->entityManager->clearAll();
     this->updateVirutalRenderer(room);
-
+    std::cout << "Carregando do tipo: " << Map::roomTypeToString(room->type) << std::endl;
     if(!this->roomStates.contains(room->id)) {
+        std::cout << "Criando estado da sala: " << room->id << std::endl;
         Map::RoomState newState;
         newState.roomRef = room;
         newState.wasVisited = false;
@@ -170,8 +140,10 @@ void RoomManager::loadRoom(Map::Room* room) {
         Vector4f playerVect = virtualRenderer()->mapToScreen(4, 4, 1, 1);
         this->player = new Entities::PlayerBody(playerVect, this->entityManager, true, true);
     }
-    
+    std::cout << "Carregando Tiles da sala: " << room->id << std::endl;
     this->loadTiles(room); 
+    std::cout << "Carregando Entidades da sala: " << room->id << std::endl;
+
     this->loadEntities(room);
 
     state.wasVisited = true;
@@ -182,83 +154,16 @@ void RoomManager::loadTiles(Map::Room* room) {
     if (!room || room->layout.empty() || room->layout[0].empty()) return;
 
     SDL_Texture* tileSheet = textures()->Get("tileset");
+    int rows = static_cast<int>(room->layout.size());
+    int cols = static_cast<int>(room->layout[0].size());
 
-    for (const auto& [dirStr, connected] : room->connections) {
-        if (!connected) continue;
-
-        EDirection dir = stringToDirection(dirStr);
-        int rows = static_cast<int>(room->layout.size());
-        int cols = static_cast<int>(room->layout[0].size());
-
-        int dx = 0, dy = 0;
-        switch (dir) {
-            case EDirection::Up: dy = -1; break;
-            case EDirection::Down: dy = 1; break;
-            case EDirection::Left: dx = -1; break;
-            case EDirection::Right: dx = 1; break;
-            default: break;
-        }
-
-        Map::Room* neighbor = getRoomByPosition(room->x + dx, room->y + dy);
-        if (!neighbor || neighbor->type == Map::ERoomType::Secret) continue;
-
-        std::vector<Vector2i> doorPositions;
-
-        switch (dir) {
-            case EDirection::Up:
-                if (cols % 2 == 0) {
-                    doorPositions.push_back({cols / 2, 0});
-                    doorPositions.push_back({(cols / 2) - 1, 0});
-                } else {
-                    doorPositions.push_back({cols / 2, 0});
-                }
-                break;
-            case EDirection::Down:
-                if (cols % 2 == 0) {
-                    doorPositions.push_back({cols / 2, rows - 1});
-                    doorPositions.push_back({(cols / 2) - 1, rows - 1});
-                } else {
-                    doorPositions.push_back({cols / 2, rows - 1});
-                }
-                break;
-            case EDirection::Left:
-                if (rows % 2 == 0) {
-                    doorPositions.push_back({0, rows / 2});
-                    doorPositions.push_back({0, (rows / 2) - 1});
-                } else {
-                    doorPositions.push_back({0, rows / 2});
-                }
-                break;
-            case EDirection::Right:
-                if (rows % 2 == 0) {
-                    doorPositions.push_back({cols - 1, rows / 2});
-                    doorPositions.push_back({cols - 1, (rows / 2) - 1});
-                } else {
-                    doorPositions.push_back({cols - 1, rows / 2});
-                }
-                break;
-            default:
-                break;
-        }
-
-        for (const auto& pos : doorPositions) {
-            if (pos.y >= 0 && pos.y < rows && pos.x >= 0 && pos.x < cols) {
-                int currentTileId = room->layout[pos.y][pos.x];
-                const Tile* currentTile = this->tileSet->getTile(currentTileId);
-                if (!currentTile || !currentTile->solid) continue; 
-                room->layout[pos.y][pos.x] = 7;
-            }
-        }
-    }
-
-    for (size_t row = 0; row < room->layout.size(); ++row) {
-        for (size_t col = 0; col < room->layout[row].size(); ++col) {
+    for (int row = 0; row < rows; ++row) {
+        for (int col = 0; col < cols; ++col) {
             int tileId = room->layout[row][col];
             const Tile* tile = this->tileSet->getTile(tileId);
             if (!tile) continue;
 
             Vector4f screenVect = virtualRenderer()->mapToScreen(col, row);
-
             auto tileBody = std::make_unique<Entities::TileBody>(
                 screenVect,
                 tileSheet,
@@ -269,27 +174,18 @@ void RoomManager::loadTiles(Map::Room* room) {
                 double angle = 0.0;
                 SDL_RendererFlip flip = SDL_FLIP_NONE;
 
-                if (row == 0) {
-                    angle = 0.0;
-                    flip = SDL_FLIP_NONE;
-                } else if (row == room->layout.size() - 1) {
-                    angle = 0.0;
-                    flip = SDL_FLIP_VERTICAL;
-                } else if (col == 0) {
-                    angle = 270.0;
-                    flip = SDL_FLIP_NONE;
-                } else if (col == room->layout[0].size() - 1) {
-                    angle = 90.0;
-                    flip = SDL_FLIP_NONE;
-                }
+                if (row == 0) angle = 0.0;
+                else if (row == rows - 1) { angle = 0.0; flip = SDL_FLIP_VERTICAL; }
+                else if (col == 0) angle = 270.0;
+                else if (col == cols - 1) angle = 90.0;
 
                 tileBody->initFlippedStaticTile(tileSheet, tile->index, angle, flip);
             } else {
                 tileBody->initStaticTile(tileSheet, tile->index);
             }
+
             tileBody->setTileId(tileId);
             tileBody->setTileData(tile);
-
             this->entityManager->add(std::move(tileBody));
         }
     }
@@ -335,20 +231,23 @@ void RoomManager::loadEntities(Map::Room* room) {
                 break;
         }
     }
-
     room->doorsOpen = !hasEnemies;
 }
 
 void RoomManager::update(float deltaTime) {
-    if (!this->currentRoom || this->currentRoom->doorsOpen) return;
+    if (!this->currentRoom) return;
 
     if (this->areAllEnemiesDefeated()) {
-        std::cout << "Todas as ameaças eliminadas. Abrindo portas..." << std::endl;
         this->openDoorsOfCurrentRoom();
     }
 }
 
 void RoomManager::updateVirutalRenderer(Map::Room* room) {
+    if (!room || room->layout.empty() || room->layout[0].empty()) {
+        std::cerr << "Layout da sala " << room->id << " está vazio.\n";
+        return;
+    }
+    std::cout << "Tamanho do layout: " << room->layout.size() << "x" << room->layout[0].size() << std::endl;
     int tileCols = room->layout[0].size();
     int tileRows = room->layout.size();
     virtualRenderer()->updateLayout(tileCols, tileRows);
@@ -383,7 +282,6 @@ const bool RoomManager::wasRoomVisited(int roomId) const {
     auto it = roomStates.find(roomId);
     return it != roomStates.end() && it->second.wasVisited;
 }
-
 
 void RoomManager::moveToRoomInDirection(EDirection direction) {
     int newX = this->currentRoom->x;
@@ -463,7 +361,6 @@ bool RoomManager::areAllEnemiesDefeated() const {
 void RoomManager::openDoorsOfCurrentRoom() {
     auto& layout = this->currentRoom->layout;
 
-    // 1. Coletar posições das portas
     std::vector<Vector2i> portasFechadas;
 
     for (auto* tile : entityManager->getEntitiesByType<Entities::TileBody>()) {
@@ -546,31 +443,21 @@ std::vector<json> RoomManager::loadAvailableRoomTemplates(const std::string& pat
 }
 
 void RoomManager::generateFloor(int index, int seed) {
-    std::vector<json> templates = this->loadAvailableRoomTemplates("assets/data/rooms.json");
-
-    std::ifstream itemFile("assets/data/items.json");
-    if (!itemFile.is_open()) {
-        std::cerr << "Erro ao abrir items.json" << std::endl;
+    std::ifstream file("assets/data/rooms.json");
+    if (!file.is_open()) {
+        std::cerr << "Erro ao abrir rooms.json\n";
         return;
     }
 
-    json itemJson;
-    itemFile >> itemJson;
+    json data;
+    file >> data;
 
-    std::vector<json> itemPool;
-    for (const auto& item : itemJson) {
-        if (item.value("pool", "") == "Room") {
-            itemPool.push_back(item);
-        }
-    }
+    std::vector<json> templates = data.at("rooms").get<std::vector<json>>();
 
-    Generator::ProceduralFloorGenerator generator(seed);
-    json floorJson = generator.generate(templates, itemPool);
+    Generator::ProceduralFloorGenerator generator;
+    this->floor = generator.generate(index, seed, templates);
 
-    std::string path = "assets/data/floor" + std::to_string(index) + ".json";
-    std::ofstream out(path);
-    out << floorJson.dump(2);
-    out.close();
+    std::cout << "Andar " << index << " gerado com sucesso!" << std::endl;
 }
 
 Manager::RoomManager::~RoomManager()

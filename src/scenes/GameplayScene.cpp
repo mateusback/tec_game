@@ -18,13 +18,12 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screen
     this->loadResources(renderer);
     notificationHandler.setFont(Manager::FontManager::get("default"));
 
-    //
     this->roomManager = new Manager::RoomManager(renderer, 
         &this->entityManager, &this->tileSet, 
         &this->itemManager, &this->enemyManager);
 
     this->roomManager->generateFloor(1, 1234);
-    this->roomManager->loadFloor(1);
+    
     this->roomManager->loadRequiredAssets(renderer);
     this->roomManager->loadRoomByType(Map::ERoomType::Start);
     this->player = this->roomManager->getPlayer();

@@ -11,6 +11,8 @@
 #include "../handlers/WeaponHandler.h"
 #include "../managers/EntityManager.h"
 #include "../weapons/MagicHandsWeapon.h"
+#include "../utils/GlobalAccess.h"
+
 
 namespace Entities
 {

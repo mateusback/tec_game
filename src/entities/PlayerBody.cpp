@@ -2,7 +2,6 @@
 #include "../../include/managers/TextureManager.h"
 #include "../../include/items/ItemTypes.h"
 #include "../../include/physics/CollisionManager.h"
-#include "../../include/utils/GlobalAccess.h"
 #include "../../include/managers/AnimationLoader.h"
 #include "../../include/managers/EventManager.h"
 #include "../../include/core/Events.h"

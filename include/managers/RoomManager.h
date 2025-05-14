@@ -38,7 +38,7 @@ namespace Manager {
     
         void update(float deltaTime);
 
-        void loadFloor(int index);
+        void connectFloorRooms();
         void loadRequiredAssets(SDL_Renderer* renderer);
         void loadRoom(Map::Room* room);
         void loadRoomByType(Map::ERoomType type);
@@ -46,7 +46,6 @@ namespace Manager {
         void loadEntities(Map::Room* room);        
 
         void updateVirutalRenderer(Map::Room* room);
-        void createPlayerInStartRoom();
         void moveToRoomInDirection(EDirection direction);
         void checkAndMovePlayerBetweenRooms();
         bool areAllEnemiesDefeated() const;
@@ -54,6 +53,7 @@ namespace Manager {
         void saveCurrentRoomState();
 
         const Map::Room* getCurrentRoom() const;
+        const Map::Room* getRoomByPosition(int x, int y) const;
         Map::Room* getRoomByPosition(int x, int y);
         const std::vector<Map::Room>& getRooms() const;
         const bool wasRoomVisited(int roomId) const;

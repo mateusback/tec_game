@@ -9,32 +9,35 @@
 #include <unordered_set>
 #include <string>
 
+#include "../map/Room.h"
+#include "../map/Floor.h"
+#include "../utils/Types.h"
+
 using json = nlohmann::json;
 using Position = std::pair<int, int>;
 
 namespace Generator {
 
     class ProceduralFloorGenerator {
-    public:
-        ProceduralFloorGenerator(int seed, int roomCount = 8, int floorLevel = 1);
-
-        json generate(const std::vector<json>& availableRooms,
-                      const std::vector<json>& itemPool);
-
     private:
+        int floorIndex;
+        int nextRoomId;
         std::mt19937 rng;
-        int roomCount;
-        int floorLevel;
+        std::unordered_map<Position, Map::Room> layout;
+        std::unordered_set<int> usedRoomIds;
 
-        std::vector<json> filterRoomsByFloor(const std::vector<json>& rooms);
-        json chooseRoomByType(const std::vector<json>& rooms, const std::string& type);
-        json chooseRandomItemFromPool(const std::vector<json>& itemPool);
+        void reset(int floorIndex, int seed);
+        std::vector<json> loadAvailableRoomTemplates(const std::string& path);
+        Map::Room chooseRoomByType(const std::vector<json>& rooms, Map::ERoomType type);
+        void expandRooms(const std::vector<json>& templates, int targetCount);
+        void connectRooms();
+        void assignSpecialRooms(const std::vector<json>& templates);
+        Map::Floor buildFloor();
+        int calculateTargetRoomCount(int floorIndex);
 
-        struct pair_hash {
-            std::size_t operator()(const std::pair<int, int>& p) const {
-                return std::hash<int>()(p.first) ^ std::hash<int>()(p.second << 1);
-            }
-        };
+    public:
+        ProceduralFloorGenerator() = default;
+        Map::Floor generate(int floorIndex, int seed, const std::vector<json>& roomTemplates);
     };
 
 }

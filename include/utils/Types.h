@@ -2,6 +2,8 @@
 #define TYPES_H
 
 #include <my-lib/math-vector.h>
+#include <utility>
+
 
 using Vector2f = Mylib::Math::Vector<float, 2>;
 using Vector4f = Mylib::Math::Vector<float, 4>;
@@ -17,6 +19,25 @@ enum class EDirection {
     Left,
     Right
 };
+
+inline EDirection oppositeDirection(EDirection dir){
+    switch (dir) {
+        case EDirection::Up: return EDirection::Down;
+        case EDirection::Down: return EDirection::Up;
+        case EDirection::Left: return EDirection::Right;
+        case EDirection::Right: return EDirection::Left;
+        default: throw std::invalid_argument("Direção inválida");
+    }
+}
+
+inline EDirection directionFromDelta(int dx, int dy) {
+    if (dx == 1 && dy == 0)  return EDirection::Right;
+    if (dx == -1 && dy == 0) return EDirection::Left;
+    if (dx == 0 && dy == 1)  return EDirection::Down;
+    if (dx == 0 && dy == -1) return EDirection::Up;
+    throw std::invalid_argument("Delta inválido para direção");
+}
+
 
 inline std::string directionToString(EDirection dir) {
     switch (dir) {
@@ -35,5 +56,16 @@ inline EDirection stringToDirection(const std::string& str) {
     if (str == "right") return EDirection::Right;
     throw std::invalid_argument("Direção inválida: " + str);
 }
+
+
+namespace std {
+    template <>
+    struct hash<std::pair<int, int>> {
+        std::size_t operator()(const std::pair<int, int>& p) const noexcept {
+            return std::hash<int>()(p.first) ^ (std::hash<int>()(p.second) << 1);
+        }
+    };
+}
+
 
 #endif

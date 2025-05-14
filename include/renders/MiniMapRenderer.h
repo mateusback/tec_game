@@ -14,6 +14,22 @@ namespace Renderer {
         const Manager::RoomManager* roomManager;
         int roomSizePx = 10;
         int spacing = 2;
+
+        int deltaX(EDirection dir) {
+            switch (dir) {
+                case EDirection::Right: return 1;
+                case EDirection::Left: return -1;
+                default: return 0;
+            }
+        }
+
+        int deltaY(EDirection dir) {
+            switch (dir) {
+                case EDirection::Down: return 1;
+                case EDirection::Up: return -1;
+                default: return 0;
+            }
+        }
     };
 }
 

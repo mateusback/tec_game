@@ -55,7 +55,6 @@ namespace Entities
         #pragma endregion
 		
         virtual void update(float deltaTime);
-
         virtual void render(SDL_Renderer* renderer);
 
         virtual void onCollision(Body* other) {};

@@ -14,17 +14,17 @@
 
 namespace Core
 {
-    Game::Game(const char* title, int width, int height) : window(nullptr), renderer(nullptr), loop(nullptr) {
-
+    Game::Game(const char* title, int width, int height) : window(nullptr),
+                                                            renderer(nullptr), loop(nullptr),
+                                                            screenWidth(width), screenHeight(height)
+    {
         #pragma region SDL_Init
-        if (SDL_Init(SDL_INIT_VIDEO) < 0) 
-        {
+        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
             std::cerr << "Erro ao inicializar SDL: " << SDL_GetError() << std::endl;
             return;
         }
 
-        if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) 
-        {
+        if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
             std::cerr << "Erro ao iniciar SDL_image: " << IMG_GetError() << std::endl;
             return;
         }
@@ -32,7 +32,7 @@ namespace Core
         if (TTF_Init() < 0) {
             std::cerr << "Erro SDL_ttf: " << TTF_GetError() << std::endl;
             return;
-        }    
+        }
 
         if (SDL_Init(SDL_INIT_AUDIO) < 0) {
             std::cout << "Erro SDL_Init: " << SDL_GetError() << "\n";
@@ -40,20 +40,17 @@ namespace Core
         }
 
         this->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                width, height, SDL_WINDOW_SHOWN);
-        if (!this->window) 
-        {
+                                        this->screenWidth, this->screenHeight, SDL_WINDOW_SHOWN);
+        if (!this->window) {
             std::cerr << "Erro ao criar janela: " << SDL_GetError() << std::endl;
             return;
         }
 
         this->renderer = SDL_CreateRenderer(this->window, -1, SDL_RENDERER_ACCELERATED);
-        if (!this->renderer) 
-        {
+        if (!this->renderer) {
             std::cerr << "Erro ao criar renderer: " << SDL_GetError() << std::endl;
             return;
         }
-
         #pragma endregion
 
         Renderer::VirtualRendererGlobal::init(width, height, 1, 1);
@@ -66,15 +63,15 @@ namespace Core
         this->loop = new GameLoop(renderer);
     }
 
-    void Game::run() 
+    void Game::run()
     {
         if (!this->loop) 
         {
             std::cerr << "Game loop not initialized." << std::endl;
             return;
         }
-        if (this->loop) 
-            this->loop->run();
+
+        this->loop->run();
     }
     
     Game::~Game() 

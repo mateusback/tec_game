@@ -49,12 +49,12 @@ namespace Entities {
                     this->setCollision(true);
                     this->state = EntityState::CoolingDown;
                     this->stateTimer = this->getAttackRate();
-                {
-                    auto attack = this->attack(this->getCenterPoint(), toPlayer);
-                    if (attack) {
-                        this->entityManager.add(std::move(attack));
+                    {
+                        auto attack = this->attack(this->getCenterPoint(), toPlayer);
+                        if (attack) {
+                            this->entityManager.add(std::move(attack));
+                        }
                     }
-                }
                     break;
 
                 case EntityState::CoolingDown:
@@ -86,7 +86,7 @@ namespace Entities {
                     if (this->stateTimer <= 0.f) {
                         if (distance > 0.f)
                             toPlayer.normalize();
-                        this->setSpeed(toPlayer * virtualRenderer()->normalizeValue(6));
+                        this->setSpeed({toPlayer.x * virtualRenderer()->normalizeValue(6), toPlayer.y * virtualRenderer()->normalizeValue(6)});
                         this->state = EntityState::Jumping;
                         this->stateTimer = 0.4f;
                     }
@@ -113,7 +113,8 @@ namespace Entities {
             }
         }
         this->setAnimationByState();
-        if(this->speed.x > 0 || this->speed.y > 0) this->move(deltaTime);
+        if(this->speed.x == 0 && this->speed.y == 0) return;
+        this->move(deltaTime);
     }
 
     void EnemyBody::setAnimationByState() {

@@ -9,8 +9,8 @@
       "sprite": "assets/animations/item.png",
       "weapon": "sword",
       "effects": [
-        { "target": "AttackDamage", "value": 5.0 },
-        { "target": "AttackSpeed", "value": 0.1 }
+        { "target": "AttackDamage", "value": 40.0 },
+        { "target": "AttackSpeed", "value": -0.5 }
       ]
     },
     {

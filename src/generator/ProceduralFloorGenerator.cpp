@@ -19,16 +19,6 @@ namespace Generator {
         this->rng.seed(seed);
     }
 
-    std::vector<json> ProceduralFloorGenerator::loadAvailableRoomTemplates(const std::string& path) {
-        std::ifstream file(path);
-        if (!file.is_open()) {
-            throw std::runtime_error("Erro ao abrir " + path);
-        }
-        json roomTemplatesJson;
-        file >> roomTemplatesJson;
-        return roomTemplatesJson.at("rooms").get<std::vector<json>>();
-    }
-
     Map::Room ProceduralFloorGenerator::chooseRoomByType(const std::vector<json>& rooms, Map::ERoomType type) {
         std::vector<json> filtered;
         for (const auto& room : rooms) {
@@ -43,56 +33,51 @@ namespace Generator {
         return room;
     }
 
-    void ProceduralFloorGenerator::expandRooms(const std::vector<json>& templates, int targetCount) {
+    void ProceduralFloorGenerator::expandRooms(const std::vector<json>& templates, std::size_t targetCount) {
         std::vector<Position> directions = {{0,1}, {1,0}, {0,-1}, {-1,0}};
         std::queue<Position> frontier;
-        frontier.push({0, 0});
+        frontier.emplace(0, 0);
 
-        while (!frontier.empty() && static_cast<int>(layout.size()) < targetCount) {
+        while (!frontier.empty() && layout.size() < targetCount) {
             Position current = frontier.front(); frontier.pop();
             std::shuffle(directions.begin(), directions.end(), rng);
 
             for (const auto& [dx, dy] : directions) {
                 Position neighbor{current.first + dx, current.second + dy};
-                if (layout.find(neighbor) != layout.end()) continue;
+                if (this->layout.find(neighbor) != this->layout.end()) continue;
 
                 auto dir = directionFromDelta(dx, dy);
                 std::string dirStr = directionToString(dir);
                 std::string oppStr = directionToString(oppositeDirection(dir));
 
-                Map::Room& currentRoom = layout[current];
+                Map::Room& currentRoom = this->layout[current];
                 bool currentAllows = currentRoom.connections.contains(dirStr) && currentRoom.connections[dirStr];
                 if (!currentAllows) continue;
 
-                if (usedRoomIds.size() >= templates.size()) {
-                    std::cout << "[WARN] Templates esgotados, permitindo repetição de salas.\n";
-                    usedRoomIds.clear();
-                }
+                if (this->usedRoomIds.size() >= templates.size()) this->usedRoomIds.clear();
 
                 for (int attempts = 0; attempts < 10; ++attempts) {
                     Map::Room candidate = chooseRoomByType(templates, Map::ERoomType::Normal);
 
-                    if (!candidate.connections.contains(oppStr) || !candidate.connections[oppStr])
-                        continue;
+                    if (!candidate.connections.contains(oppStr) || !candidate.connections[oppStr]) continue;
 
-                    if (usedRoomIds.contains(candidate.id))
-                        continue;
+                    if (this->usedRoomIds.contains(candidate.id)) continue;
 
                     candidate.x = neighbor.first;
                     candidate.y = neighbor.second;
                     layout[neighbor] = candidate;
-                    usedRoomIds.insert(candidate.id);
+                    this->usedRoomIds.insert(candidate.id);
                     frontier.push(neighbor);
                     break;
                 }
 
-                if (layout.size() >= targetCount) break;
+                if (this->layout.size() >= targetCount) break;
             }
         }
     }
 
     void ProceduralFloorGenerator::connectRooms() {
-        for (auto& [pos, room] : layout) {
+        for (auto& [pos, room] : this->layout) {
             int rows = static_cast<int>(room.layout.size());
             int cols = static_cast<int>(room.layout[0].size());
             int midCol = cols / 2;
@@ -102,9 +87,9 @@ namespace Generator {
 
             for (const auto& [dx, dy] : std::vector<Position>{{0,1},{1,0},{0,-1},{-1,0}}) {
                 Position neighbor{pos.first + dx, pos.second + dy};
-                if (!layout.contains(neighbor)) continue;
+                if (!this->layout.contains(neighbor)) continue;
 
-                auto& neighborRoom = layout[neighbor];
+                auto& neighborRoom = this->layout[neighbor];
                 auto dir = directionFromDelta(dx, dy);
                 std::string dirStr = directionToString(dir);
                 std::string oppStr = directionToString(oppositeDirection(dir));
@@ -157,9 +142,9 @@ namespace Generator {
 
     void ProceduralFloorGenerator::assignSpecialRooms(const std::vector<json>& templates) {
         std::vector<std::pair<Position, Map::Room*>> candidates;
-        for (auto& [pos, room] : layout) {
+        for (auto& [pos, room] : this->layout) {
             if (room.type == Map::ERoomType::Normal)
-                candidates.push_back({pos, &room});
+                candidates.emplace_back(pos, &room);
         }
 
         std::sort(candidates.begin(), candidates.end(), [](auto& a, auto& b) {
@@ -188,13 +173,15 @@ namespace Generator {
         floor.index = this->floorIndex;
         for (const auto& [_, room] : layout) {
             floor.rooms.push_back(room);
+            std::cout << "Sala " << room.id << " (" << room.x << ", " << room.y << ") adicionada ao andar " << floor.index << "\n";
+            std::cout << "Tipo: " << Map::roomTypeToString(room.type) << "\n";
             floor.roomInfos.push_back(Map::RoomInfo{room.id, room.x, room.y});
         }
         return floor;
     }
 
     int ProceduralFloorGenerator::calculateTargetRoomCount(int floorIndex) {
-        int baseRooms = static_cast<int>(3.33f * floorIndex);
+        int baseRooms = static_cast<int>(3.33f * floorIndex) + 3;
         int extraRooms = (this->rng() % 2) + 5;
         return std::min(baseRooms + extraRooms, 20);
     }
@@ -206,9 +193,9 @@ namespace Generator {
         start.id = nextRoomId++;
         start.x = 0;
         start.y = 0;
-        layout[{0, 0}] = start;
+        this->layout[{0, 0}] = start;
 
-        int targetRooms = calculateTargetRoomCount(floorIndex);
+        std::size_t targetRooms = calculateTargetRoomCount(floorIndex);
         expandRooms(roomTemplates, targetRooms);
         assignSpecialRooms(roomTemplates);
         connectRooms();

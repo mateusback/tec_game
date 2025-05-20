@@ -52,7 +52,7 @@ void BombHandler::handleExplosion(const Event::BombExploded& event) {
     }
 
     auto effect = std::make_unique<Entities::EffectBody>(
-        event.position,
+        event.position - event.radius / 2,
         Vector2f{event.radius, event.radius},
         Manager::TextureManager::Get("bomb_explosion"),
         0.5f

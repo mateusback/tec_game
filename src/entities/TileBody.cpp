@@ -6,7 +6,7 @@ namespace Entities {
         this->animationManager.clear();
 
         auto sprite = Manager::AnimationLoader::loadSingleFrame(tileSheet, tileIndex);
-        std::vector<Renderer::Sprite> frames = { std::move(sprite) };
+        std::vector frames = { std::move(sprite) };
 
         Renderer::Animation anim(frames, 0.0f, false);
         this->animationManager.addAnimation("default", anim);
@@ -23,7 +23,7 @@ namespace Entities {
         sprite.setAngle(angle);
         sprite.setFlip(flip);
 
-        std::vector<Renderer::Sprite> frames = { std::move(sprite) };
+        std::vector frames = { std::move(sprite) };
 
         Renderer::Animation anim(frames, 0.0f, false);
         this->animationManager.addAnimation("default", anim);

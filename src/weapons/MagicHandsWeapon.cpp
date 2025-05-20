@@ -27,9 +27,3 @@ void MagicHandsWeapon::attack(const Vector2f& direction) {
     attack->setSpeed(direction * virtualRenderer()->normalizeValue(this->owner->getAttackSpeed()));
     entityManager->add(std::move(attack));
 }
-
-void MagicHandsWeapon::update(float /*deltaTime*/) {
-}
-
-void MagicHandsWeapon::render(SDL_Renderer* /*renderer*/) {
-}

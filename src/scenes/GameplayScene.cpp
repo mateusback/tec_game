@@ -12,6 +12,8 @@
 
 #include <SDL2/SDL_image.h>
 #include <fstream>
+#include <random>
+#include <chrono>
 
 GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight) {
     this->debugMode = true;
@@ -22,7 +24,8 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screen
         &this->entityManager, &this->tileSet, 
         &this->itemManager, &this->enemyManager);
 
-    this->roomManager->generateFloor(1, 1234);
+    unsigned randomSeed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    this->roomManager->generateFloor(1, randomSeed);
     
     this->roomManager->loadRequiredAssets(renderer);
     this->roomManager->loadRoomByType(Map::ERoomType::Start);
@@ -120,8 +123,14 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
         enemy->update(deltaTime);
         if (Physics::isColliding(this->player, enemy)) {
             player->onCollision(enemy);
-            continue;
+            Physics::CollisionManager::resolveCollision(this->player, enemy);
         }
+        for (auto* tile : tiles) {
+            if (Physics::isColliding(enemy, tile)) {
+                Physics::CollisionManager::resolveCollision(enemy, tile);
+            }
+        }
+
     }
 
     for (auto* effect : effects) {
@@ -140,7 +149,6 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
 void GameplayScene::render(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
-    //TODO - Isso foi um grande erro, lembrar de separar em camadas depois
     this->entityManager.renderAll(renderer);
     this->player->render(renderer);
 

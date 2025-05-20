@@ -38,7 +38,6 @@ namespace Entities
         {
             SDL_FRect rect = { fullSize.x, fullSize.y, fullSize.z, fullSize.w };
             SDL_RenderCopyF(renderer, this->texture, nullptr, &rect);
-            return;
-        } 
+        }
     }
 }

@@ -10,7 +10,8 @@ void AttackBody::update(float deltaTime)
 
     this->attackDuration -= deltaTime;
 
-    if (this->attackDuration <= 0.f) {
+    if (this->attackDuration <= 0.f)
+    {
         this->setActive(false);
         return;
     }
@@ -18,7 +19,8 @@ void AttackBody::update(float deltaTime)
     this->move(deltaTime);
 }
 
-void AttackBody::loadAnimations() {
+void AttackBody::loadAnimations()
+{
     if (!this->is_animated) return;
     Manager::AnimationLoader::loadNamedAnimations(this->texture, {
         {"swing", 0, 30, false}

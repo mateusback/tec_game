@@ -428,20 +428,6 @@ void RoomManager::saveCurrentRoomState() {
     state.doorsOpened = this->currentRoom->doorsOpen;
 }
 
-std::vector<json> RoomManager::loadAvailableRoomTemplates(const std::string& path) {
-    std::ifstream file(path);
-    if (!file.is_open()) {
-        std::cerr << "Erro ao abrir " << path << std::endl;
-        return {};
-    }
-
-    json roomTemplatesJson;
-    file >> roomTemplatesJson;
-
-    std::vector<json> rooms = roomTemplatesJson.at("rooms").get<std::vector<json>>();
-    return rooms;
-}
-
 void RoomManager::generateFloor(int index, int seed) {
     std::ifstream file("assets/data/rooms.json");
     if (!file.is_open()) {

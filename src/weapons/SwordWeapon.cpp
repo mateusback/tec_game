@@ -13,15 +13,15 @@ void SwordWeapon::attack(const Vector2f& direction) {
 
     Vector2f attackSize;
     if (std::abs(dir.x) > std::abs(dir.y)) {
-        attackSize = {1.0f, 0.5f};
+        attackSize = {0.0f, 0.5f};
     } else {
-        attackSize = {0.5f, 1.0f};
+        attackSize = {0.5f, 0.0f};
     }
 
     float offset = this->owner->getScale().x * 0.5f + virtualRenderer()->normalizeValue(0.2f);
     Vector2f origin = this->owner->getCenterPoint() + dir * offset;
 
-    Vector2f pixelSize = virtualRenderer()->normalizeVector(attackSize);
+    Vector2f pixelSize = virtualRenderer()->normalizeVector({1 ,1});
 
     auto attack = std::make_unique<Entities::AttackBody>(
         origin - pixelSize * 0.5f,
@@ -35,16 +35,10 @@ void SwordWeapon::attack(const Vector2f& direction) {
         0.1f,
         2.0f
     );
-
+    attack->setHitboxMargin(attackSize);
     attack->setTexture(textures()->Get("swing"));
     attack->setAnimated(true);
     attack->loadAnimations();
     attack->setOrigin(this->owner);
     entityManager->add(std::move(attack));
-}
-
-void SwordWeapon::update(float /*renderer*/) {
-}
-
-void SwordWeapon::render(SDL_Renderer* /*renderer*/) {
 }

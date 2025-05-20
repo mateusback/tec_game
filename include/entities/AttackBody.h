@@ -57,11 +57,8 @@ namespace Entities
 		#pragma endregion
 
         void update(float deltaTime);
-
-
 		void loadAnimations() override;
 		
-
 		#pragma region Getters
 		float getAttackDamage() { return this->attackDamage; }
 		float getAttackRange() { return this->attackRange; }

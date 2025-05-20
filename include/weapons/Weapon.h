@@ -14,9 +14,6 @@ public:
     void setEntityManager(Manager::EntityManager* em) { this->entityManager = em; }
 
     virtual void attack(const Vector2f& direction) = 0;
-    virtual void update(float deltaTime) = 0;
-    virtual void render(SDL_Renderer* renderer) = 0;
-
 
     Entities::CharacterBody* getOwner() { return this->owner; }
     void setOwner(Entities::CharacterBody* owner) { 

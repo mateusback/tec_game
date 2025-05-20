@@ -97,9 +97,11 @@ namespace Entities
         weapon->setEntityManager(entityManager);
         weaponHandler.setWeapon(std::move(weapon));
         weaponHandler.getWeapon()->setOwner(this);
+        this->setAttackRate(2.5f);
+        this->setAttackDamage(50.0f);
+        this->setAttackDuration(0.5f);
     }
 
-    //TODO - DÁ PRA COLOCAR NO ITEM MANAGER
     void PlayerBody::pickUpItem(ItemBody* item){
         audio()->playSoundEffect("pickup-item", 0);
 

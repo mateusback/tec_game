@@ -13,7 +13,9 @@ private:
     TTF_Font* font = nullptr;
     SDL_Texture* logoTexture = nullptr;
     int width, height;
-    
+
+    void renderLogo(SDL_Renderer* renderer);
+    void renderFont(SDL_Renderer* renderer);
 public:
     MenuScene(SDL_Renderer* renderer, int width, int height);
     ~MenuScene();

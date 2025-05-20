@@ -12,30 +12,34 @@ namespace Physics {
     }
 
     void CollisionManager::resolveCollision(Entities::Body* a, const Entities::Body* b) {
+        Vector4i colisions = {0, 0, 0, 0};
+
+        Vector2f aCenter = a->getCenterPoint();
+        Vector2f bCenter = b->getCenterPoint();
+
         Vector4f aHitbox = a->getHitbox();
         Vector4f bHitbox = b->getHitbox();
 
-        float aCenterX = aHitbox.x + aHitbox.z / 2.0f;
-        float aCenterY = aHitbox.y + aHitbox.w / 2.0f;
-        float bCenterX = bHitbox.x + bHitbox.z / 2.0f;
-        float bCenterY = bHitbox.y + bHitbox.w / 2.0f;
+        Vector2f distance = { aCenter.x - bCenter.x, aCenter.y - bCenter.y };
+        Vector2f target_distance = {
+            (aHitbox.z + bHitbox.z) / 2.0f,
+            (aHitbox.w + bHitbox.w) / 2.0f
+        };
 
-        float dx = aCenterX - bCenterX;
-        float dy = aCenterY - bCenterY;
+        Vector2f collision_vector;
+        bool colliding_x = std::abs(distance.x) < target_distance.x;
+        bool colliding_y = std::abs(distance.y) < target_distance.y;
 
-        float combinedHalfWidth = (aHitbox.z + bHitbox.z) / 2.0f;
-        float combinedHalfHeight = (aHitbox.w + bHitbox.w) / 2.0f;
+        collision_vector.x = std::copysign(target_distance.x - std::abs(distance.x), distance.x);
+        collision_vector.y = std::copysign(target_distance.y - std::abs(distance.y), distance.y);
 
-        float overlapX = combinedHalfWidth - std::abs(dx);
-        float overlapY = combinedHalfHeight - std::abs(dy);
-
-        if (overlapX > 0 && overlapY > 0) {
+        if (colliding_x && colliding_y) {
             Vector2f pos = a->getPosition();
 
-            if (overlapX < overlapY) {
-                pos.x += (dx > 0) ? overlapX : -overlapX;
+            if (std::abs(collision_vector.x) < std::abs(collision_vector.y)) {
+                pos.x += collision_vector.x;
             } else {
-                pos.y += (dy > 0) ? overlapY : -overlapY;
+                pos.y += collision_vector.y;
             }
 
             a->setPosition(pos);

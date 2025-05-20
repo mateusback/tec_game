@@ -59,7 +59,6 @@ namespace Manager {
         const bool wasRoomVisited(int roomId) const;
 
         //Procedural Generation
-        std::vector<json> loadAvailableRoomTemplates(const std::string& path);
         void generateFloor(int index, int seed);
 
 

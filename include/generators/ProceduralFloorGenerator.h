@@ -27,9 +27,8 @@ namespace Generator {
         std::unordered_set<int> usedRoomIds;
 
         void reset(int floorIndex, int seed);
-        std::vector<json> loadAvailableRoomTemplates(const std::string& path);
         Map::Room chooseRoomByType(const std::vector<json>& rooms, Map::ERoomType type);
-        void expandRooms(const std::vector<json>& templates, int targetCount);
+        void expandRooms(const std::vector<json>& templates, std::size_t targetCount);
         void connectRooms();
         void assignSpecialRooms(const std::vector<json>& templates);
         Map::Floor buildFloor();

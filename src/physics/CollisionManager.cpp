@@ -12,8 +12,6 @@ namespace Physics {
     }
 
     void CollisionManager::resolveCollision(Entities::Body* a, const Entities::Body* b) {
-        Vector4i colisions = {0, 0, 0, 0};
-
         Vector2f aCenter = a->getCenterPoint();
         Vector2f bCenter = b->getCenterPoint();
 

@@ -5,9 +5,6 @@
 #include <memory>
 #include "../core/Scene.h"
 #include "../entities/PlayerBody.h"
-#include "../entities/ItemBody.h"
-#include "../entities/TileBody.h"
-#include "../entities/EnemyBody.h"
 #include "../managers/ItemManager.h"
 #include "../managers/EnemyManager.h"
 #include "../map/Floor.h"
@@ -19,23 +16,22 @@
 #include "../handlers/BombHandler.h"
 #include "../handlers/NotificationHandler.h"
 
-
-
 class GameplayScene : public Core::Scene {
 private:
     Entities::PlayerBody* player;
+    bool debugMode = true;
+    bool isPaused = false;
     Manager::ItemManager itemManager;
     Manager::EnemyManager enemyManager;
     Map::Floor floor;
-    Map::Room* currentRoom = nullptr;
     Manager::EntityManager entityManager;
-    bool debugMode = true;
     Renderer::HudRenderer* hudRenderer = nullptr;
     Manager::RoomManager* roomManager = nullptr;
     Renderer::MiniMapRenderer* miniMapRenderer = nullptr;
     TileSet tileSet;
     std::unique_ptr<BombHandler> bombHandler;
     NotificationHandler notificationHandler;
+    SDL_Renderer* renderer;
 
 public:
     GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight);

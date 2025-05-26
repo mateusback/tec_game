@@ -77,6 +77,8 @@ namespace Entities
             return Vector4f(position.x + marginX, position.y + marginY, newW, newH);
         }
 
+        Vector4f getHurtbox() const { return this->getHitbox(); }
+
         
 		#pragma region Getters
         bool hasCollision() const { return this->has_collision; }

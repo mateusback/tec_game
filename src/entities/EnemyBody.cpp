@@ -24,7 +24,7 @@ namespace Entities {
     void EnemyBody::applyEnemyBehavior(float deltaTime) {
         const EEnemyBehavior behavior = this->getEnemyData().getBehavior();
         auto* player = this->getTarget();
-        //if (!player) [[unlikely]] return;
+        if (!player) [[unlikely]] return;
     
         auto toPlayer = player->getPosition() - this->getPosition();
         float distance = toPlayer.length();
@@ -119,7 +119,8 @@ namespace Entities {
 
     void EnemyBody::setAnimationByState() {
         std::string desiredAnimation;
-    
+
+        //todo - refatorar tudo isso aqui, remover redundâncias e melhorar a lógica
         switch (this->state) {
             case EntityState::Idle:
                 desiredAnimation = "idle";
@@ -187,15 +188,16 @@ namespace Entities {
     void EnemyBody::loadAnimations() {
         this->is_animated = true;
         if (this->enemyData.getBehavior() == EEnemyBehavior::Jumper) {
-        SDL_Texture* texture = Manager::TextureManager::Get(this->enemyData.getSpritePath());
+            SDL_Texture* texture = Manager::TextureManager::Get(this->enemyData.getSpritePath());
 
-        Manager::AnimationLoader::loadStaticAnimations(texture, {
-            {"idle",   0, 0},
-            {"prep",   0, 1},
-            {"jump", 0, 2},
-        }, this->animationManager);
+            Manager::AnimationLoader::loadStaticAnimations(texture, {
+                {"idle",   0, 0},
+                {"prep",   0, 1},
+                {"jump", 0, 2},
+            }, this->animationManager);
 
-        this->animationManager.setAnimation("idle");
+            this->animationManager.setAnimation("idle");
+            return;
         }
         if (this->enemyData.getBehavior() == EEnemyBehavior::Shell) {
             SDL_Texture* texture = Manager::TextureManager::Get(this->enemyData.getSpritePath());
@@ -208,7 +210,6 @@ namespace Entities {
 
             this->animationManager.setAnimation("idle");
         }
-        std::cout << "Enemy animations loaded: " << this->enemyData.getName() << std::endl;
     }
 
     void EnemyBody::onCollision(Body* other) {

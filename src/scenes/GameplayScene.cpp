@@ -1,6 +1,7 @@
 #include "../../include/scenes/GameplayScene.h"
 #include "../../include/physics/CollisionManager.h"
-#include "../../include/renders/TextRenderer.h"
+#include "../../include/entities/EnemyBody.h"
+#include "../../include/entities/TileBody.h"
 #include "../../include/managers/FontManager.h"
 #include "../../include/utils/DebugUtils.h"
 #include "../../include/utils/GlobalAccess.h"
@@ -8,52 +9,51 @@
 #include "../../include/entities/EffectBody.h"
 #include "../../include/entities/BombBody.h"
 #include "../../include/managers/EventManager.h"
-#include "../../include/core/Events.h"
 
-#include <SDL2/SDL_image.h>
 #include <fstream>
-#include <random>
 #include <chrono>
 
 GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight) {
+    this->renderer = renderer;
     this->debugMode = true;
-    this->loadResources(renderer);
+    this->loadResources(this->renderer);
     notificationHandler.setFont(Manager::FontManager::get("default"));
 
-    this->roomManager = new Manager::RoomManager(renderer, 
+    this->roomManager = new Manager::RoomManager(this->renderer,
         &this->entityManager, &this->tileSet, 
         &this->itemManager, &this->enemyManager);
 
     unsigned randomSeed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     this->roomManager->generateFloor(1, randomSeed);
     
-    this->roomManager->loadRequiredAssets(renderer);
+    this->roomManager->loadRequiredAssets(this->renderer);
     this->roomManager->loadRoomByType(Map::ERoomType::Start);
     this->player = this->roomManager->getPlayer();
     std::cout << "Player position: " << this->player->getPosition().x << ", " << this->player->getPosition().y << std::endl;
 
     this->bombHandler = std::make_unique<BombHandler>(&this->entityManager, &this->tileSet);
-    this->miniMapRenderer = new Renderer::MiniMapRenderer(renderer, this->roomManager);
-    this->hudRenderer = new Renderer::HudRenderer(renderer);
+    this->miniMapRenderer = new Renderer::MiniMapRenderer(this->renderer, this->roomManager);
+    this->hudRenderer = new Renderer::HudRenderer(this->renderer);
 }
 
 
 void GameplayScene::handleEvent(const SDL_Event& event) {
     if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
-        //TODO - Implement pause menu
+        this->isPaused = !this->isPaused;
+    }
+    if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_F3) {
+        this->debugMode = !this->debugMode;
     }
 }
 
 void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
 
-    if(!this->player->isActive()) {
-        return;
-    }
+    if (this->isPaused) return;
+    if(!this->player->isActive()) return;
+
     this->player->handleInput(input);
 
-    
     this->player->update(deltaTime);
-    //this->entityManager.updateAll(deltaTime);
 
     auto items = entityManager.getEntitiesByType<Entities::ItemBody>();
     auto tiles = entityManager.getEntitiesByType<Entities::TileBody>();
@@ -69,7 +69,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     for (auto* tile : tiles) {
         if (Physics::isColliding(this->player, tile)) {
             Physics::CollisionManager::resolveCollision(this->player, tile);
-            break;
+        if (this->debugMode) break;
         }
     }
 
@@ -103,7 +103,6 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
                         score()->add(20);
                         enemy->setActive(false);
                     }
-                    break;
                 }
             }
         }
@@ -114,7 +113,6 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     
                 attack->setActive(false);
                 addDestroyEffect(attack->getPosition(), attack->getScale());
-                break;
             }
         }
     }
@@ -231,7 +229,6 @@ void GameplayScene::loadResources(SDL_Renderer* renderer){
     this->tileSet.loadFromFile("assets/data/tileset.json");
     this->itemManager.loadFromFile("assets/data/items.json");
     textures()->Load(renderer, "tileset", tileSet.getSpriteSheetPath());
-    //Load 
 }
 
 void GameplayScene::addDestroyEffect(Vector2f position, Vector2f scale) {

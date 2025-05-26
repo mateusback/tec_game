@@ -24,15 +24,16 @@ namespace Entities
                 this->setState(EntityState::Moving);
             }
     
-        } else {
-            if (input.shootDirection.x != 0.f || input.shootDirection.y != 0.f) {
-                this->attack(input.shootDirection);
-            }
-    
+        }
+        else {
             if (state == EntityState::Moving) {
                 this->animationManager.setAnimation("idle");
                 this->setState(EntityState::Idle);
             }
+        }
+
+        if (input.shootDirection.x != 0.f || input.shootDirection.y != 0.f) {
+            this->attack(input.shootDirection);
         }
 
         if(input.putBomb) {

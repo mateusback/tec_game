@@ -3,7 +3,7 @@
 
 #include <my-lib/math-vector.h>
 #include <utility>
-
+#include <functional>
 
 using Vector2f = Mylib::Math::Vector<float, 2>;
 using Vector4f = Mylib::Math::Vector<float, 4>;
@@ -57,12 +57,17 @@ inline EDirection stringToDirection(const std::string& str) {
     throw std::invalid_argument("Direção inválida: " + str);
 }
 
+namespace Utils {
+    using Position = std::pair<int, int>;
+}
 
 namespace std {
-    template <>
+    template<>
     struct hash<std::pair<int, int>> {
         std::size_t operator()(const std::pair<int, int>& p) const noexcept {
-            return std::hash<int>()(p.first) ^ (std::hash<int>()(p.second) << 1);
+            std::size_t h1 = std::hash<int>{}(p.first);
+            std::size_t h2 = std::hash<int>{}(p.second);
+            return h1 ^ (h2 << 1);
         }
     };
 }

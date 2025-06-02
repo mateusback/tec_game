@@ -11,7 +11,7 @@ namespace Entities {
 
     public:
         EffectBody(Vector2f position, Vector2f scale, SDL_Texture* texture, float durationSeconds = 0.3f)
-            : Body(position.x, position.y, scale.x, scale.y, false, true),
+            : Body(position, scale, false, true),
               duration(durationSeconds) {
             this->setTexture(texture);
         }

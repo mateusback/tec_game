@@ -1,21 +1,16 @@
 # ✅ TODO List do Projeto
 
-## Gameplay 
-- [ ] Implementar inimigos
-- [x] Implementar lógica de ataques do jogador - Gustavo Lopes (revisado)
-- [ ] Implementar lógica de salas (sala de inimigos, item, secreta, etc)
-- [ ] Implementar Items básicos - Mateus Back
-- [ ] Adicionar HUD (vida, itens, etc.)
-- [ ] Criar itens estáticos na tela (uma pedra, por exemplo)
-- [ ] Identificar o que está causando Segmentation fault - Mateus Back
+- [ ] Implementar sistema de inventário
+- [ ] Adicionar sistema de drops ao limpar a sala
+- [ ] Desenvolver HUD de inventário
+- [ ] Adicionar mais inimigos
+- [ ] Implementar sistema de itens ativos
+- [ ] Implementar sistema de sinergia entre armas
+- [ ] Adicionar sistema de upgrades para armas
+- [ ] Desenolver sistema de chefes e mini-chefes
+- [ ] Implementar sistema de progressão de níveis (derror chefes)
+- [ ] Desenvolver sistema de lojas
+- [ ] Implementar tiles de armadilhas
 
-## Sprites
-- [ ] Definir um tema artístico - Gustavo Lopes
-- [ ] Desenvolver Sprites - Gustavo Lopes
-- [ ] Iniciar lógica de animação
-
-## Engine Base
-- [ ] Continuar implementação do sistema de cenas (menu, gameplay, etc.)
-- [ ] Implementar sistema de debug (utilizar do my-lib como exemplo)
-- [ ] Implementar o sistema de colisões (deixar de froma que seja reutilizavel)
-- [ ] Adicionar gerenciadores de fisica (knockback e outros que ainda não pensei)
+## Outro:
+- [ ] Criar um sistema para facilitar a criação de salas

@@ -9,18 +9,10 @@ namespace Entities {
     protected:
         int tileId = -1;
         const Tile* tileData = nullptr;
-        TileBody(float x = 0, float y = 0, float w = 50, float h = 50, bool solid = false)
-        : Body(x, y, w, h, solid, true) {}
     public:
         #pragma region Constructors
-        TileBody(float x, float y, float w, float h, SDL_Texture* texture, bool solid = false)
-        : Body(x, y, w, h, solid, true) { this->setTexture(texture); }
-
-        TileBody(Vector2f pos, Vector2f scl, SDL_Texture* texture, bool solid = false)
-        : Body(pos.x, pos.y, scl.x, scl.y, solid, true) { this->setTexture(texture); }
-
         TileBody(Vector4f collider, SDL_Texture* texture, bool solid = false)
-        : Body(collider.x, collider.y, collider.z, collider.w, solid, true) { this->setTexture(texture); }
+        : Body(collider, solid, true) { this->setTexture(texture); }
 
         TileBody(const TileBody& other)
         : Body(other), tileId(other.tileId), tileData(other.tileData) {

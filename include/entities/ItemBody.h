@@ -16,23 +16,21 @@ namespace Entities
 
     public:
         #pragma region Constructors
-        ItemBody(Vector4f collider, const Item& item,
-            bool collision = true, bool visible = true)
-        : Body(collider.x, collider.y, collider.z, collider.w, collision, visible),
-            type(item.getType()), item(item) {}
+        ItemBody(Vector4f collider, const Item& item, bool collision = true, bool visible = true)
+            : Body(collider, collision, visible),
+            type(item.getType()),
+            item(item) {}
 
-        ItemBody(Vector2f pos, Vector2f scl, const Item& item,
-            bool collision = true, bool visible = true)
-        : Body(pos.x, pos.y, scl.x, scl.y, collision, visible),
-            type(item.getType()), item(item) {}
+        ItemBody(Vector2f pos, Vector2f scl, const Item& item, bool collision = true, bool visible = true)
+            : ItemBody(Vector4f(pos.x, pos.y, scl.x, scl.y), item, collision, visible) {}
 
-        ItemBody(const ItemBody& other)
-        : Body(other),
-          type(other.type),
-          item(other.item) {
-            this->setTexture(other.getTexture());
-            this->setPosition(other.getPosition());
-          }
+        // ItemBody(const ItemBody& other)
+        //     : Body(other),
+        //     type(other.type),
+        //     item(other.item) {
+        //     this->setTexture(other.getTexture());
+        //     this->setPosition(other.getPosition());
+        // }
         #pragma endregion
     
         #pragma region Getters

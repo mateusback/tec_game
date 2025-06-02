@@ -441,7 +441,7 @@ void RoomManager::generateFloor(int index, int seed) {
     std::vector<json> templates = data.at("rooms").get<std::vector<json>>();
 
     Generator::ProceduralFloorGenerator generator;
-    this->floor = generator.generate(index, seed, templates);
+    this->floor = generator.generate(index, seed, templates, this->itemManager);
 
     std::cout << "Andar " << index << " gerado com sucesso!" << std::endl;
 }

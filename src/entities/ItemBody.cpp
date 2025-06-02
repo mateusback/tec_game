@@ -28,8 +28,19 @@ namespace Entities
     void ItemBody::loadAnimations()
     {
         SDL_Texture* texture = textures()->Get(this->item.getSpritePath());
+
+        if (!texture) return;
+
+        int w, h;
+        SDL_QueryTexture(texture, nullptr, nullptr, &w, &h);
+
+        if (w == 32 && h == 32) {
+            this->is_animated = false;
+            return;
+        }
+
         this->is_animated = true;
-    
+
         Manager::AnimationLoader::loadNamedAnimations(texture, {
             { "idle", 0, 30 }
         }, this->animationManager);

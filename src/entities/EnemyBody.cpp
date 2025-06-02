@@ -5,7 +5,7 @@
 
 namespace Entities {
     EnemyBody::EnemyBody(Vector4f collider, const Enemies::Enemy& data, Manager::EntityManager& entityManager)
-    : CharacterBody(collider.x, collider.y, collider.z, collider.w, true, true, 0.f),
+    : CharacterBody(collider, true, true, 0.f),
       enemyData(data),
       entityManager(entityManager) {
         this->setAggroRange(virtualRenderer()->normalizeValue(data.getAggroRange()));

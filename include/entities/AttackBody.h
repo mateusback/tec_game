@@ -19,41 +19,26 @@ namespace Entities
 
     public:
 		#pragma region Constructors
-		AttackBody(Vector2f position, Vector2f scale, bool collision = false, bool visible = true, 
-			float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
-			: MovingBody(position.x, position.y, scale.x, scale.y, collision, visible, 0.0f),
-			attackDamage(dmg),
-			attackRange(range),
-			attackDuration(duration),
-			lifeSteal(lifesteal),
-			criticalChance(crit_chance),
-			criticalDamage(crit_dmg) {
-				this->loadAnimations();
-			}
-
 		AttackBody(float x, float y, float w, float h, bool collision = false, bool visible = true, 
-			float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
-			: MovingBody(x, y, w, h, collision, visible, 0.0f),
-			attackDamage(dmg),
-			attackRange(range),
-			attackDuration(duration),
-			lifeSteal(lifesteal),
-			criticalChance(crit_chance),
-			criticalDamage(crit_dmg) {
-				this->loadAnimations();
-			}
+				float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
+			: AttackBody(Vector4f(x, y, w, h), collision, visible, dmg, range, duration, lifesteal, crit_chance, crit_dmg) {}
+
+		AttackBody(Vector2f position, Vector2f scale, bool collision = false, bool visible = true, 
+				float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
+			: AttackBody(Vector4f(position.x, position.y, scale.x, scale.y), collision, visible, dmg, range, duration, lifesteal, crit_chance, crit_dmg) {}
 
 		AttackBody(Vector4f collider, bool collision = false, bool visible = true, 
-			float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
-			: MovingBody(collider.x, collider.y, collider.w, collider.z, collision, visible, 0.0f),
+				float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
+			: MovingBody(collider, collision, visible, 0.0f),
 			attackDamage(dmg),
 			attackRange(range),
 			attackDuration(duration),
 			lifeSteal(lifesteal),
 			criticalChance(crit_chance),
-			criticalDamage(crit_dmg) {
-				this->loadAnimations();
-			}
+			criticalDamage(crit_dmg) 
+		{
+			this->loadAnimations();
+		}
 		#pragma endregion
 
         void update(float deltaTime);

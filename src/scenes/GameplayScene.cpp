@@ -9,6 +9,7 @@
 #include "../../include/entities/EffectBody.h"
 #include "../../include/entities/BombBody.h"
 #include "../../include/managers/EventManager.h"
+#include "../../include/entities/LaserAttackBody.h"
 
 #include <fstream>
 #include <chrono>
@@ -61,6 +62,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     auto attacks = entityManager.getEntitiesByType<Entities::AttackBody>();
     auto effects = entityManager.getEntitiesByType<Entities::EffectBody>();
     auto bombs = entityManager.getEntitiesByType<Entities::BombBody>();
+    auto lasers = entityManager.getEntitiesByType<Entities::LaserAttackBody>();
 
     for (auto* bomb : bombs) {
         bomb->update(deltaTime);
@@ -70,6 +72,11 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
         if (Physics::isColliding(this->player, tile)) {
             Physics::CollisionManager::resolveCollision(this->player, tile);
         if (this->debugMode) break;
+        }
+        for (auto* lasers : lasers) {
+            if (Physics::isColliding(lasers, tile)) {
+                addSplashEffect(lasers->getPosition(), lasers->getScale());
+            }          
         }
     }
 
@@ -126,6 +133,18 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
         for (auto* tile : tiles) {
             if (Physics::isColliding(enemy, tile)) {
                 Physics::CollisionManager::resolveCollision(enemy, tile);
+            }
+        }
+        for (auto* laser : lasers) {
+            if (Physics::isColliding(enemy, laser)) {
+                enemy->takeDamage(laser->getDamage());
+                audio()->playSoundEffect("hit-enemy", 0);
+                enemy->setInvencibleTimer(laser->getDamageTime());
+                //TODO - CRIAR UM METODO DE "INIMIGO MORTO" NO SCORE MANAGER
+                if (enemy->getHealth() <= 0) {
+                    score()->add(20);
+                    enemy->setActive(false);
+                }
             }
         }
 
@@ -237,6 +256,16 @@ void GameplayScene::addDestroyEffect(Vector2f position, Vector2f scale) {
         scale,
         textures()->Get("attack_destroy"),
         0.2f
+    );
+    entityManager.add(std::move(effect));
+}
+
+void GameplayScene::addSplashEffect(Vector2f position, Vector2f scale) {
+    auto effect = std::make_unique<Entities::EffectBody>(
+        position,
+        scale,
+        textures()->Get("splash"),
+        0.5f
     );
     entityManager.add(std::move(effect));
 }

@@ -7,6 +7,7 @@
 #include "managers/AnimationManager.h"
 
 #include "Entity.h"
+#include "../core/GameConstants.h"
 #include "../renders/Sprite.h"
 #include "../utils/Types.h"
 
@@ -30,28 +31,13 @@ namespace Entities
         
         public:
         #pragma region Constructors
-        Body() 
-            : position(0, 0), 
-            scale(50, 50), 
-            has_collision(false), 
-            is_visible(true) {}
+        Body(Vector2f pos, Vector2f scl, bool collision = GameConstants::Body::DEFAULT_COLLISION, bool visible = GameConstants::Body::DEFAULT_VISIBLE)
+            : position(pos), scale(scl),
+            has_collision(collision),
+            is_visible(visible) {}
 
-        Body(float x = 0, float y = 0, float w = 50, float h = 50, bool collision = false, bool visible = true)
-            : position(x, y), 
-            scale(w, h), 
-            has_collision(collision), 
-            is_visible(visible) {}
-        
-        Body(Vector2f pos, Vector2f scl, bool collision = false, bool visible = true)
-            : position(pos), scale(scl), 
-            has_collision(collision), 
-            is_visible(visible) {}
-        
-        Body(Vector4f collider, bool collision = false, bool visible = true)
-            : position(collider.x, collider.y), 
-            scale(collider.z, collider.w), 
-            has_collision(collision), 
-            is_visible(visible) {}
+        Body(Vector4f collider, bool collision = GameConstants::Body::DEFAULT_COLLISION, bool visible = GameConstants::Body::DEFAULT_VISIBLE)
+            : Body(Vector2f(collider.x, collider.y), Vector2f(collider.z, collider.w), collision, visible) {}
         #pragma endregion
 		
         virtual void update(float deltaTime);

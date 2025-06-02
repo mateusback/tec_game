@@ -29,8 +29,8 @@ namespace Entities
 
 	public:
 		#pragma region Constructors
-		PlayerBody(Vector4f collider, Manager::EntityManager* entityManager, bool collision = false, bool visible = true)
-		: CharacterBody(collider.x, collider.y, collider.z, collider.w, collision, visible), 
+		PlayerBody(Vector4f collider, Manager::EntityManager* entityManager, bool collision = GameConstants::Body::DEFAULT_COLLISION, bool visible = GameConstants::Body::DEFAULT_VISIBLE)
+		: CharacterBody(collider, collision, visible), 
 		coins(0), keys(0), bombs(0), experience(0),
 		weaponHandler(entityManager)
 		{

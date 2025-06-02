@@ -3,6 +3,7 @@
 
 #include <string>
 #include <list>
+#include "../core/GameConstants.h"
 #include "MovingBody.h"
 #include "AttackBody.h"
 #include "EntitiesTypes.h"
@@ -29,44 +30,21 @@ namespace Entities
 
 	public:
 		#pragma region Constructors
-		CharacterBody(float x = 0, float y = 0, float w = 50, float h = 50, bool collision = false, bool visible = true, float acceleration = 100.0f)
-			: MovingBody(x, y, w, h, collision, visible, acceleration),
-			health(100.0f), 
-			maxHealth(100.0f), 
-			attackDamage(10.0f), 
-			attackSpeed(200.0f),
-			attackRange(1.0f), 
-			attackDuration(3.0f), 
-			attackRate(0.3f), 
-			attackTimer(0.0f), 
-			defense(0.0f),
-			level(1) {}
+		CharacterBody(Vector2f pos, Vector2f scl, bool collision = GameConstants::Body::DEFAULT_COLLISION, bool visible = GameConstants::Body::DEFAULT_VISIBLE, float acceleration = GameConstants::Character::BASE_ACCELERATION)
+			: CharacterBody(Vector4f(pos.x, pos.y, scl.x, scl.y), collision, visible, acceleration) {}
 
-		CharacterBody(Vector2f pos, Vector2f scl, bool collision = false, bool visible = true, float acceleration = 100.0f)
-			: MovingBody(pos.x, pos.y, scl.x, scl.y, collision, visible, acceleration),
-			health(100.0f), 
-			maxHealth(100.0f), 
-			attackDamage(10.0f), 
-			attackSpeed(200.0f),
-			attackRange(1.0f), 
-			attackDuration(3.0f), 
-			attackRate(0.3f), 
-			attackTimer(0.0f), 
-			defense(0.0f),
-			level(1) {}
-
-		CharacterBody(Vector4f collider, bool collision = false, bool visible = true, float acceleration = 100.0f)
-			: MovingBody(collider.x, collider.y, collider.z, collider.w, collision, visible, acceleration),
-			health(100.0f), 
-			maxHealth(100.0f), 
-			attackDamage(10.0f), 
-			attackSpeed(200.0f),
-			attackRange(1.0f), 
-			attackDuration(3.0f), 
-			attackRate(0.3f), 
-			attackTimer(0.0f), 
-			defense(0.0f),
-			level(1) {}
+		CharacterBody(Vector4f collider, bool collision = GameConstants::Body::DEFAULT_COLLISION, bool visible = GameConstants::Body::DEFAULT_VISIBLE, float acceleration = GameConstants::Character::BASE_ACCELERATION)
+			: MovingBody(collider, collision, visible, acceleration),
+			health(GameConstants::Character::BASE_HEALTH),
+			maxHealth(GameConstants::Character::BASE_HEALTH),
+			attackDamage(GameConstants::Character::BASE_ATTACK_DAMAGE),
+			attackSpeed(GameConstants::Character::BASE_ATTACK_SPEED),
+			attackRange(GameConstants::Character::BASE_ATTACK_RANGE),
+			attackDuration(GameConstants::Character::BASE_ATTACK_DURATION),
+			attackRate(GameConstants::Character::BASE_ATTACK_RATE),
+			attackTimer(0.0f),
+			defense(GameConstants::Character::BASE_DEFENSE),
+			level(GameConstants::Character::BASE_LEVEL) {}
 		#pragma endregion
 
 		virtual void takeDamage(float dmg);

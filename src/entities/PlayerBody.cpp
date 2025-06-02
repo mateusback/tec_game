@@ -111,6 +111,7 @@ namespace Entities
             this->setWeapon(newWeapon, this->weaponHandler.getWeapon()->getEntityManager());
             return;
         }
+        //Todo - Colocar em um item manager, e verificar se dá pra fazer de uma forma melhor, tipo com um unordered_map
         for (const auto& effect : item->getItem().getEffects()) {
             switch (effect.target) {
 				using enum Items::EEffectTarget;
@@ -137,6 +138,12 @@ namespace Entities
                     break;
                 case MaxHealth:
                     this->setMaxHealth(this->getMaxHealth() + effect.value);
+                    break;
+                case PlayerSize:
+                    this->setScale(this->getScale() + Vector2f(effect.value, effect.value));
+                    break;
+                case PlayerSpeed:
+                    this->setAcceleration(this->getAcceleration() + effect.value);
                     break;
             }
         }

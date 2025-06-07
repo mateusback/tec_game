@@ -20,14 +20,14 @@ namespace Entities
         if (input.moveDirection.x != 0.f || input.moveDirection.y != 0.f) {
     
             if (state != EntityState::Attacking) {
-                this->animationManager.setAnimation("walk");
+                this->animator.play("walk");
                 this->setState(EntityState::Moving);
             }
     
         }
         else {
             if (state == EntityState::Moving) {
-                this->animationManager.setAnimation("idle");
+                this->animator.play("idle");
                 this->setState(EntityState::Idle);
             }
         }
@@ -46,7 +46,7 @@ namespace Entities
 
     void PlayerBody::update(float deltaTime)
     {
-        this->animationManager.update(deltaTime);
+        this->animator.update(deltaTime);
         if(this->active == false) return;
         this->move(deltaTime);
 
@@ -61,7 +61,7 @@ namespace Entities
         }
 
         if (this->health <= 0.0f) {
-            this->animationManager.setAnimation("death", [this]() {
+            this->animator.play("death", [this]() {
                 this->state = EntityState::Dead;
                 this->setActive(false);
             });
@@ -75,7 +75,7 @@ namespace Entities
     void PlayerBody::attack(Vector2f direction)
     {
         this->setState(EntityState::Attacking);
-        this->animationManager.setAnimation("attack", [this]() {
+        this->animator.play("attack", [this]() {
             this->setState(EntityState::Idle);
         });
         this->weaponHandler.attack(direction);
@@ -155,16 +155,24 @@ namespace Entities
         SDL_Texture* texture = Manager::TextureManager::Get("player_sheet");
         this->is_animated = true;
 
+        Manager::AnimationManager anim;
         Manager::AnimationLoader::loadNamedAnimations(texture, {
-            {"idle",   4, 5},
-            {"walk",   3, 7},
+            {"idle",   1, 5},
+            {"walk",   1, 5},
             {"attack", 8, 7, false},
             {"death",  7, 7, false}
-        }, this->animationManager);
+        }, anim);
 
-        this->animationManager.setFrameTime("attack", 0.05f);
-    
-        this->animationManager.setAnimation("idle");
+        Manager::AnimationManager anim2;
+        Manager::AnimationLoader::loadNamedAnimations(texture, {
+            {"idle",   0, 5},
+        }, anim2);
+
+        anim.setFrameTime("attack", 0.05f);
+
+        this->animator.add_part(anim, Vector2f(0.f, 0.f));
+        this->animator.add_part(anim2, Vector2f(0.f, virtualRenderer()->normalizeValue(-1)));
+        this->animator.play("idle");
     }
 
     void PlayerBody::tryPlaceBomb() {

@@ -6,7 +6,7 @@ namespace Entities
 {
 void AttackBody::update(float deltaTime)
 {
-    this->animationManager.update(deltaTime);
+    this->animator.update(deltaTime);
 
     this->attackDuration -= deltaTime;
 
@@ -22,9 +22,18 @@ void AttackBody::update(float deltaTime)
 void AttackBody::loadAnimations()
 {
     if (!this->is_animated) return;
-    Manager::AnimationLoader::loadNamedAnimations(this->texture, {
-        {"swing", 0, 30, false}
-    }, this->animationManager, 0.015f);
-    this->animationManager.setAnimation("swing");
+
+    Manager::AnimationManager swingAnim;
+    Manager::AnimationLoader::loadNamedAnimations(
+        this->texture,
+        {
+            {"swing", 0, 30, false}
+        },
+        swingAnim,
+        0.015f
+    );
+
+    this->animator.add_part(swingAnim, Vector2f(0.f, 0.f));
+    this->animator.play("swing");
 }
 }

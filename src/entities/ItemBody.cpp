@@ -21,12 +21,11 @@ namespace Entities
     {
         if (this->active == false) return;
         if (this->is_animated) {
-            this->animationManager.update(deltaTime);
+            this->animator.update(deltaTime);
         }
     }
 
-    void ItemBody::loadAnimations()
-    {
+    void ItemBody::loadAnimations() {
         SDL_Texture* texture = textures()->Get(this->item.getSpritePath());
 
         if (!texture) return;
@@ -41,10 +40,12 @@ namespace Entities
 
         this->is_animated = true;
 
+        Manager::AnimationManager anim;
         Manager::AnimationLoader::loadNamedAnimations(texture, {
             { "idle", 0, 30 }
-        }, this->animationManager);
-    
-        this->animationManager.setAnimation("idle");
+        }, anim);
+
+        this->animator.add_part(anim, Vector2f(0.f, 0.f));
+        this->animator.play("idle");
     }
 }

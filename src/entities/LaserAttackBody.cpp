@@ -11,7 +11,7 @@ LaserAttackBody::LaserAttackBody(Vector2f origin, Vector2f dir, float dmg, float
 
 void LaserAttackBody::update(float deltaTime)
 {
-    this->animationManager.update(deltaTime);
+    this->animator.update(deltaTime);
 }
 
 void LaserAttackBody::render(SDL_Renderer* renderer)

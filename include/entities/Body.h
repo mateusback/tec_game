@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include <my-lib/math-vector.h>
 #include <nlohmann/json.hpp>
-#include "managers/AnimationManager.h"
+#include "managers/MultiAnimatorManager.h"
 
 #include "Entity.h"
 #include "../core/GameConstants.h"
@@ -27,8 +27,7 @@ namespace Entities
         bool is_animated = false;
         SDL_Texture* texture = nullptr;
 
-        Manager::AnimationManager animationManager;
-        
+        MultiAnimator animator;
         public:
         #pragma region Constructors
         Body(Vector2f pos, Vector2f scl, bool collision = GameConstants::Body::DEFAULT_COLLISION, bool visible = GameConstants::Body::DEFAULT_VISIBLE)
@@ -72,8 +71,8 @@ namespace Entities
         Vector2f getScale() const { return this->scale; }
         bool isVisible() const { return this->is_visible; }
         bool isAnimated() const { return this->is_animated; }
-        Manager::AnimationManager& getAnimationManager() { return this->animationManager; }
-        const Manager::AnimationManager& getAnimationManager() const { return this->animationManager; }
+        MultiAnimator& getAnimationManager() { return this->animator; }
+        const MultiAnimator& getAnimationManager() const { return this->animator; }
         inline SDL_FRect getRect() const { return { this->position.x, this->position.y, this->scale.x, this->scale.y }; }
         SDL_Texture* getTexture() const { return this->texture; }
 		#pragma endregion

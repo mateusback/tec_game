@@ -150,7 +150,7 @@ namespace Entities {
                 desiredAnimation = "idle";
                 break;
         }
-        this->animationManager.setAnimation(desiredAnimation);
+        this->animator.play(desiredAnimation);
     }
 
     std::unique_ptr<AttackBody> EnemyBody::attack(Pointf origin, Vector2f direction) {
@@ -187,28 +187,32 @@ namespace Entities {
 
     void EnemyBody::loadAnimations() {
         this->is_animated = true;
+
+        SDL_Texture* texture = Manager::TextureManager::Get(this->enemyData.getSpritePath());
+
+        Manager::AnimationManager anim;
+        
         if (this->enemyData.getBehavior() == EEnemyBehavior::Jumper) {
-            SDL_Texture* texture = Manager::TextureManager::Get(this->enemyData.getSpritePath());
-
             Manager::AnimationLoader::loadStaticAnimations(texture, {
-                {"idle",   0, 0},
-                {"prep",   0, 1},
-                {"jump", 0, 2},
-            }, this->animationManager);
+                {"idle", 0, 0},
+                {"prep", 0, 1},
+                {"jump", 0, 2}
+            }, anim);
 
-            this->animationManager.setAnimation("idle");
+            this->animator.add_part(anim, Vector2f(0, 0));
+            this->animator.play("idle");
             return;
         }
+
         if (this->enemyData.getBehavior() == EEnemyBehavior::Shell) {
-            SDL_Texture* texture = Manager::TextureManager::Get(this->enemyData.getSpritePath());
-
             Manager::AnimationLoader::loadStaticAnimations(texture, {
-                {"hidden",   0, 0},
+                {"hidden", 0, 0},
                 {"attack", 0, 1},
-                {"idle",   0, 2},
-            }, this->animationManager);
+                {"idle", 0, 2}
+            }, anim);
 
-            this->animationManager.setAnimation("idle");
+            this->animator.add_part(anim, Vector2f(0, 0));
+            this->animator.play("idle");
         }
     }
 

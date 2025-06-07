@@ -4,7 +4,7 @@ namespace Entities
 {
     void Body::update(float deltaTime)  {
         if (this->is_animated) {
-            this->animationManager.update(deltaTime);
+            this->animator.update(deltaTime);
         }
     }
 
@@ -13,12 +13,14 @@ namespace Entities
         if (!this->is_visible || !this->active) return;
         Vector4f fullSize = this->getFullSize();
 
+        auto sprites = this->animator.getCurrentSprites();
+        for (const auto& s : sprites) {
+            const Renderer::Sprite* sprite = s.sprite;
+            if (!sprite || !sprite->getTexture()) continue;
 
-        const Renderer::Sprite* sprite = this->animationManager.getCurrentSprite();
-        if (sprite && sprite->getTexture()) {
             SDL_FRect dst = {
-                position.x + sprite->getOffset().x,
-                position.y + sprite->getOffset().y,
+                position.x + s.offset.x + sprite->getOffset().x,
+                position.y + s.offset.y + sprite->getOffset().y,
                 scale.x,
                 scale.y
             };
@@ -32,7 +34,6 @@ namespace Entities
                 nullptr,
                 sprite->getFlip()
             );
-            return;
         }
         if (this->texture)
         {

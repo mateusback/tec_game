@@ -227,7 +227,7 @@ void GameplayScene::loadResources(SDL_Renderer* renderer){
     textures()->Load(renderer, "player_f", "assets/player/personagem_F.png");
     textures()->Load(renderer, "player_l", "assets/player/personagem_L.png");
     textures()->Load(renderer, "player_r", "assets/player/personagem_R.png");
-    textures()->Load(renderer, "player_sheet", "assets/animations/player.png");
+    textures()->Load(renderer, "player_sheet", "assets/animations/personagem_bruxa.png");
     textures()->Load(renderer, "swing", "assets/animations/swing.png");
 
     textures()->Load(renderer, "player_with_item", "assets/player_with_item.png");

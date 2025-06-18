@@ -31,12 +31,18 @@ namespace Manager {
         static std::vector<Renderer::Sprite> loadFromIndices(SDL_Texture* texture, const std::vector<int>& indices);
         static std::vector<Renderer::Sprite> loadRange(SDL_Texture* texture, int startFrame, int frameCount);
         static Renderer::Sprite loadSingleFrame(SDL_Texture* texture, int frameIndex);
-        static void loadNamedAnimations(SDL_Texture* texture, const std::vector<AnimationInfo>& animations, AnimationManager& manager, float frameDuration = 0.15f);
+        static void loadNamedAnimations(SDL_Texture* texture, const std::vector<AnimationInfo>& animations, AnimationManager& manager, float frameDuration = 0.15f, int spriteWidth = SPRITE_WIDTH, int spriteHeight = SPRITE_HEIGHT);
         static void loadStaticAnimations(SDL_Texture* texture, const std::vector<StaticAnimationInfo>& animations, AnimationManager& manager);
         static int calculateStartIndex(SDL_Texture* texture, int row);
-        
+
+        static std::vector<Renderer::Sprite> loadFromIndices(SDL_Texture* texture, const std::vector<int>& indices, int spriteWidth, int spriteHeight);
+        static std::vector<Renderer::Sprite> loadRange(SDL_Texture* texture, int startFrame, int frameCount, int spriteWidth, int spriteHeight);
+        static Renderer::Sprite loadSingleFrame(SDL_Texture* texture, int frameIndex, int spriteWidth, int spriteHeight);
+        static void loadStaticAnimations(SDL_Texture* texture, const std::vector<StaticAnimationInfo>& animations, AnimationManager& manager, int spriteWidth = SPRITE_WIDTH, int spriteHeight = SPRITE_HEIGHT);
+
         private:
-        static SDL_Rect computeSourceRect(SDL_Texture* texture, int frameIndex);        
+        static SDL_Rect computeSourceRect(SDL_Texture* texture, int frameIndex);
+        static SDL_Rect computeSourceRect(SDL_Texture* texture, int frameIndex, int spriteWidth, int spriteHeight);    
     };
 }
 

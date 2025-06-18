@@ -14,7 +14,8 @@ namespace Entities {
 
     enum class EEnemyBehavior {
         Shell,
-        Jumper
+        Jumper,
+        Chaser,
     };
     
 }

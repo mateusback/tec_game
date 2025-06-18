@@ -34,6 +34,9 @@ namespace Entities
 
         if (input.shootDirection.x != 0.f || input.shootDirection.y != 0.f) {
             this->attack(input.shootDirection);
+        } else if (state != EntityState::Moving || state != EntityState::Attacking) {
+            this->setState(EntityState::Idle);
+            this->animationManager.setAnimation("idle");
         }
 
         if(input.putBomb) {
@@ -156,11 +159,11 @@ namespace Entities
         this->is_animated = true;
 
         Manager::AnimationLoader::loadNamedAnimations(texture, {
-            {"idle",   4, 5},
-            {"walk",   3, 7},
-            {"attack", 8, 7, false},
-            {"death",  7, 7, false}
-        }, this->animationManager);
+            {"idle",   0, 4},
+            {"walk",   0, 4},
+            {"attack", 0, 4, false},
+            {"death",  0, 4, false}
+        }, this->animationManager, 0.15f, 32, 64);
 
         this->animationManager.setFrameTime("attack", 0.05f);
     

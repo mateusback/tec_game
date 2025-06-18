@@ -137,7 +137,7 @@ void RoomManager::loadRoom(Map::Room* room) {
         return;
     }
     if (room->type == Map::ERoomType::Start){
-        Vector4f playerVect = virtualRenderer()->mapToScreen(4, 4, 1, 1);
+        Vector4f playerVect = virtualRenderer()->mapToScreen(4, 4, 1, 1.1f);
         this->player = new Entities::PlayerBody(playerVect, this->entityManager, true, true);
     }
     std::cout << "Carregando Tiles da sala: " << room->id << std::endl;

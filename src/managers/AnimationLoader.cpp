@@ -111,7 +111,7 @@ namespace Manager
         return Renderer::Sprite(texture, computeSourceRect(texture, frameIndex, spriteWidth, spriteHeight));
     }
 
-    void AnimationLoader::loadNamedAnimations(SDL_Texture *texture, const std::vector<AnimationInfo> &animations, AnimationManager &manager, float frameDuration, int spriteWidth = SPRITE_WIDTH, int spriteHeight = SPRITE_HEIGHT)
+    void AnimationLoader::loadNamedAnimations(SDL_Texture *texture, const std::vector<AnimationInfo> &animations, AnimationManager &manager, float frameDuration, int spriteWidth, int spriteHeight)
     {
         int textureWidth = 0;
         SDL_QueryTexture(texture, nullptr, nullptr, &textureWidth, nullptr);
@@ -122,24 +122,6 @@ namespace Manager
             int startIndex = anim.row * tilesPerRow;
             auto frames = loadRange(texture, startIndex, anim.frameCount, spriteWidth, spriteHeight);
             Renderer::Animation animation(frames, frameDuration, anim.loop);
-            manager.addAnimation(anim.name, animation);
-        }
-    }
-
-    void AnimationLoader::loadStaticAnimations(SDL_Texture *texture, const std::vector<StaticAnimationInfo> &animations, AnimationManager &manager)
-    {
-        for (const auto &anim : animations)
-        {
-            SDL_Rect rect = {
-                anim.column * SPRITE_WIDTH,
-                anim.row * SPRITE_HEIGHT,
-                SPRITE_WIDTH,
-                SPRITE_HEIGHT};
-
-            std::vector<Renderer::Sprite> frames;
-            frames.emplace_back(texture, rect);
-
-            Renderer::Animation animation(frames, 1.0f, false);
             manager.addAnimation(anim.name, animation);
         }
     }

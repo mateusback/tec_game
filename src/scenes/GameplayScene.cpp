@@ -10,6 +10,10 @@
 #include "../../include/entities/BombBody.h"
 #include "../../include/managers/EventManager.h"
 #include "../../include/entities/LaserAttackBody.h"
+#include "../../include/entities/BossBody.h"
+#include "../../include/renders/TextRenderer.h"
+#include "../../include/scenes/EndScene.h"
+#include "../../include/managers/SceneManager.h"
 
 #include <fstream>
 #include <chrono>
@@ -22,7 +26,8 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screen
 
     this->roomManager = new Manager::RoomManager(this->renderer,
         &this->entityManager, &this->tileSet, 
-        &this->itemManager, &this->enemyManager);
+        &this->itemManager, &this->enemyManager,
+        &this->bossManager);
 
     unsigned randomSeed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     this->roomManager->generateFloor(1, randomSeed);
@@ -63,6 +68,20 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     auto effects = entityManager.getEntitiesByType<Entities::EffectBody>();
     auto bombs = entityManager.getEntitiesByType<Entities::BombBody>();
     auto lasers = entityManager.getEntitiesByType<Entities::LaserAttackBody>();
+    auto bosses = entityManager.getEntitiesByType<Entities::BossBody>();
+
+    for (auto* boss : bosses) {
+        boss->update(deltaTime);
+        if (Physics::isColliding(this->player, boss)) {
+            player->onCollision(boss);
+            Physics::CollisionManager::resolveCollision(this->player, boss);
+        }
+        for (auto* tile : tiles) {
+            if (Physics::isColliding(boss, tile)) {
+                Physics::CollisionManager::resolveCollision(boss, tile);
+            }
+        }
+    }
 
     for (auto* bomb : bombs) {
         bomb->update(deltaTime);
@@ -111,6 +130,26 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
                         enemy->setActive(false);
                     }
                 }
+            }
+        }
+
+        for (auto* boss : bosses) {
+            if (!boss->isActive()) continue;
+
+            if (Physics::isColliding(attack, boss)) {
+                boss->takeDamage(attack->getAttackDamage());
+                audio()->playSoundEffect("hit-boss", 0);
+                attack->setActive(false);
+                addDestroyEffect(attack->getPosition(), attack->getScale());
+
+                if (boss->getHealth() <= 0) {
+                    score()->add(100);
+                    boss->setActive(false);
+                    std::cout << "Boss defeated!" << std::endl;
+                    Manager::SceneManager::setScene(new Scenes::EndScene(this->renderer, virtualRenderer()->getScreenWidth(), virtualRenderer()->getScreenHeight(), score()->getScore()));
+                    return;
+                }
+                break;
             }
         }
 
@@ -198,12 +237,65 @@ void GameplayScene::render(SDL_Renderer* renderer) {
         SDL_RenderFillRectF(renderer, &barFill);
     }
 
+    auto bosses = entityManager.getEntitiesByType<Entities::BossBody>();
+    for (auto* boss : bosses) {
+        if (!boss->isActive()) continue;
+
+        float screenWidth = virtualRenderer()->getScreenWidth();
+        float screenHeight = virtualRenderer()->getScreenHeight();
+
+        float barWidth = 300.0f;
+        float barHeight = 20.0f;
+        float marginBottom = 30.0f;
+        float marginTop = 8.0f;
+
+        float healthPercent = boss->getHealthPercent();
+        Vector2f barPos = {
+            (screenWidth - barWidth) / 2.0f,
+            screenHeight - barHeight - marginBottom
+        };
+
+        SDL_FRect barBg = {
+            barPos.x,
+            barPos.y,
+            barWidth,
+            barHeight
+        };
+
+        SDL_FRect barFill = {
+            barPos.x,
+            barPos.y,
+            barWidth * healthPercent,
+            barHeight
+        };
+
+        SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
+        SDL_RenderFillRectF(renderer, &barBg);
+
+        SDL_SetRenderDrawColor(renderer, 200, 30, 30, 255);
+        SDL_RenderFillRectF(renderer, &barFill);
+
+        SDL_Color white = {255, 255, 255, 255};
+        std::string name = boss->getBossData().getName();
+
+        Core::TextRenderer::render(
+            renderer,
+            Manager::FontManager::get("default"),
+            name,
+            static_cast<int>(barPos.x + barWidth / 2.0f),
+            static_cast<int>(barPos.y - marginTop),
+            white,
+            true
+        );
+    }
+
     if (this->debugMode) {
         Utils::DebugUtils::drawCollidersOfType<Entities::ItemBody>(renderer, entityManager, {0, 0, 255, 255});
         Utils::DebugUtils::drawCollidersOfType<Entities::TileBody>(renderer, entityManager, {0, 255, 0, 255});
         Utils::DebugUtils::drawCollidersOfType<Entities::AttackBody>(renderer, entityManager, {255, 0, 255, 255});
         Utils::DebugUtils::drawCollidersOfType<Entities::EnemyBody>(renderer, entityManager, {255, 255, 0, 255});
-    
+        Utils::DebugUtils::drawCollidersOfType<Entities::BossBody>(renderer, entityManager, {255, 165, 0, 255});
+
         if (player->hasCollision()) {
             Vector4f hb = player->getHitbox();
             SDL_FRect rect = {
@@ -229,6 +321,8 @@ void GameplayScene::loadResources(SDL_Renderer* renderer){
     textures()->Load(renderer, "player_r", "assets/player/personagem_R.png");
     textures()->Load(renderer, "player_sheet", "assets/animations/personagem_bruxa32x32-Sheet.png");
     textures()->Load(renderer, "swing", "assets/animations/swing.png");
+    textures()->Load(renderer, "chain", "assets/animations/chain.png");
+    textures()->Load(renderer, "pf", "assets/animations/pf_export.png");
 
     textures()->Load(renderer, "player_with_item", "assets/player_with_item.png");
     textures()->Load(renderer, "attack", "assets/attack.png");
@@ -247,6 +341,7 @@ void GameplayScene::loadResources(SDL_Renderer* renderer){
     this->enemyManager.loadFromFile("assets/data/enemies.json");
     this->tileSet.loadFromFile("assets/data/tileset.json");
     this->itemManager.loadFromFile("assets/data/items.json");
+    this->bossManager.loadFromFile("assets/data/bosses.json");
     textures()->Load(renderer, "tileset", tileSet.getSpriteSheetPath());
 }
 

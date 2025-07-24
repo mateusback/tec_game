@@ -13,7 +13,7 @@ namespace Core
     {
     public:
         static void render(SDL_Renderer* renderer, TTF_Font* font, const std::string& text,
-            int x, int y, SDL_Color color = {255, 255, 255});
+                int x, int y, SDL_Color color = {255, 255, 255}, bool center = false);
     };
         
 }

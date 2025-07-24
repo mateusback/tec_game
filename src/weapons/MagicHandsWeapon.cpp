@@ -14,7 +14,7 @@ void MagicHandsWeapon::attack(const Vector2f& direction) {
         virtualRenderer()->normalizeVector({DEFAULT_BULLET_SIZE, DEFAULT_BULLET_SIZE}),
         true,
         true, 
-        this->owner->getAttackDamage(),
+        this->owner->getAttackDamage() *  200,
         this->owner->getAttackRange(),
         this->owner->getAttackDuration(),
         0.f,

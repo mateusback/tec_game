@@ -10,17 +10,21 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 
+#include "entities/BossBody.h"
+
 namespace Manager {
     RoomManager::RoomManager(SDL_Renderer* renderer,
         EntityManager* entityManager,
         TileSet* tileSet,
         ItemManager* itemManager,
-        EnemyManager* enemyManager)
+        EnemyManager* enemyManager,
+        BossManager* bossManager)
         : renderer(renderer),
           entityManager(entityManager),
           tileSet(tileSet),
           itemManager(itemManager),
-          enemyManager(enemyManager) {}
+          enemyManager(enemyManager),
+          bossManager(bossManager){}
 
 void RoomManager::connectFloorRooms() {
     for (auto& room : this->floor.rooms) {
@@ -76,6 +80,17 @@ void RoomManager::loadRequiredAssets(SDL_Renderer* renderer) {
                     if (item) {
                         const std::string& path = item->getSpritePath();
                         textures()->Load(renderer, path, path);
+                    }
+                    break;
+                }
+                case Map::EEntityType::Boss: {
+                    const auto* boss = bossManager->getBossById(e.id);
+                    if (boss) {
+                        textures()->Load(renderer, boss->getSpritePath(), boss->getSpritePath());
+
+                        for (const auto& [_, path] : boss->getSpecialTexturesMap()) {
+                            textures()->Load(renderer, path, path);
+                        }
                     }
                     break;
                 }
@@ -195,6 +210,8 @@ void RoomManager::loadEntities(Map::Room* room) {
     bool hasEnemies = false;
 
     for (const auto& e : room->entities) {
+            std::cout << "Carregando entidade: " << e.id << " do tipo: " << Map::entityTypeToString(e.type) << std::endl;
+
         switch (e.type) {
             case Map::EEntityType::Item: {
                 if (!this->itemManager) break;
@@ -226,6 +243,26 @@ void RoomManager::loadEntities(Map::Room* room) {
                 }
                 break;
             }
+
+            case Map::EEntityType::Boss: {
+                if (!this->bossManager) break;
+                std::cout << "Carregando Boss: " << e.id << std::endl;
+                const Enemies::BossData* bossData = this->bossManager->getBossById(e.id);
+                if (bossData) {
+                    Vector4f screenVect = virtualRenderer()->mapToScreen(e.x, e.y, 3.0f, 3.0f); // 96x96
+
+                    auto boss = std::make_unique<Entities::BossBody>(
+                        screenVect, *bossData, *this->entityManager
+                    );
+                    boss->setTexture(textures()->Get(bossData->getSpritePath()));
+                    boss->setTarget(this->player);
+
+                    this->entityManager->add(std::move(boss));
+                    hasEnemies = true;
+                }
+                break;
+            }
+
 
             default:
                 break;

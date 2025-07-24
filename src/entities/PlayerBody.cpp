@@ -159,11 +159,15 @@ namespace Entities
         this->is_animated = true;
 
         Manager::AnimationLoader::loadNamedAnimations(texture, {
-            {"idle",   0, 4},
             {"walk",   0, 4},
             {"attack", 0, 4, false},
             {"death",  0, 4, false}
         }, this->animationManager, 0.15f, 32, 64);
+
+        auto tex = textures()->Get("pf");
+        Manager::AnimationLoader::loadNamedAnimations(tex, {
+            {"idle",   0, 30},
+        }, this->animationManager, 0.03f, 32, 64);
 
         this->animationManager.setFrameTime("attack", 0.05f);
     

@@ -1,5 +1,6 @@
 #include "../include/managers/EntityManager.h"
 #include "../include/entities/EnemyBody.h"
+#include "../include/entities/BossBody.h"
 
 namespace Manager
 {
@@ -47,6 +48,9 @@ namespace Manager
         for (const auto& e : this->entities) {
             if (auto* enemy = dynamic_cast<Entities::EnemyBody*>(e.get())) {
                 if (!enemy->isDead()) return true;
+            }
+            if (auto* boss = dynamic_cast<Entities::BossBody*>(e.get())) {
+                if (!boss->isDead()) return true;
             }
         }
         return false;

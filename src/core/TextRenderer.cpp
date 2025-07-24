@@ -3,7 +3,7 @@
 
 namespace Core {
     void TextRenderer::render(SDL_Renderer* renderer, TTF_Font* font, const std::string& text,
-                            int x, int y, SDL_Color color) {
+                          int x, int y, SDL_Color color, bool center) {
         if (!font) {
             std::cerr << "Fonte nula passada para TextRenderer!" << std::endl;
             return;
@@ -23,6 +23,11 @@ namespace Core {
         }
 
         SDL_Rect dstRect = { x, y, surface->w, surface->h };
+
+        if (center) {
+            dstRect.x -= surface->w / 2;
+        }
+
         SDL_RenderCopy(renderer, texture, nullptr, &dstRect);
 
         SDL_FreeSurface(surface);

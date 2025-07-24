@@ -4,6 +4,8 @@
 #include "../../include/renders/TextRenderer.h"
 #include "../../include/utils/GlobalAccess.h"
 #include "../../include/managers/FontManager.h"
+#include "../../include/scenes/CreditsScene.h"
+#include "../../include/scenes/ScoresScene.h"
 
 #include <SDL2/SDL.h>
 #include <iostream>
@@ -45,12 +47,16 @@ void MenuScene::handleEvent(const SDL_Event& event)
                 selectedIndex = (selectedIndex + 1) % options.size();
                 break;
             case SDLK_RETURN:
-                if (options[selectedIndex] == "Iniciar Jogo")
-                {
+                if (options[selectedIndex] == "Iniciar Jogo") {
                     auto renderer = SDL_GetRenderer(SDL_GetWindowFromID(1));
                     Manager::SceneManager::setScene(new GameplayScene(renderer, this->width, this->height));
-                } else if (options[selectedIndex] == "Sair")
-                {
+                } else if (options[selectedIndex] == "Ver Pontuação") {
+                    auto renderer = SDL_GetRenderer(SDL_GetWindowFromID(1));
+                    Manager::SceneManager::setScene(new Scenes::ScoresScene(renderer, this->width, this->height));
+                } else if (options[selectedIndex] == "Ver Créditos") {
+                    auto renderer = SDL_GetRenderer(SDL_GetWindowFromID(1));
+                    Manager::SceneManager::setScene(new Scenes::CreditsScene(renderer, this->width, this->height));
+                } else if (options[selectedIndex] == "Sair") {
                     SDL_Event quit;
                     quit.type = SDL_QUIT;
                     SDL_PushEvent(&quit);
@@ -118,16 +124,33 @@ void MenuScene::renderLogo(SDL_Renderer* renderer)
 
 void MenuScene::renderFont(SDL_Renderer* renderer)
 {
+    const int spacing = 50;
+    const int offsetAfterLogo = 120;
+
+    const int startY = static_cast<int>(this->height * 0.5f) + offsetAfterLogo;
+
     for (size_t i = 0; i < options.size(); ++i)
     {
         SDL_Color color = (i == selectedIndex) ? SDL_Color{0, 153, 51} : SDL_Color{214, 214, 194};
 
-        int textWidth = 0, textHeight = 0;
-        TTF_SizeText(this->font, options[i].c_str(), &textWidth, &textHeight);
+        SDL_Surface* surface = TTF_RenderUTF8_Blended(this->font, options[i].c_str(), color);
+        if (!surface) continue;
 
-        int x = (this->width - textWidth) / 2;
-        int y = static_cast<int>(this->height * 0.7f) + static_cast<int>(i) * 50;
+        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+        if (!texture) {
+            SDL_FreeSurface(surface);
+            continue;
+        }
 
-        Core::TextRenderer::render(renderer, this->font, options[i], x, y, color);
+        SDL_Rect dst;
+        dst.w = surface->w;
+        dst.h = surface->h;
+        dst.x = (this->width - dst.w) / 2;
+        dst.y = startY + static_cast<int>(i) * spacing;
+
+        SDL_RenderCopy(renderer, texture, nullptr, &dst);
+
+        SDL_FreeSurface(surface);
+        SDL_DestroyTexture(texture);
     }
 }

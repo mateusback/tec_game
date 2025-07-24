@@ -8,7 +8,12 @@
 
 class MenuScene : public Core::Scene {
 private:
-    std::vector<std::string> options = { "Iniciar Jogo", "Sair" };
+    std::vector<std::string> options = {
+        "Iniciar Jogo",
+        "Ver Pontuação",
+        "Ver Créditos",
+        "Sair"
+    };
     size_t selectedIndex = 0;
     TTF_Font* font = nullptr;
     SDL_Texture* logoTexture = nullptr;

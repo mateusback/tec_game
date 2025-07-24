@@ -5,6 +5,7 @@
 #include "../map/Floor.h"
 #include "../map/Room.h"
 #include "EntityManager.h"
+#include "BossManager.h"
 #include "ItemManager.h"
 #include "EnemyManager.h"
 #include "../utils/Types.h"
@@ -25,6 +26,7 @@ namespace Manager {
         TileSet* tileSet;
         ItemManager* itemManager = nullptr;
         EnemyManager* enemyManager = nullptr;
+        BossManager* bossManager = nullptr;
         Entities::PlayerBody* player = nullptr;
         std::unordered_map<int, Map::RoomState> roomStates;
     
@@ -33,7 +35,8 @@ namespace Manager {
             EntityManager* entityManager,
             TileSet* tileSet,
             ItemManager* itemManager,
-            EnemyManager* enemyManager);
+            EnemyManager* enemyManager,
+            BossManager* bossManager);
         ~RoomManager();
     
         void update(float deltaTime);

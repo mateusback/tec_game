@@ -14,13 +14,16 @@ namespace Map
 	enum class EEntityType {
 		Enemy,
 		Item,
+		Boss,
 		Unknown
 	};
 
 	inline EEntityType entityTypeFromString(const std::string& str) {
 		static const std::unordered_map<std::string, EEntityType> map = {
 			{"Enemy", EEntityType::Enemy},
-			{"Item", EEntityType::Item}
+			{"Item", EEntityType::Item},
+			{"Boss", EEntityType::Boss},
+			{"Unknown", EEntityType::Unknown}
 		};
 
 		auto it = map.find(str);
@@ -31,6 +34,7 @@ namespace Map
 		static const std::unordered_map<EEntityType, std::string> map = {
 			{EEntityType::Enemy, "Enemy"},
 			{EEntityType::Item, "Item"},
+			{EEntityType::Boss, "Boss"},
 			{EEntityType::Unknown, "Unknown"}
 		};
 

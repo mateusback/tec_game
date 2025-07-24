@@ -27,6 +27,7 @@ private:
     Manager::EntityManager entityManager;
     Renderer::HudRenderer* hudRenderer = nullptr;
     Manager::RoomManager* roomManager = nullptr;
+    Manager::BossManager bossManager;
     Renderer::MiniMapRenderer* miniMapRenderer = nullptr;
     TileSet tileSet;
     std::unique_ptr<BombHandler> bombHandler;

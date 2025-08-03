@@ -4,13 +4,14 @@
 #include "../../include/entities/TileBody.h"
 #include "../../include/entities/ItemBody.h"
 #include "../../include/entities/EnemyBody.h"
+#include "../../include/entities/EffectBody.h"
+#include "../../include/entities/BossBody.h"
 #include "../../include/generators/ProceduralFloorGenerator.h"
 
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
 
-#include "entities/BossBody.h"
 
 namespace Manager {
     RoomManager::RoomManager(SDL_Renderer* renderer,
@@ -270,7 +271,6 @@ void RoomManager::loadEntities(Map::Room* room) {
                 break;
             }
 
-
             default:
                 break;
         }
@@ -282,7 +282,11 @@ void RoomManager::update(float deltaTime) {
     if (!this->currentRoom) return;
 
     if (this->areAllEnemiesDefeated()) {
-        this->openDoorsOfCurrentRoom();
+        if (!this->currentRoom->doorsOpen) {
+            std::cout << "Abrindo portas da sala: " << this->currentRoom->id << std::endl;
+            this->openDoorsOfCurrentRoom();
+            audio()->playSoundEffect("open-door", 0);
+        }
     }
 }
 
@@ -443,7 +447,22 @@ void RoomManager::openDoorsOfCurrentRoom() {
         tile->setTileId(11);
         tile->setTileData(tileData);
 
+        Vector2f position{screenPos.x, screenPos.y};
+        
+        std::cout << "Abrindo porta na posição: " << position.x << ", " << position.y << std::endl;
+
         this->entityManager->add(std::move(tile));
+        auto effect = std::make_unique<Entities::EffectBody>(
+            position,
+            Vector2f{virtualRenderer()->getTileSize(), virtualRenderer()->getTileSize()},
+            textures()->Get("door_open_anim"),
+            0.5f
+        );
+
+        effect->setAngle(angle);
+        effect->setFlip(flip);
+        effect->loadAnimations();
+        this->entityManager->add(std::move(effect));
     }
 
     this->currentRoom->doorsOpen = true;

@@ -331,11 +331,14 @@ void GameplayScene::loadResources(SDL_Renderer* renderer){
     textures()->Load(renderer, "bomb_explosion", "assets/bomb_explosion.png");
     textures()->Load(renderer, "hudsheet", "assets/hudsheet.png");
 
+    textures()->Load(renderer, "door_open_anim", "assets/animations/door_open.png");
+
     audio()->loadSoundEffect("bomb_explosion", "assets/audio/explosion.mp3");
     audio()->loadSoundEffect("shoot", "assets/audio/shoot.mp3");
     audio()->loadSoundEffect("hit-enemy", "assets/audio/hit-enemy.mp3");
     audio()->loadSoundEffect("hit-player", "assets/audio/hit-player.mp3");
     audio()->loadSoundEffect("pickup-item", "assets/audio/pickup-item.mp3");
+    audio()->loadSoundEffect("open-door", "assets/audio/open-door.mp3");
 
     this->enemyManager.loadFromFile("assets/data/enemies.json");
     this->tileSet.loadFromFile("assets/data/tileset.json");

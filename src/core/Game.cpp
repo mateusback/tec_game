@@ -58,6 +58,9 @@ namespace Core
         Manager::AudioManagerGlobal::init();
         Manager::ScoreManagerGlobal::init();
 
+        Manager::FontManager::load("menu", "assets/fonts/Roboto-Regular.ttf", 26);
+        textures()->Load(renderer, "logo", "assets/images/logo.png");
+
         Manager::SceneManager::setScene(new MenuScene(renderer, width, height));
 
         this->loop = new GameLoop(renderer);

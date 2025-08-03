@@ -343,6 +343,8 @@ void GameplayScene::loadResources(SDL_Renderer* renderer){
     this->itemManager.loadFromFile("assets/data/items.json");
     this->bossManager.loadFromFile("assets/data/bosses.json");
     textures()->Load(renderer, "tileset", tileSet.getSpriteSheetPath());
+    audio()->loadMusic("bg_game", "assets/music/bg_game.mp3");
+    audio()->playMusic("bg_game", -1);
 }
 
 void GameplayScene::addDestroyEffect(Vector2f position, Vector2f scale) {

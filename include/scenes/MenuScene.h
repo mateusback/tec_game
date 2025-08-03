@@ -12,6 +12,7 @@ private:
         "Iniciar Jogo",
         "Ver Pontuação",
         "Ver Créditos",
+        "Opções",
         "Sair"
     };
     size_t selectedIndex = 0;

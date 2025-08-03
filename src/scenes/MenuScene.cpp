@@ -6,6 +6,7 @@
 #include "../../include/managers/FontManager.h"
 #include "../../include/scenes/CreditsScene.h"
 #include "../../include/scenes/ScoresScene.h"
+#include "../../include/scenes/OptionsScene.h"
 
 #include <SDL2/SDL.h>
 #include <iostream>
@@ -13,8 +14,8 @@
 MenuScene::MenuScene(SDL_Renderer* renderer, int width, int height)
     : width(width), height(height)
 {
-    Manager::FontManager::load("menu", "assets/fonts/Roboto-Regular.ttf", 26);
-    textures()->Load(renderer, "logo", "assets/images/logo.png");
+    audio()->loadMusicIfNotLoaded("bg_menu", "assets/music/bg_menu.mp3");
+    audio()->playMusicIfNotPlaying("bg_menu", -1);
 
     this->logoTexture = textures()->Get("logo");
     this->font = Manager::FontManager::get("menu");
@@ -51,11 +52,14 @@ void MenuScene::handleEvent(const SDL_Event& event)
                     auto renderer = SDL_GetRenderer(SDL_GetWindowFromID(1));
                     Manager::SceneManager::setScene(new GameplayScene(renderer, this->width, this->height));
                 } else if (options[selectedIndex] == "Ver Pontuação") {
-                    auto renderer = SDL_GetRenderer(SDL_GetWindowFromID(1));
+                    auto renderer = SDL_GetRenderer(SDL_GetWindowFromID(1));    
                     Manager::SceneManager::setScene(new Scenes::ScoresScene(renderer, this->width, this->height));
                 } else if (options[selectedIndex] == "Ver Créditos") {
                     auto renderer = SDL_GetRenderer(SDL_GetWindowFromID(1));
                     Manager::SceneManager::setScene(new Scenes::CreditsScene(renderer, this->width, this->height));
+                } else if (options[selectedIndex] == "Opções") {
+                    auto renderer = SDL_GetRenderer(SDL_GetWindowFromID(1));
+                    Manager::SceneManager::setScene(new OptionsScene(renderer, this->width, this->height));
                 } else if (options[selectedIndex] == "Sair") {
                     SDL_Event quit;
                     quit.type = SDL_QUIT;
@@ -66,10 +70,7 @@ void MenuScene::handleEvent(const SDL_Event& event)
     }
 }
 
-void MenuScene::update(float deltaTime, const Manager::PlayerInput& input)
-{
-    // Nada por enquanto
-}
+void MenuScene::update(float deltaTime, const Manager::PlayerInput& input){}
 
 void MenuScene::render(SDL_Renderer* renderer)
 {
@@ -125,7 +126,7 @@ void MenuScene::renderLogo(SDL_Renderer* renderer)
 void MenuScene::renderFont(SDL_Renderer* renderer)
 {
     const int spacing = 50;
-    const int offsetAfterLogo = 120;
+    const int offsetAfterLogo = 90;
 
     const int startY = static_cast<int>(this->height * 0.5f) + offsetAfterLogo;
 

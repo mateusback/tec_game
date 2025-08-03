@@ -47,6 +47,7 @@ namespace Manager
     bool EntityManager::hasAnyAliveEnemy() const {
         auto enemies = this->getEntitiesByType<Entities::EnemyBody>();
         auto bosses  = this->getEntitiesByType<Entities::BossBody>();
+        if (enemies.empty() && bosses.empty()) return false;
 
         for (auto* e : enemies) {
             if (!e->isDead()) return true;

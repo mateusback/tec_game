@@ -266,7 +266,7 @@ void RoomManager::loadEntities(Map::Room* room) {
                     boss->setTarget(this->player);
 
                     this->entityManager->add(std::move(boss));
-                    hasEnemies = true;
+                    room->doorsOpen = true;
                 }
                 break;
             }
@@ -275,7 +275,7 @@ void RoomManager::loadEntities(Map::Room* room) {
                 break;
         }
     }
-    room->doorsOpen = !hasEnemies;
+    room->doorsOpen = false;
 }
 
 void RoomManager::update(float deltaTime) {
@@ -449,7 +449,6 @@ void RoomManager::openDoorsOfCurrentRoom() {
 
         Vector2f position{screenPos.x, screenPos.y};
         
-        std::cout << "Abrindo porta na posição: " << position.x << ", " << position.y << std::endl;
 
         this->entityManager->add(std::move(tile));
         auto effect = std::make_unique<Entities::EffectBody>(

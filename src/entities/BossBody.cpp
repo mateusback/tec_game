@@ -1,7 +1,8 @@
 #include "../../include/entities/BossBody.h"
 
 #include <iostream>
-#include <cstdlib> // rand
+#include <cstdlib>
+#include <set>
 
 #include "../../include/managers/TextureManager.h"
 #include "../../include/managers/AnimationLoader.h"
@@ -58,6 +59,7 @@ namespace Entities {
                     2.0f,
                     1.5f
                 );
+                audio()->playSoundEffect("chain", 0);
 
                 attack->setSpeed({0, 0});
                 attack->setTexture(textures()->Get("chain"));
@@ -128,26 +130,32 @@ namespace Entities {
         }
     }
 
-    void BossBody::summonAttacksAroundPlayer() {
-        Vector2f playerCenter = this->target->getCenterPoint();
-        float tile = virtualRenderer()->getTileSize();
-        for (int i = 0; i < 3; ++i) {
-            float offsetX = ((rand() % 5) - 2) * tile;
-            float offsetY = ((rand() % 5) - 2) * tile;
-            Vector2f spawnPos = playerCenter + Vector2f(offsetX, offsetY);
-            auto effect = std::make_unique<EffectBody>(
-                spawnPos,
-                Vector2f(tile, tile),
-                textures()->Get("portal_spawn"),
-                0.5f
-            );
-            effect->setAnimationInfo({ "spin", 0, 8 });
-            effect->loadAnimations();
-            entityManager.add(std::move(effect));
+void BossBody::summonAttacksAroundPlayer() {
+    Vector2f playerCenter = this->target->getCenterPoint();
+    float tile = virtualRenderer()->getTileSize();
 
-            scheduledAttacks.push_back({ spawnPos, 0.5f });
-        }
+    for (int i = 0; i < 6; ++i) { // Mais ataques!
+        float offsetX = ((rand() % 5) - 2) * tile;
+        float offsetY = ((rand() % 5) - 2) * tile;
+        Vector2f centerPos = playerCenter + Vector2f(offsetX, offsetY);
+
+        // O portal aparece ANTES e fica embaixo do ataque
+        auto effect = std::make_unique<EffectBody>(
+            centerPos - Vector2f(tile / 2.f, tile / 2.f), // portal pelo topo esquerdo
+            Vector2f(tile, tile),
+            textures()->Get("portal_spawn"),
+            1.0f
+        );
+        effect->setAnimationInfo({ "spin", 0, 8 });
+        effect->loadAnimations();
+        entityManager.add(std::move(effect));
+
+        // Agendamos o ataque para surgir após o portal (0.5s)
+        scheduledAttacks.push_back({ centerPos, 0.5f }); // centerPos, não offset
     }
+
+    audio()->playSoundEffect("portal");
+}
 
     void BossBody::loadAnimations() {
         this->is_animated = true;

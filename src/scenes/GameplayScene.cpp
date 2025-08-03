@@ -340,6 +340,8 @@ void GameplayScene::loadResources(SDL_Renderer* renderer){
     audio()->loadSoundEffect("hit-player", "assets/audio/hit-player.mp3");
     audio()->loadSoundEffect("pickup-item", "assets/audio/pickup-item.mp3");
     audio()->loadSoundEffect("open-door", "assets/audio/open-door.mp3");
+    audio()->loadSoundEffect("chain", "assets/audio/chain.mp3");
+    audio()->loadSoundEffect("portal", "assets/audio/portal.mp3");
 
     this->enemyManager.loadFromFile("assets/data/enemies.json");
     this->tileSet.loadFromFile("assets/data/tileset.json");

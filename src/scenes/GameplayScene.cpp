@@ -179,7 +179,6 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
                 enemy->takeDamage(laser->getDamage());
                 audio()->playSoundEffect("hit-enemy", 0);
                 enemy->setInvencibleTimer(laser->getDamageTime());
-                //TODO - CRIAR UM METODO DE "INIMIGO MORTO" NO SCORE MANAGER
                 if (enemy->getHealth() <= 0) {
                     score()->add(20);
                     enemy->setActive(false);

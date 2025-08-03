@@ -121,22 +121,23 @@ namespace Generator {
                             break;
                     }
                 } else if (neighborRoom.type == Map::ERoomType::Secret) {
+                    const int fakeWallId = 9; // FakeWall
                     switch (dir) {
                         case EDirection::Up:
-                            room.layout[0][midCol] = 1;
-                            if (evenCols) room.layout[0][midCol - 1] = 1;
+                            room.layout[0][midCol] = fakeWallId;
+                            if (evenCols) room.layout[0][midCol - 1] = fakeWallId;
                             break;
                         case EDirection::Down:
-                            room.layout[rows - 1][midCol] = 1;
-                            if (evenCols) room.layout[rows - 1][midCol - 1] = 1;
+                            room.layout[rows - 1][midCol] = fakeWallId;
+                            if (evenCols) room.layout[rows - 1][midCol - 1] = fakeWallId;
                             break;
                         case EDirection::Left:
-                            room.layout[midRow][0] = 1;
-                            if (evenRows) room.layout[midRow - 1][0] = 1;
+                            room.layout[midRow][0] = fakeWallId;
+                            if (evenRows) room.layout[midRow - 1][0] = fakeWallId;
                             break;
                         case EDirection::Right:
-                            room.layout[midRow][cols - 1] = 1;
-                            if (evenRows) room.layout[midRow - 1][cols - 1] = 1;
+                            room.layout[midRow][cols - 1] = fakeWallId;
+                            if (evenRows) room.layout[midRow - 1][cols - 1] = fakeWallId;
                             break;
                     }
                 }

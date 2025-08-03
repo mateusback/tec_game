@@ -19,7 +19,7 @@
 class GameplayScene : public Core::Scene {
 private:
     Entities::PlayerBody* player;
-    bool debugMode = true;
+    bool debugMode = false;
     bool isPaused = false;
     Manager::ItemManager itemManager;
     Manager::EnemyManager enemyManager;

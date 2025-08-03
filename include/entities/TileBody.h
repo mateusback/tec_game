@@ -29,13 +29,15 @@ namespace Entities {
         void initFlippedStaticTile(SDL_Texture* texture, int tileIndex, double angle = 0.0, SDL_RendererFlip flip = SDL_FLIP_NONE);
         
 		#pragma region Getters
-        int getTileId() const { return tileId; }
-        const Tile* getTileData() const { return tileData; }
+        int getTileId() const { return this->tileId; }
+        const Tile* getTileData() const { return this->tileData; }
+        SDL_RendererFlip getFlip() const { return this->animationManager.getCurrentSprite()->getFlip(); }
+        double getAngle() const { return this->animationManager.getCurrentSprite()->getAngle(); }
         #pragma endregion
         
         #pragma region Setters
-        void setTileId(int id) { tileId = id; }
-        void setTileData(const Tile* tile) { tileData = tile; }
+        void setTileId(int id) { this->tileId = id; }
+        void setTileData(const Tile* tile) { this->tileData = tile; }
         #pragma endregion
     };
 }

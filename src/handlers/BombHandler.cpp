@@ -35,7 +35,7 @@ void BombHandler::handleExplosion(const Event::BombExploded& event) {
                 tile->setCollision(destroyedTileData->solid);
                 tile->setTileId(tileData->destroyedId);
                 tile->setTileData(destroyedTileData);
-                tile->initStaticTile(tileSheet, destroyedTileData->index);
+                tile->initFlippedStaticTile(tileSheet, destroyedTileData->index, tile->getAngle(), tile->getFlip());
             }
         }
     }

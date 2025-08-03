@@ -121,8 +121,15 @@ void RoomManager::loadRoom(Map::Room* room) {
         for (auto& t : state.tiles) {
             const Tile* tileData = this->tileSet->getTile(t.id);
             Vector4f screenVect = virtualRenderer()->mapToScreen(t.position);
+
             auto tile = std::make_unique<Entities::TileBody>(screenVect, textures()->Get("tileset"), tileData->solid);
-            tile->initStaticTile(textures()->Get("tileset"), tileData->index);
+
+            if (t.angle != 0.0 || t.flip != SDL_FLIP_NONE) {
+                tile->initFlippedStaticTile(textures()->Get("tileset"), tileData->index, t.angle, t.flip);
+            } else {
+                tile->initStaticTile(textures()->Get("tileset"), tileData->index);
+            }
+
             tile->setTileId(t.id);
             tile->setTileData(tileData);
             this->entityManager->add(std::move(tile));
@@ -185,7 +192,7 @@ void RoomManager::loadTiles(Map::Room* room) {
                 tile->solid
             );
 
-            if (tileId == 7) {
+            if (tileId == 7 || tileId == 9) {
                 double angle = 0.0;
                 SDL_RendererFlip flip = SDL_FLIP_NONE;
 
@@ -397,6 +404,8 @@ bool RoomManager::areAllEnemiesDefeated() const {
 
 void RoomManager::openDoorsOfCurrentRoom() {
     auto& layout = this->currentRoom->layout;
+    int rows = static_cast<int>(layout.size());
+    int cols = static_cast<int>(layout[0].size());
 
     std::vector<Vector2i> portasFechadas;
 
@@ -408,15 +417,30 @@ void RoomManager::openDoorsOfCurrentRoom() {
     }
 
     for (const auto& pos : portasFechadas) {
-        layout[pos.y][pos.x] = 0;
+        layout[pos.y][pos.x] = 11;
 
-        const Tile* tileData = this->tileSet->getTile(0);
+        const Tile* tileData = this->tileSet->getTile(11);
         if (!tileData) continue;
 
         Vector4f screenPos = virtualRenderer()->mapToScreen(pos);
         auto tile = std::make_unique<Entities::TileBody>(screenPos, textures()->Get("tileset"), tileData->solid);
-        tile->initStaticTile(textures()->Get("tileset"), tileData->index);
-        tile->setTileId(0);
+
+        double angle = 0.0;
+        SDL_RendererFlip flip = SDL_FLIP_NONE;
+
+        if (pos.y == 0) {
+            angle = 0.0;
+        } else if (pos.y == rows - 1) {
+            angle = 0.0;
+            flip = SDL_FLIP_VERTICAL;
+        } else if (pos.x == 0) {
+            angle = 270.0;
+        } else if (pos.x == cols - 1) {
+            angle = 90.0;
+        }
+
+        tile->initFlippedStaticTile(textures()->Get("tileset"), tileData->index, angle, flip);
+        tile->setTileId(11);
         tile->setTileData(tileData);
 
         this->entityManager->add(std::move(tile));
@@ -439,7 +463,9 @@ void RoomManager::saveCurrentRoomState() {
         state.tiles.push_back({
             tile->getTileId(),
             virtualRenderer()->screenToTilePosition(tile->getPosition()),
-            tile->getTileData()->solid
+            tile->getTileData()->solid,
+            tile->getAngle(),
+            tile->getFlip()
         });
     }
 

@@ -64,7 +64,6 @@ namespace Manager {
         //Procedural Generation
         void generateFloor(int index, int seed);
 
-
         Entities::PlayerBody* getPlayer() const { return this->player; }
     };
 }

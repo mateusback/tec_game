@@ -6,6 +6,13 @@
 #include <functional>
 
 namespace Renderer {
+
+    struct AnimationInformation {
+        std::string name;
+        int startFrame;
+        int endFrame;
+    };
+
     class Animation {
     private:
         std::vector<Sprite> frames;

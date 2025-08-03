@@ -332,6 +332,7 @@ void GameplayScene::loadResources(SDL_Renderer* renderer){
     textures()->Load(renderer, "hudsheet", "assets/hudsheet.png");
 
     textures()->Load(renderer, "door_open_anim", "assets/animations/door_open.png");
+    textures()->Load(renderer, "portal_spawn", "assets/animations/portal.png");
 
     audio()->loadSoundEffect("bomb_explosion", "assets/audio/explosion.mp3");
     audio()->loadSoundEffect("shoot", "assets/audio/shoot.mp3");

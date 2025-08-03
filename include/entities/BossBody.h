@@ -8,6 +8,12 @@
 #include "../managers/EntityManager.h"
 
 namespace Entities {
+
+    struct PendingAttack {
+        Vector2f position;
+        float timer;
+    };
+    
     class BossBody : public CharacterBody {
     private:
         Enemies::BossData bossData;
@@ -16,6 +22,7 @@ namespace Entities {
         float aggroRange = 0.f;
         float stateTimer = 0.f;
         EntityState state = EntityState::Idle;
+        std::vector<PendingAttack> scheduledAttacks;
 
     public:
         BossBody(Vector4f collider, const Enemies::BossData& data, Manager::EntityManager& entityManager);
@@ -24,7 +31,7 @@ namespace Entities {
         void update(float deltaTime) override;
         void loadAnimations();
         void setAnimationByState();
-        std::vector<std::unique_ptr<AttackBody>> summonAttacks();
+        void summonAttacksAroundPlayer();
         void onCollision(Body* other) override;
 
         inline void setTarget(PlayerBody* player) { this->target = player; }

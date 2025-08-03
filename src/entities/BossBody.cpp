@@ -1,10 +1,11 @@
 #include "../../include/entities/BossBody.h"
 
 #include <iostream>
-#include <bits/ostream.tcc>
+#include <cstdlib> // rand
 
 #include "../../include/managers/TextureManager.h"
 #include "../../include/managers/AnimationLoader.h"
+#include "../../include/entities/EffectBody.h"
 #include "../../include/utils/GlobalAccess.h"
 
 namespace Entities {
@@ -36,6 +37,38 @@ namespace Entities {
         if (this->is_animated) {
             this->animationManager.update(deltaTime);
         }
+
+        for (auto it = scheduledAttacks.begin(); it != scheduledAttacks.end(); ) {
+            it->timer -= deltaTime;
+            if (it->timer <= 0.f) {
+                float tile = virtualRenderer()->getTileSize();
+                Vector2f pos = it->position;
+
+                auto attack = std::make_unique<AttackBody>(
+                    pos.x - tile / 2.f,
+                    pos.y - tile / 2.f,
+                    tile,
+                    tile,
+                    false,
+                    true,
+                    this->getAttackDamage(),
+                    this->getAttackRange(),
+                    2.0f,
+                    0.1f,
+                    2.0f,
+                    1.5f
+                );
+
+                attack->setSpeed({0, 0});
+                attack->setTexture(textures()->Get("chain"));
+                attack->setOrigin(this);
+
+                entityManager.add(std::move(attack));
+                it = scheduledAttacks.erase(it);
+            } else {
+                ++it;
+            }
+        }
     }
 
     void BossBody::applyBossBehavior(float deltaTime) {
@@ -49,7 +82,7 @@ namespace Entities {
             this->speed = direction * bossData.getAcceleration();
             this->move(deltaTime);
         } else {
-            this->speed = Vector2f(0, 0); 
+            this->speed = Vector2f(0, 0);
         }
 
         switch (state) {
@@ -59,16 +92,10 @@ namespace Entities {
                 break;
 
             case EntityState::Attacking:
-                {
-                    std::cout << "Boss summoned attacks!" << std::endl;
-                    auto attacks = this->summonAttacks();
-                    for (auto& atk : attacks) {
-                        std::cout << "Summoning attack real: " << std::endl;
-                        this->entityManager.add(std::move(atk));
-                    }
-                    this->state = EntityState::CoolingDown;
-                    this->stateTimer = this->getAttackRate();
-                }
+                std::cout << "Boss summoning portal attacks!" << std::endl;
+                this->summonAttacksAroundPlayer();
+                this->state = EntityState::CoolingDown;
+                this->stateTimer = this->getAttackRate();
                 break;
 
             case EntityState::CoolingDown:
@@ -101,52 +128,26 @@ namespace Entities {
         }
     }
 
-    std::vector<std::unique_ptr<AttackBody>> BossBody::summonAttacks() {
-        std::vector<std::unique_ptr<AttackBody>> attacks;
-
-        Vector2f center = this->getCenterPoint();
-        Vector2f direction = this->target->getCenterPoint() - center;
-
-        if (direction.x != 0.f || direction.y != 0.f) {
-            direction.normalize();
-        }
-
-        float tileUnit = virtualRenderer()->getTileSize(); 
-
-        for (int i = 1; i <= 3; ++i) {
-            Vector2f offset = direction * static_cast<float>(i) * tileUnit;
-            Vector2f attackPos = center + offset;
-
-            float attackSize = tileUnit;
-
-            auto attack = std::make_unique<AttackBody>(
-                attackPos.x - attackSize / 2.f,
-                attackPos.y - attackSize / 2.f,
-                attackSize,
-                attackSize,
-                false,
-                true,
-                this->getAttackDamage(),
-                this->getAttackRange(),
-                2.0f,
-                0.1f,
-                2.0f,
-                1.5f
+    void BossBody::summonAttacksAroundPlayer() {
+        Vector2f playerCenter = this->target->getCenterPoint();
+        float tile = virtualRenderer()->getTileSize();
+        for (int i = 0; i < 3; ++i) {
+            float offsetX = ((rand() % 5) - 2) * tile;
+            float offsetY = ((rand() % 5) - 2) * tile;
+            Vector2f spawnPos = playerCenter + Vector2f(offsetX, offsetY);
+            auto effect = std::make_unique<EffectBody>(
+                spawnPos,
+                Vector2f(tile, tile),
+                textures()->Get("portal_spawn"),
+                0.5f
             );
+            effect->setAnimationInfo({ "spin", 0, 8 });
+            effect->loadAnimations();
+            entityManager.add(std::move(effect));
 
-            attack->setSpeed({0, 0});
-            attack->setTexture(textures()->Get("chain"));
-            attack->setOrigin(this);
-
-            std::cout << "Summoning attack at tile offset " << i << ": "
-                    << attackPos.x << ", " << attackPos.y << std::endl;
-
-            attacks.push_back(std::move(attack));
+            scheduledAttacks.push_back({ spawnPos, 0.5f });
         }
-
-        return attacks;
     }
-
 
     void BossBody::loadAnimations() {
         this->is_animated = true;
@@ -170,5 +171,4 @@ namespace Entities {
             player->takeDamage(this->getAttackDamage());
         }
     }
-
 }

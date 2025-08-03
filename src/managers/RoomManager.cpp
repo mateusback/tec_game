@@ -458,7 +458,7 @@ void RoomManager::openDoorsOfCurrentRoom() {
             textures()->Get("door_open_anim"),
             0.5f
         );
-
+        effect->setAnimationInfo({ "open", 0, 5 });
         effect->setAngle(angle);
         effect->setFlip(flip);
         effect->loadAnimations();

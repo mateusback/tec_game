@@ -6,11 +6,12 @@ namespace Entities
     void EffectBody::loadAnimations() {
         this->setAnimated(true);
         this->animationManager.clear();
+
         Manager::AnimationLoader::loadNamedAnimations(this->getTexture(), {
-            { "open", 0, 5 } 
+            { animInfo.name, animInfo.startFrame, animInfo.endFrame }
         }, this->animationManager);
 
-        this->animationManager.setAnimation("open");
+        this->animationManager.setAnimation(animInfo.name);
     }
 
     void EffectBody::render(SDL_Renderer* renderer) {

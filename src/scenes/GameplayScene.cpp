@@ -369,12 +369,6 @@ void GameplayScene::loadResources(SDL_Renderer* renderer){
 }
 
 void GameplayScene::loadStaticSprites(SDL_Renderer* renderer) {
-    textures()->Load(renderer, "player_b", "assets/player/personagem_B.png");
-    textures()->Load(renderer, "player_f", "assets/player/personagem_F.png");
-    textures()->Load(renderer, "player_l", "assets/player/personagem_L.png");
-    textures()->Load(renderer, "player_r", "assets/player/personagem_R.png");
-    textures()->Load(renderer, "player_with_item", "assets/player_with_item.png");
-
     textures()->Load(renderer, "attack", "assets/attack.png");
     textures()->Load(renderer, "attack_destroy", "assets/attack_fade.png");
 

@@ -153,8 +153,8 @@ namespace Entities
         this->is_animated = true;
 
         Manager::AnimationLoader::loadNamedAnimations(texture, {
-            {"walk",   0, 4},
-            {"attack", 0, 4, false},
+            {"walk",   5, 4},
+            {"attack", 0, 5, false},
             {"death",  4, 5, false},
             {"walk-r", 1, 5, true},
         }, this->animationManager, 0.15f, 32, 34);

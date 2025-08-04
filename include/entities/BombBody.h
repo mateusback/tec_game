@@ -25,10 +25,14 @@ namespace Entities
        : Body(rect, collision, visible),
          timeToExplode(time),
          explosionRadius(radius),
-         explosionDamage(damage) {}
+         explosionDamage(damage) {
+            this->loadAnimations();
+        }
 
         virtual void update(float deltaTime) override;
         void explode();
+
+        void loadAnimations() override;
         
 		#pragma region Getters
         float getTimeToExplode() const { return this->timeToExplode; }

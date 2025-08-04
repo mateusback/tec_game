@@ -11,6 +11,7 @@ namespace Renderer {
         std::string name;
         int startFrame;
         int endFrame;
+        float frameDuration = 0.15f;
     };
 
     class Animation {

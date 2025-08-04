@@ -9,7 +9,7 @@ namespace Entities
 
         Manager::AnimationLoader::loadNamedAnimations(this->getTexture(), {
             { animInfo.name, animInfo.startFrame, animInfo.endFrame }
-        }, this->animationManager);
+        }, this->animationManager, this->animInfo.frameDuration);
 
         this->animationManager.setAnimation(animInfo.name);
     }

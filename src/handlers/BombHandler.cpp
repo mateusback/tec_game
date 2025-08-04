@@ -57,6 +57,8 @@ void BombHandler::handleExplosion(const Event::BombExploded& event) {
         Manager::TextureManager::Get("bomb_explosion"),
         0.5f
     );
+    effect->setAnimationInfo({"explosion", 0, 9, 0.1f});
+    effect->loadAnimations();
     this->entityManager->add(std::move(effect));
 }
 

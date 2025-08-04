@@ -215,7 +215,6 @@ void RoomManager::loadTiles(Map::Room* room) {
 }
 
 void RoomManager::loadEntities(Map::Room* room) {
-    bool hasEnemies = false;
 
     for (const auto& e : room->entities) {
             std::cout << "Carregando entidade: " << e.id << " do tipo: " << Map::entityTypeToString(e.type) << std::endl;
@@ -247,7 +246,6 @@ void RoomManager::loadEntities(Map::Room* room) {
                     enemy->setTexture(textures()->Get(enemyData->getSpritePath()));
                     enemy->setTarget(this->player);
                     this->entityManager->add(std::move(enemy));
-                    hasEnemies = true;
                 }
                 break;
             }
@@ -266,7 +264,6 @@ void RoomManager::loadEntities(Map::Room* room) {
                     boss->setTarget(this->player);
 
                     this->entityManager->add(std::move(boss));
-                    room->doorsOpen = true;
                 }
                 break;
             }

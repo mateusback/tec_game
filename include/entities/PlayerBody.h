@@ -25,7 +25,11 @@ namespace Entities
 		float bombCooldown = 5.0f;
 		float experience;
 		EDirection currentDirection = EDirection::Down;
+		EDirection lastDirectionHorizontal = EDirection::Left;
 		WeaponHandler weaponHandler;
+
+	private:
+		void updateAnimationByInput(const Vector2f& moveDirection);
 
 	public:
 		#pragma region Constructors

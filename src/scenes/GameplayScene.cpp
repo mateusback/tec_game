@@ -9,7 +9,6 @@
 #include "../../include/entities/EffectBody.h"
 #include "../../include/entities/BombBody.h"
 #include "../../include/managers/EventManager.h"
-#include "../../include/entities/LaserAttackBody.h"
 #include "../../include/entities/BossBody.h"
 #include "../../include/renders/TextRenderer.h"
 #include "../../include/scenes/EndScene.h"
@@ -20,7 +19,6 @@
 
 GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight) {
     this->renderer = renderer;
-    this->debugMode = true;
     this->loadResources(this->renderer);
     notificationHandler.setFont(Manager::FontManager::get("default"));
 
@@ -67,7 +65,6 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     auto attacks = entityManager.getEntitiesByType<Entities::AttackBody>();
     auto effects = entityManager.getEntitiesByType<Entities::EffectBody>();
     auto bombs = entityManager.getEntitiesByType<Entities::BombBody>();
-    auto lasers = entityManager.getEntitiesByType<Entities::LaserAttackBody>();
     auto bosses = entityManager.getEntitiesByType<Entities::BossBody>();
 
     for (auto* boss : bosses) {
@@ -91,11 +88,6 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
         if (Physics::isColliding(this->player, tile)) {
             Physics::CollisionManager::resolveCollision(this->player, tile);
         if (this->debugMode) break;
-        }
-        for (auto* lasers : lasers) {
-            if (Physics::isColliding(lasers, tile)) {
-                addSplashEffect(lasers->getPosition(), lasers->getScale());
-            }          
         }
     }
 
@@ -172,17 +164,6 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
         for (auto* tile : tiles) {
             if (Physics::isColliding(enemy, tile)) {
                 Physics::CollisionManager::resolveCollision(enemy, tile);
-            }
-        }
-        for (auto* laser : lasers) {
-            if (Physics::isColliding(enemy, laser)) {
-                enemy->takeDamage(laser->getDamage());
-                audio()->playSoundEffect("hit-enemy", 0);
-                enemy->setInvencibleTimer(laser->getDamageTime());
-                if (enemy->getHealth() <= 0) {
-                    score()->add(20);
-                    enemy->setActive(false);
-                }
             }
         }
 
@@ -318,7 +299,7 @@ void GameplayScene::loadResources(SDL_Renderer* renderer){
     textures()->Load(renderer, "player_f", "assets/player/personagem_F.png");
     textures()->Load(renderer, "player_l", "assets/player/personagem_L.png");
     textures()->Load(renderer, "player_r", "assets/player/personagem_R.png");
-    textures()->Load(renderer, "player_sheet", "assets/animations/personagem_bruxa32x32-Sheet.png");
+    textures()->Load(renderer, "player_sheet", "assets/animations/player_sheet.png");
     textures()->Load(renderer, "swing", "assets/animations/swing.png");
     textures()->Load(renderer, "chain", "assets/animations/chain.png");
     textures()->Load(renderer, "pf", "assets/animations/pf_export.png");

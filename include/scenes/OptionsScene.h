@@ -16,7 +16,7 @@ public:
 private:
     TTF_Font* font = nullptr;
     int width, height;
-    int selectedIndex = 0;
+    size_t selectedIndex = 0;
 
     std::vector<std::string> options = {
         "Volume da Música",

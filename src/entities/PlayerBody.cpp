@@ -15,6 +15,10 @@ namespace Entities
 
     void PlayerBody::handleInput(const Manager::PlayerInput& input)
     {
+
+        if (this->state == EntityState::Dying || this->state == EntityState::Dead)
+            return;
+
         Vector2f playerDirection = input.moveDirection;
 
         this->updateAnimationByInput(playerDirection);
@@ -35,6 +39,10 @@ namespace Entities
     {
         this->animationManager.update(deltaTime);
         if(this->active == false) return;
+        if (this->state == EntityState::Dead) return;
+        if (this->state == EntityState::Dying) return;
+
+
         this->move(deltaTime);
 
         if (this->attackTimer > 0.0f)
@@ -46,12 +54,14 @@ namespace Entities
                 this->invencible = false;
             }
         }
-
-        if (this->health <= 0.0f) {
+        std::cout << "Player Health: " << this->health << std::endl;
+        if (this->health <= 0.0f && this->state != EntityState::Dying) {
+            this->state = EntityState::Dying;
+            this->setSpeed({0.f, 0.f});
             this->animationManager.setAnimation("death", [this]() {
                 this->state = EntityState::Dead;
-                this->setActive(false);
             });
+            return;
         }
 
         if (this->bombCooldown > 0.0f) {
@@ -76,7 +86,7 @@ namespace Entities
 
     void PlayerBody::takeDamage(float damage) {
         if (this->invencible) return;
-        this->health -= damage / this->getDefense();
+        this->health -= damage;
         this->invencible = true;
         this->invencibleTimer = 1.0f;
         audio()->playSoundEffect("hit-player", 0);
@@ -146,8 +156,8 @@ namespace Entities
         Manager::AnimationLoader::loadNamedAnimations(texture, {
             {"walk",   0, 4},
             {"attack", 0, 4, false},
-            {"death",  0, 4, false},
-            {"walk-r", 1, 5, true}
+            {"death",  4, 5, false},
+            {"walk-r", 1, 5, true},
         }, this->animationManager, 0.15f, 32, 34);
 
         Manager::AnimationLoader::loadNamedAnimations(texture, {

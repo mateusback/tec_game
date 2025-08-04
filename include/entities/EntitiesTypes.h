@@ -9,6 +9,7 @@ namespace Entities {
         Hidden,
         CoolingDown,
         Dead,
+        Dying,
         Jumping
     };
 

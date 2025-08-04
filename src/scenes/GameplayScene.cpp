@@ -13,6 +13,7 @@
 #include "../../include/renders/TextRenderer.h"
 #include "../../include/scenes/EndScene.h"
 #include "../../include/managers/SceneManager.h"
+#include "../../include/scenes/GameOverScene.h"
 
 #include <fstream>
 #include <chrono>
@@ -54,6 +55,15 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
 
     if (this->isPaused) return;
     if(!this->player->isActive()) return;
+
+    if (this->player->getState() == Entities::EntityState::Dead) {
+        Manager::SceneManager::setScene(new Scenes::GameOverScene(
+            this->renderer,
+            virtualRenderer()->getScreenWidth(),
+            virtualRenderer()->getScreenHeight()
+        ));
+        return;
+    }
 
     this->player->handleInput(input);
 

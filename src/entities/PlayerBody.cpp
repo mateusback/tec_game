@@ -54,7 +54,6 @@ namespace Entities
                 this->invencible = false;
             }
         }
-        std::cout << "Player Health: " << this->health << std::endl;
         if (this->health <= 0.0f && this->state != EntityState::Dying) {
             this->state = EntityState::Dying;
             this->setSpeed({0.f, 0.f});

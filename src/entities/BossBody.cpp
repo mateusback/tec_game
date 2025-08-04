@@ -134,14 +134,13 @@ void BossBody::summonAttacksAroundPlayer() {
     Vector2f playerCenter = this->target->getCenterPoint();
     float tile = virtualRenderer()->getTileSize();
 
-    for (int i = 0; i < 6; ++i) { // Mais ataques!
+    for (int i = 0; i < 6; ++i) { 
         float offsetX = ((rand() % 5) - 2) * tile;
         float offsetY = ((rand() % 5) - 2) * tile;
         Vector2f centerPos = playerCenter + Vector2f(offsetX, offsetY);
 
-        // O portal aparece ANTES e fica embaixo do ataque
         auto effect = std::make_unique<EffectBody>(
-            centerPos - Vector2f(tile / 2.f, tile / 2.f), // portal pelo topo esquerdo
+            centerPos - Vector2f(tile / 2.f, tile / 2.f),
             Vector2f(tile, tile),
             textures()->Get("portal_spawn"),
             1.0f
@@ -150,8 +149,7 @@ void BossBody::summonAttacksAroundPlayer() {
         effect->loadAnimations();
         entityManager.add(std::move(effect));
 
-        // Agendamos o ataque para surgir após o portal (0.5s)
-        scheduledAttacks.push_back({ centerPos, 0.5f }); // centerPos, não offset
+        scheduledAttacks.push_back({ centerPos, 0.5f });
     }
 
     audio()->playSoundEffect("portal");

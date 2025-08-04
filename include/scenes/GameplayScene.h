@@ -34,6 +34,34 @@ private:
     NotificationHandler notificationHandler;
     SDL_Renderer* renderer;
 
+    void setupRoomManager();
+    void generateFloorAndLoadStartRoom();
+    void setupHandlersAndRenderers();
+
+    bool checkIfPlayerIsDead();
+    void updateBombs(float deltaTime);
+    void updateTilesAndHandlePlayerCollision();
+    void updateItemsAndPickup(float deltaTime);
+    void updateEnemies(float deltaTime);
+    void updateBosses(float deltaTime);
+    void updateAttacks(float deltaTime);
+    void updateEffects(float deltaTime);
+
+    void clearScreen(SDL_Renderer* renderer);
+    void renderEntities(SDL_Renderer* renderer);
+    void renderPlayer(SDL_Renderer* renderer);
+    void renderEnemyHealthBars(SDL_Renderer* renderer);
+    void renderBossHealthBars(SDL_Renderer* renderer);
+    void renderDebugColliders(SDL_Renderer* renderer);
+
+    void loadResources(SDL_Renderer* renderer);
+    void loadAudios();
+    void loadStaticSprites(SDL_Renderer* renderer);
+    void loadAnimations(SDL_Renderer* renderer);
+
+    void addDestroyEffect(Vector2f position, Vector2f scale);
+    void addSplashEffect(Vector2f position, Vector2f scale);
+
 public:
     GameplayScene(SDL_Renderer* renderer, int screenWidth, int screenHeight);
     ~GameplayScene() override;
@@ -41,9 +69,6 @@ public:
     void update(float deltaTime, const Manager::PlayerInput& input);
     void handleEvent(const SDL_Event& event) override;
     void render(SDL_Renderer* renderer) override;
-    void addDestroyEffect(Vector2f position, Vector2f scale);
-    void addSplashEffect(Vector2f position, Vector2f scale);
-    void loadResources(SDL_Renderer* renderer);
     
     void setItemManager(const Manager::ItemManager& itemManager) { this->itemManager = itemManager; }
     Manager::ItemManager getItemManager() { return itemManager; }

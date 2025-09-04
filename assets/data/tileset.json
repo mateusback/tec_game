@@ -17,6 +17,16 @@
     "12": { "name": "Wall-Top-Right", "index": 12, "solid": true },
     "13": { "name": "Wall-Top-Left", "index": 13, "solid": true },
     "14": { "name": "Wall-Bottom-Right", "index": 14, "solid": true },
-    "15": { "name": "Wall-Bottom-Left", "index": 15, "solid": true }
+    "15": { "name": "Wall-Bottom-Left", "index": 15, "solid": true },
+    "16": { "name": "Hole-Top-Left", "index": 16, "solid": true },
+    "17": { "name": "Hole-Top-Right", "index": 17, "solid": true },
+    "18": { "name": "Hole-Full", "index": 18, "solid": true },
+    "19": { "name": "Hole-Right", "index": 19, "solid": true },
+    "20": { "name": "Hole-Bottom", "index": 20, "solid": true },
+    "21": { "name": "Hole-Left", "index": 21, "solid": true },
+    "22": { "name": "Hole-Top", "index": 22, "solid": true },
+    "23": { "name": "Hole-Dark", "index": 23, "solid": true },
+    "25": { "name": "Hole-Bottom-Left", "index": 25, "solid": true },
+    "26": { "name": "Hole-Bottom-Right", "index": 26, "solid": true }
   }
 }

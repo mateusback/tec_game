@@ -1,0 +1,72 @@
+#ifndef ENTITY_MANAGER_H
+#define ENTITY_MANAGER_H
+
+#include "../entities/Entity.h"
+#include "../entities/Body.h"
+#include <vector>
+#include <memory>
+#include <algorithm>
+
+namespace Manager {
+
+	class EntityManager {
+	private:
+		std::vector<std::unique_ptr<Entities::Entity>> entities;
+		std::vector<std::unique_ptr<Entities::Entity>> toAdd;
+
+	public:
+		void add(std::unique_ptr<Entities::Entity> entity);
+		void updateAll(float deltaTime);
+		void renderAll(SDL_Renderer* renderer);
+
+		void addAll();
+		void removeInactive();
+		void clear() { this->entities.clear(); }
+		void clearAll() { this->entities.clear(); this->toAdd.clear(); }
+
+		bool hasAnyAliveEnemy() const;
+
+		#pragma region Getters
+		std::vector<std::unique_ptr<Entities::Entity>>& getEntities() { return this->entities; }
+		#pragma endregion
+
+		#pragma region Templates
+		template<typename T>
+		std::vector<T*> getEntitiesByType() {
+			std::vector<T*> filtered;
+		
+			for (auto& e : entities) {
+				if (auto* casted = dynamic_cast<T*>(e.get())) {
+					filtered.push_back(casted);
+				}
+			}
+		
+			return filtered;
+		}
+
+		template<typename T>
+		std::vector<const T*> getEntitiesByType() const {
+			std::vector<const T*> filtered;
+
+			for (const auto& e : entities) {
+				if (const auto* casted = dynamic_cast<const T*>(e.get())) {
+					filtered.push_back(casted);
+				}
+			}
+
+			return filtered;
+		}
+
+		template <typename T>
+		void deactivateEntitiesOfType() {
+			for (const auto& entity : this->entities) {
+				if (auto* ptr = dynamic_cast<T*>(entity.get())) {
+					ptr->setActive(false);
+				}
+			}
+		}
+		#pragma endregion
+	};
+}
+
+#endif

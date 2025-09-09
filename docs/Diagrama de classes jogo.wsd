@@ -1,0 +1,135 @@
+@startuml Entidades Tec_Game
+package "Entidades" {
+
+	enum EntityState {
+        Idle
+        Moving
+        Attacking
+        Hidden
+        CoolingDown
+        Dead
+    }
+
+    class Entity {
+        #active: bool = true
+    }
+
+	class Body {
+		#position: Vector
+		#scale: Vector
+		#texture: SDL_Texture* = nullptr
+		#has_collision: bool
+		#is_visible: bool
+		+virutal void render(SDL_Render* renderer)
+		+virutal void update(float deltaTime)
+		+virtual void onCollision(Body* other)
+		+virutal EBodyType getBodyType()
+	}
+
+	class MovingBody {
+		#speed: Vector
+		#acceleration: float
+		+void move(float deltaTime)
+	}
+
+	class CharacterBody {
+		#name: std::string
+		#health: float
+		#maxHealth: float
+		#attackDamage: float
+		#attackSpeed: float
+		#attackRange: float 
+		#attackDuration: float
+		#attackRate: float
+		#attackTimer: float
+		#defense: float
+		#level: uint8_t
+		#stateTimer: float	
+		#state: EntityState
+	}
+
+	class ItemBody {
+		#type: EItemType
+		#item: Item
+		+void update(float deltaTime) override {}
+		+void onCollision(Body* other) override
+	}
+
+	class TileBody {
+		+void update(float deltaTime) override {}
+        +void onCollision(Body* other) override {}
+	}
+
+	class PlayerBody{
+		#inventory: std::list<Item>
+		#coins: uint8_t
+		#keys: uint8_t
+		#bombs: uint8_t
+		#experience: float
+		+void update(float deltaTime) override
+		+void onCollision(Body other) override
+		+void handleInput(const PlayerInput& input)
+		+std::unique_ptr<AttackBody> attack(Point characterCenter, Vector direction)
+		+void pickUpItem(ItemBody* item)
+	}
+	
+	class AttackBody {
+		#origin: Entity*
+		#attackDamage: float
+		#attackRange: float
+		#attackDuration: float
+		#lifeSteal: float
+		#criticalChance: float
+		#criticalDamage: float
+	}
+
+	class EffectBody {
+		#duration: Float
+		+update(float deltaTime) override
+	}
+
+    class EnemyBody {
+        -origin: Entity*
+        -attackDamage: float
+        -attackRange: float
+        -attackDuration: float
+        -lifeSteal: float
+        -criticalChance: float
+        -criticalDamage: float
+        +void update(float deltaTime)
+        -void applyEnemyBehavior(float deltaTime)
+    }
+
+	class Enemy {
+        -id: int
+        -name: std::string
+        -spritePath: std::string
+        -acceleration: float
+        -aggroRange: float
+        -health: float
+        -maxHealth: float
+        -attackDamage: float
+        -attackRate: float
+        -attackRange: float
+        -attackSpeed: float
+        -defense: float
+        -behavior: std::string
+    }
+
+	Entity <|-- Body
+	Body <|-- ItemBody
+	Body <|-- TileBody
+	Body <|-- MovingBody
+	body <|-- EffectBody
+	MovingBody <|-- CharacterBody
+	MovingBody <|-- AttackBody
+	CharacterBody <|-- PlayerBody
+	CharacterBody <|-- EnemyBody
+	EnemyBody --> Enemy
+    CharacterBody --> EntityState
+
+
+}
+
+
+@enduml

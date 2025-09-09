@@ -2,7 +2,6 @@
 #define COLLISION_MANAGER_H
 
 #include <SDL2/SDL.h>
-#include <my-lib/math-vector.h>
 #include "../../include/entities/Body.h"
 
 namespace Physics
@@ -10,8 +9,16 @@ namespace Physics
     class CollisionManager
     {
     public:
-        static bool checkCollision(const SDL_FRect& a, const SDL_FRect& b);
+        static bool checkCollision(const Vector4f& a, const Vector4f& b);
+        static void resolveCollision(Entities::Body* a, const Entities::Body* b);
     };
+
+    template <typename A, typename B>
+    inline bool isColliding(A* a, B* b) {
+        return a->hasCollision() &&
+               b->hasCollision() &&
+               CollisionManager::checkCollision(a->getHitbox(), b->getHitbox());
+    }
 }
 
 

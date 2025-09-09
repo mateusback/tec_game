@@ -1,36 +1,30 @@
 #include "../../include/entities/AttackBody.h"
+#include "../../include/managers/AnimationLoader.h"
 #include <SDL2/SDL.h>
 
 namespace Entities
 {
-    AttackBody::AttackBody(float x, float y, float w, float h, bool collision, bool visible, float dmg, float range, float duration, float lifesteal, float crit_chance, float crit_dmg)
-        : MovingBody(x, y, w, h, collision, visible), 
-          attack_damage(dmg), attack_range(range), attack_duration(duration),
-          life_steal(lifesteal), critical_chance(crit_chance), critical_damage(crit_dmg) {}
+void AttackBody::update(float deltaTime)
+{
+    this->animationManager.update(deltaTime);
 
-    void AttackBody::update(float deltaTime)
+    this->attackDuration -= deltaTime;
+
+    if (this->attackDuration <= 0.f)
     {
-        this->move(deltaTime);
-        attack_duration -= deltaTime;
+        this->setActive(false);
+        return;
     }
 
-    void AttackBody::render(SDL_Renderer* renderer)
-    {
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    this->move(deltaTime);
+}
 
-        SDL_Rect intRect = this->getIntRect();
-        SDL_RenderFillRect(renderer, &intRect);
-    }
-
-    bool AttackBody::isExpired() const
-    {
-        return attack_duration <= 0.0f;
-    }
-
-    float AttackBody::getAttackDamage() const { return attack_damage; }
-    float AttackBody::getAttackRange() const { return attack_range; }
-    float AttackBody::getAttackDuration() const { return attack_duration; }
-    float AttackBody::getLifeSteal() const { return life_steal; }
-    float AttackBody::getCriticalChance() const { return critical_chance; }
-    float AttackBody::getCriticalDamage() const { return critical_damage; }
+void AttackBody::loadAnimations()
+{
+    if (!this->is_animated) return;
+    Manager::AnimationLoader::loadNamedAnimations(this->texture, {
+        {"swing", 0, 30, false}
+    }, this->animationManager, 0.015f);
+    this->animationManager.setAnimation("swing");
+}
 }

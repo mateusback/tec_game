@@ -3,33 +3,39 @@
 
 #include "CharacterBody.h"
 #include "PlayerBody.h"
+#include "../enemies/Enemy.h"
+#include "../managers/EntityManager.h"
 
-namespace Entities
-{
+namespace Entities {
+
     class EnemyBody : public CharacterBody {
-    protected:
-        PlayerBody* target;
-        float aggro_range;
+    private:
+        Enemies::Enemy enemyData;
+        PlayerBody* target = nullptr;
+        float agrroRange = 0.f;
+        Manager::EntityManager& entityManager;
 
     public:
-        EnemyBody(float x = 0, float y = 0, float w = 50, float h = 50, bool collision = false, bool visible = true)
-            : CharacterBody(x, y, w, h, collision, visible), target(nullptr), aggro_range(100) {}
+        EnemyBody(Vector4f collider, const Enemies::Enemy& data, Manager::EntityManager& entityManager);
 
-        void setTarget(PlayerBody* target) {
-            this->target = target;
+        std::unique_ptr<AttackBody> attack(Pointf origin, Vector2f direction);
+
+        void setTarget(PlayerBody* player) { this->target = player; }
+        PlayerBody* getTarget() const { return this->target; }
+
+        void update(float deltaTime) override {
+            applyEnemyBehavior(deltaTime);
+            Body::update(deltaTime);
         }
 
-        PlayerBody* getTarget() const {
-            return target;
-        }
-
-        void setAggroRange(float range) {
-            this->aggro_range = range;
-        }
-
-        float getAggroRange() const {
-            return this->aggro_range;
-        }
+        void applyEnemyBehavior(float deltaTime);
+        void loadAnimations() override;
+        void onCollision(Body* other) override;
+        void setAnimationByState();
+        const Enemies::Enemy& getEnemyData() const { return enemyData; }
+        void setEnemyData(const Enemies::Enemy& data) { this->enemyData = data; }
+        float getAggroRange() const { return this->agrroRange; }
+        void setAggroRange(float range) { this->agrroRange = range; }
     };
 }
 

@@ -1,73 +1,94 @@
 #include "../../include/core/Game.h"
 #include "../../include/core/GameLoop.h"
-#include "../../include/core/SceneManager.h"
+#include "../../include/managers/SceneManager.h"
 #include "../../include/scenes/GameplayScene.h"
-#include "../../include/core/TextRenderer.h"
+#include "../../include/scenes/MenuScene.h"
+#include "../../include/renders/TextRenderer.h"
+#include "../../include/renders/VirtualRendererGlobal.h"
+#include "../../include/managers/TextureManagerGlobal.h"
+#include "../../include/managers/AudioManagerGlobal.h"
+#include "../../include/managers/ScoreManagerGlobal.h"
+#include "../../include/managers/FontManager.h"
 
 #include <iostream>
 
 namespace Core
 {
-
-    Game::Game() : window(nullptr), renderer(nullptr), loop(nullptr) {}
-
-    Game::~Game() 
+    Game::Game(const char* title, int width, int height) : window(nullptr),
+                                                            renderer(nullptr), loop(nullptr),
+                                                            screenWidth(width), screenHeight(height)
     {
-        shutdown();
-    }
-
-    bool Game::init(const char* title, int width, int height) 
-    {
-        if (SDL_Init(SDL_INIT_VIDEO) < 0) 
-        {
+        #pragma region SDL_Init
+        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
             std::cerr << "Erro ao inicializar SDL: " << SDL_GetError() << std::endl;
-            return false;
+            return;
         }
 
-        if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) 
-        {
+        if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
             std::cerr << "Erro ao iniciar SDL_image: " << IMG_GetError() << std::endl;
-            return false;
+            return;
         }
 
         if (TTF_Init() < 0) {
             std::cerr << "Erro SDL_ttf: " << TTF_GetError() << std::endl;
-            return 1;
-        }    
+            return;
+        }
 
-        window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                width, height, SDL_WINDOW_SHOWN);
-        if (!window) 
-        {
+        if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+            std::cout << "Erro SDL_Init: " << SDL_GetError() << "\n";
+            return;
+        }
+
+        this->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                                        this->screenWidth, this->screenHeight, SDL_WINDOW_SHOWN);
+        if (!this->window) {
             std::cerr << "Erro ao criar janela: " << SDL_GetError() << std::endl;
-            return false;
+            return;
         }
 
-        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-        if (!renderer) 
-        {
+        this->renderer = SDL_CreateRenderer(this->window, -1, SDL_RENDERER_ACCELERATED);
+        if (!this->renderer) {
             std::cerr << "Erro ao criar renderer: " << SDL_GetError() << std::endl;
-            return false;
+            return;
+        }
+        #pragma endregion
+
+        Renderer::VirtualRendererGlobal::init(width, height, 1, 1);
+        Manager::TextureManagerGlobal::init();
+        Manager::AudioManagerGlobal::init();
+        Manager::ScoreManagerGlobal::init();
+
+        Manager::FontManager::load("menu", "assets/fonts/Roboto-Regular.ttf", 26);
+        textures()->Load(renderer, "logo", "assets/images/logo.png");
+
+        Manager::SceneManager::setScene(new MenuScene(renderer, width, height));
+
+        this->loop = new GameLoop(renderer);
+    }
+
+    void Game::run()
+    {
+        if (!this->loop) 
+        {
+            std::cerr << "Game loop not initialized." << std::endl;
+            return;
         }
 
-        SceneManager::setScene(new GameplayScene(renderer));
-
-        loop = new GameLoop(renderer);
-        return true;
+        this->loop->run();
     }
-
-    void Game::run() 
+    
+    Game::~Game() 
     {
-        if (loop) loop->run();
-    }
-
-    void Game::shutdown() 
-    {
-        delete loop;
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
+        Renderer::VirtualRendererGlobal::destroy();
+        Manager::TextureManagerGlobal::destroy();
+        Manager::AudioManagerGlobal::destroy();
+        Manager::ScoreManagerGlobal::destroy();
+        delete this->loop;
+        SDL_DestroyRenderer(this->renderer);
+        SDL_DestroyWindow(this->window);
         TTF_Quit();
         IMG_Quit();
         SDL_Quit();
     }
+
 }

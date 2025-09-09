@@ -9,27 +9,60 @@ namespace Entities
     class AttackBody : public MovingBody 
     {
     protected:
-        float attack_damage;
-        float attack_range;
-        float attack_duration;
-        float life_steal;
-        float critical_chance;
-        float critical_damage;
+		Entity* origin = nullptr;
+        float attackDamage;
+        float attackRange;
+        float attackDuration;
+        float lifeSteal;
+        float criticalChance;
+        float criticalDamage;
 
     public:
-        AttackBody(float x = 0, float y = 0, float w = 0, float h = 0, bool collision = false, bool visible = true, 
-                   float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0);
+		#pragma region Constructors
+		AttackBody(float x, float y, float w, float h, bool collision = false, bool visible = true, 
+				float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
+			: AttackBody(Vector4f(x, y, w, h), collision, visible, dmg, range, duration, lifesteal, crit_chance, crit_dmg) {}
+
+		AttackBody(Vector2f position, Vector2f scale, bool collision = false, bool visible = true, 
+				float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
+			: AttackBody(Vector4f(position.x, position.y, scale.x, scale.y), collision, visible, dmg, range, duration, lifesteal, crit_chance, crit_dmg) {}
+
+		AttackBody(Vector4f collider, bool collision = false, bool visible = true, 
+				float dmg = 0, float range = 0, float duration = 0, float lifesteal = 0, float crit_chance = 0, float crit_dmg = 0)
+			: MovingBody(collider, collision, visible, 0.0f),
+			attackDamage(dmg),
+			attackRange(range),
+			attackDuration(duration),
+			lifeSteal(lifesteal),
+			criticalChance(crit_chance),
+			criticalDamage(crit_dmg) 
+		{
+			this->loadAnimations();
+		}
+		#pragma endregion
 
         void update(float deltaTime);
-        void render(SDL_Renderer* renderer);
-        bool isExpired() const;
+		void loadAnimations() override;
+		
+		#pragma region Getters
+		float getAttackDamage() { return this->attackDamage; }
+		float getAttackRange() { return this->attackRange; }
+		float getAttackDuration() { return this->attackDuration; }
+		float getLifeSteal() { return this->lifeSteal; }
+		float getCriticalChance() { return this->criticalChance; }
+		float getCriticalDamage() { return this->criticalDamage; }
+		Entity* getOrigin() { return this->origin; }
+		#pragma endregion
 
-        float getAttackDamage() const;
-        float getAttackRange() const;
-        float getAttackDuration() const;
-        float getLifeSteal() const;
-        float getCriticalChance() const;
-        float getCriticalDamage() const;
+		#pragma region Setters
+		void setAttackDamage(float attackDamage) { this->attackDamage = attackDamage; }
+		void setAttackRange(float attackRange) { this->attackRange = attackRange; }
+		void setAttackDuration(float attackDuration) { this->attackDuration = attackDuration; }
+		void setLifeSteal(float lifeSteal) { this->lifeSteal = lifeSteal; }
+		void setCriticalChance(float criticalChance) { this->criticalChance = criticalChance; }
+		void setCriticalDamage(float criticalDamage) { this->criticalDamage = criticalDamage; }
+		void setOrigin(Entity* origin) { this->origin = origin; }
+		#pragma endregion
     };
 }
 

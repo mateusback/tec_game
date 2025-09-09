@@ -3,7 +3,7 @@
 #include <iostream>
 
 int main(int argc, char* argv[]) {
-    Core::Game game("TEC_GAME", 1280, 720);
+    Core::Game game("TEC_GAME", 1500, 830);
     game.run();
     return 0;
 }

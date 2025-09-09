@@ -4,23 +4,28 @@
 #include "../../include/entities/TileBody.h"
 #include "../../include/entities/ItemBody.h"
 #include "../../include/entities/EnemyBody.h"
+#include "../../include/entities/EffectBody.h"
+#include "../../include/entities/BossBody.h"
 #include "../../include/generators/ProceduralFloorGenerator.h"
 
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
 
+
 namespace Manager {
     RoomManager::RoomManager(SDL_Renderer* renderer,
         EntityManager* entityManager,
         TileSet* tileSet,
         ItemManager* itemManager,
-        EnemyManager* enemyManager)
+        EnemyManager* enemyManager,
+        BossManager* bossManager)
         : renderer(renderer),
           entityManager(entityManager),
           tileSet(tileSet),
           itemManager(itemManager),
-          enemyManager(enemyManager) {}
+          enemyManager(enemyManager),
+          bossManager(bossManager){}
 
 void RoomManager::connectFloorRooms() {
     for (auto& room : this->floor.rooms) {
@@ -79,6 +84,17 @@ void RoomManager::loadRequiredAssets(SDL_Renderer* renderer) {
                     }
                     break;
                 }
+                case Map::EEntityType::Boss: {
+                    const auto* boss = bossManager->getBossById(e.id);
+                    if (boss) {
+                        textures()->Load(renderer, boss->getSpritePath(), boss->getSpritePath());
+
+                        for (const auto& [_, path] : boss->getSpecialTexturesMap()) {
+                            textures()->Load(renderer, path, path);
+                        }
+                    }
+                    break;
+                }
                 default:
                     break;
             }
@@ -106,8 +122,15 @@ void RoomManager::loadRoom(Map::Room* room) {
         for (auto& t : state.tiles) {
             const Tile* tileData = this->tileSet->getTile(t.id);
             Vector4f screenVect = virtualRenderer()->mapToScreen(t.position);
+
             auto tile = std::make_unique<Entities::TileBody>(screenVect, textures()->Get("tileset"), tileData->solid);
-            tile->initStaticTile(textures()->Get("tileset"), tileData->index);
+
+            if (t.angle != 0.0 || t.flip != SDL_FLIP_NONE) {
+                tile->initFlippedStaticTile(textures()->Get("tileset"), tileData->index, t.angle, t.flip);
+            } else {
+                tile->initStaticTile(textures()->Get("tileset"), tileData->index);
+            }
+
             tile->setTileId(t.id);
             tile->setTileData(tileData);
             this->entityManager->add(std::move(tile));
@@ -137,7 +160,7 @@ void RoomManager::loadRoom(Map::Room* room) {
         return;
     }
     if (room->type == Map::ERoomType::Start){
-        Vector4f playerVect = virtualRenderer()->mapToScreen(4, 4, 1, 1);
+        Vector4f playerVect = virtualRenderer()->mapToScreen(4, 4, 1, 1.1f);
         this->player = new Entities::PlayerBody(playerVect, this->entityManager, true, true);
     }
     std::cout << "Carregando Tiles da sala: " << room->id << std::endl;
@@ -170,7 +193,7 @@ void RoomManager::loadTiles(Map::Room* room) {
                 tile->solid
             );
 
-            if (tileId == 7) {
+            if (tileId == 7 || tileId == 9) {
                 double angle = 0.0;
                 SDL_RendererFlip flip = SDL_FLIP_NONE;
 
@@ -192,9 +215,10 @@ void RoomManager::loadTiles(Map::Room* room) {
 }
 
 void RoomManager::loadEntities(Map::Room* room) {
-    bool hasEnemies = false;
 
     for (const auto& e : room->entities) {
+            std::cout << "Carregando entidade: " << e.id << " do tipo: " << Map::entityTypeToString(e.type) << std::endl;
+
         switch (e.type) {
             case Map::EEntityType::Item: {
                 if (!this->itemManager) break;
@@ -222,7 +246,24 @@ void RoomManager::loadEntities(Map::Room* room) {
                     enemy->setTexture(textures()->Get(enemyData->getSpritePath()));
                     enemy->setTarget(this->player);
                     this->entityManager->add(std::move(enemy));
-                    hasEnemies = true;
+                }
+                break;
+            }
+
+            case Map::EEntityType::Boss: {
+                if (!this->bossManager) break;
+                std::cout << "Carregando Boss: " << e.id << std::endl;
+                const Enemies::BossData* bossData = this->bossManager->getBossById(e.id);
+                if (bossData) {
+                    Vector4f screenVect = virtualRenderer()->mapToScreen(e.x, e.y, 3.0f, 3.0f); // 96x96
+
+                    auto boss = std::make_unique<Entities::BossBody>(
+                        screenVect, *bossData, *this->entityManager
+                    );
+                    boss->setTexture(textures()->Get(bossData->getSpritePath()));
+                    boss->setTarget(this->player);
+
+                    this->entityManager->add(std::move(boss));
                 }
                 break;
             }
@@ -231,14 +272,18 @@ void RoomManager::loadEntities(Map::Room* room) {
                 break;
         }
     }
-    room->doorsOpen = !hasEnemies;
+    room->doorsOpen = false;
 }
 
 void RoomManager::update(float deltaTime) {
     if (!this->currentRoom) return;
 
     if (this->areAllEnemiesDefeated()) {
-        this->openDoorsOfCurrentRoom();
+        if (!this->currentRoom->doorsOpen) {
+            std::cout << "Abrindo portas da sala: " << this->currentRoom->id << std::endl;
+            this->openDoorsOfCurrentRoom();
+            audio()->playSoundEffect("open-door", 0);
+        }
     }
 }
 
@@ -360,6 +405,8 @@ bool RoomManager::areAllEnemiesDefeated() const {
 
 void RoomManager::openDoorsOfCurrentRoom() {
     auto& layout = this->currentRoom->layout;
+    int rows = static_cast<int>(layout.size());
+    int cols = static_cast<int>(layout[0].size());
 
     std::vector<Vector2i> portasFechadas;
 
@@ -371,18 +418,47 @@ void RoomManager::openDoorsOfCurrentRoom() {
     }
 
     for (const auto& pos : portasFechadas) {
-        layout[pos.y][pos.x] = 0;
+        layout[pos.y][pos.x] = 11;
 
-        const Tile* tileData = this->tileSet->getTile(0);
+        const Tile* tileData = this->tileSet->getTile(11);
         if (!tileData) continue;
 
         Vector4f screenPos = virtualRenderer()->mapToScreen(pos);
         auto tile = std::make_unique<Entities::TileBody>(screenPos, textures()->Get("tileset"), tileData->solid);
-        tile->initStaticTile(textures()->Get("tileset"), tileData->index);
-        tile->setTileId(0);
+
+        double angle = 0.0;
+        SDL_RendererFlip flip = SDL_FLIP_NONE;
+
+        if (pos.y == 0) {
+            angle = 0.0;
+        } else if (pos.y == rows - 1) {
+            angle = 0.0;
+            flip = SDL_FLIP_VERTICAL;
+        } else if (pos.x == 0) {
+            angle = 270.0;
+        } else if (pos.x == cols - 1) {
+            angle = 90.0;
+        }
+
+        tile->initFlippedStaticTile(textures()->Get("tileset"), tileData->index, angle, flip);
+        tile->setTileId(11);
         tile->setTileData(tileData);
 
+        Vector2f position{screenPos.x, screenPos.y};
+        
+
         this->entityManager->add(std::move(tile));
+        auto effect = std::make_unique<Entities::EffectBody>(
+            position,
+            Vector2f{virtualRenderer()->getTileSize(), virtualRenderer()->getTileSize()},
+            textures()->Get("door_open_anim"),
+            0.5f
+        );
+        effect->setAnimationInfo({ "open", 0, 5 });
+        effect->setAngle(angle);
+        effect->setFlip(flip);
+        effect->loadAnimations();
+        this->entityManager->add(std::move(effect));
     }
 
     this->currentRoom->doorsOpen = true;
@@ -402,7 +478,9 @@ void RoomManager::saveCurrentRoomState() {
         state.tiles.push_back({
             tile->getTileId(),
             virtualRenderer()->screenToTilePosition(tile->getPosition()),
-            tile->getTileData()->solid
+            tile->getTileData()->solid,
+            tile->getAngle(),
+            tile->getFlip()
         });
     }
 
@@ -441,7 +519,7 @@ void RoomManager::generateFloor(int index, int seed) {
     std::vector<json> templates = data.at("rooms").get<std::vector<json>>();
 
     Generator::ProceduralFloorGenerator generator;
-    this->floor = generator.generate(index, seed, templates);
+    this->floor = generator.generate(index, seed, templates, this->itemManager);
 
     std::cout << "Andar " << index << " gerado com sucesso!" << std::endl;
 }

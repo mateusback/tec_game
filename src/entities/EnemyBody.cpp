@@ -5,7 +5,7 @@
 
 namespace Entities {
     EnemyBody::EnemyBody(Vector4f collider, const Enemies::Enemy& data, Manager::EntityManager& entityManager)
-    : CharacterBody(collider.x, collider.y, collider.z, collider.w, true, true, 0.f),
+    : CharacterBody(collider, true, true, 0.f),
       enemyData(data),
       entityManager(entityManager) {
         this->setAggroRange(virtualRenderer()->normalizeValue(data.getAggroRange()));
@@ -24,7 +24,7 @@ namespace Entities {
     void EnemyBody::applyEnemyBehavior(float deltaTime) {
         const EEnemyBehavior behavior = this->getEnemyData().getBehavior();
         auto* player = this->getTarget();
-        if (!player) [[unlikely]] return;
+        //if (!player) [[unlikely]] return;
     
         auto toPlayer = player->getPosition() - this->getPosition();
         float distance = toPlayer.length();
@@ -108,6 +108,34 @@ namespace Entities {
                     }
                     break;
         
+                default:
+                    break;
+            }
+        } else if (behavior == EEnemyBehavior::Chaser) {
+            switch (this->state) {
+                case EntityState::Idle:
+                    if (distance < this->getAggroRange()) {
+                        this->state = EntityState::Attacking;
+                    }
+                    break;
+
+                case EntityState::Attacking:
+                    toPlayer.normalize();
+                    this->setSpeed(toPlayer * virtualRenderer()->normalizeValue(2));
+                    if (distance < this->getAttackRange()) {
+                        this->state = EntityState::CoolingDown;
+                        this->stateTimer = this->getAttackRate();
+                    }
+                    break;
+
+                case EntityState::CoolingDown:
+                    this->stateTimer -= deltaTime;
+                    if (this->stateTimer <= 0.f) {
+                        this->state = EntityState::Idle;
+                        this->setSpeed({0.f, 0.f});
+                    }
+                    break;
+
                 default:
                     break;
             }
@@ -207,6 +235,18 @@ namespace Entities {
                 {"attack", 0, 1},
                 {"idle",   0, 2},
             }, this->animationManager);
+
+            this->animationManager.setAnimation("idle");
+        }
+        if (this->enemyData.getBehavior() == EEnemyBehavior::Chaser) {
+            SDL_Texture* texture = Manager::TextureManager::Get(this->enemyData.getSpritePath());
+
+            Manager::AnimationLoader::loadNamedAnimations(texture,{
+            {"idle", 0, 2},
+            {"attack", 0, 2},
+            {"cooldown", 0, 2
+            }},
+            this->animationManager);
 
             this->animationManager.setAnimation("idle");
         }

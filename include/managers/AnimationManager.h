@@ -10,6 +10,7 @@ namespace Manager {
     private:
         Mylib::unordered_map_string_key<Renderer::Animation> animations;
         Renderer::Animation* currentAnimation = nullptr;
+        std::string currentAnimationName;
 
     public:
     void addAnimation(const std::string& name, const Renderer::Animation& animation) {
@@ -21,12 +22,15 @@ namespace Manager {
             std::cout << "[AnimationManager] Animação não encontrada: " << name << std::endl;
             return;
         }
-    
-        if (force || currentAnimation != &animations[name]) {
-            currentAnimation = &animations[name];
-            currentAnimation->reset();
-            currentAnimation->onComplete = onComplete;
+
+        if (!force && currentAnimation == &animations[name]) {
+            return;
         }
+
+        this->currentAnimationName = name;
+        this->currentAnimation = &animations[name];
+        this->currentAnimation->reset();
+        this->currentAnimation->onComplete = onComplete;
     }
     
     void update(float deltaTime) {
@@ -64,6 +68,10 @@ namespace Manager {
     
      SDL_Texture* getTexture() const{
         return currentAnimation->getFrame(0).getTexture();
+    }
+
+    std::string getCurrentAnimationName() const {
+        return currentAnimationName;
     }
     
     };

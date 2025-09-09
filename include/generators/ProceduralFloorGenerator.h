@@ -12,9 +12,10 @@
 #include "../map/Room.h"
 #include "../map/Floor.h"
 #include "../utils/Types.h"
+#include "../managers/ItemManager.h"
 
 using json = nlohmann::json;
-using Position = std::pair<int, int>;
+using Utils::Position;
 
 namespace Generator {
 
@@ -25,6 +26,7 @@ namespace Generator {
         std::mt19937 rng;
         std::unordered_map<Position, Map::Room> layout;
         std::unordered_set<int> usedRoomIds;
+        const Manager::ItemManager* itemManager;
 
         void reset(int floorIndex, int seed);
         Map::Room chooseRoomByType(const std::vector<json>& rooms, Map::ERoomType type);
@@ -36,7 +38,7 @@ namespace Generator {
 
     public:
         ProceduralFloorGenerator() = default;
-        Map::Floor generate(int floorIndex, int seed, const std::vector<json>& roomTemplates);
+        Map::Floor generate(int floorIndex, int seed, const std::vector<json>& roomTemplates, const Manager::ItemManager* itemManager);
     };
 
 }

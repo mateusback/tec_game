@@ -17,7 +17,7 @@ private:
     std::string title;
     std::string subtitle;
     float displayTime = 0.0f;
-    const float duration = 2.5f;
+    const float duration = 4.0f;
 
     TTF_Font* font = nullptr;
 };

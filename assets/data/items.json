@@ -1,29 +1,56 @@
 [
-    {
-      "id": 1,
-      "pool": "Room",
-      "name": "Espada do Destino",
-      "description": "A última espada sagrada, capaz de derrotar qualquer inimigo.",
-      "quality": 5,
-      "type": "Weapon",
-      "sprite": "assets/animations/item.png",
-      "weapon": "sword",
-      "effects": [
-        { "target": "AttackDamage", "value": 40.0 },
-        { "target": "AttackSpeed", "value": -0.5 }
-      ]
-    },
-    {
-        "id": 2,
-        "pool": "Chest",
-        "name": "Poção da Fúria",
-        "description": "Aumenta o ataque por 10 segundos.",
-        "quality": 3,
-        "type": "Active",
-        "sprite": "assets/pocao_furia.png",
-        "effects": [
-        { "target": "AttackDamage", "value": 8.0 }
-        ]
-    }
+
+  {
+    "id": 1,
+    "pool": "Room",
+    "name": "Espada do Podre",
+    "description": "A última espada sagrada, capaz de derrotar qualquer inimigo.",
+    "quality": 5,
+    "type": "Weapon",
+    "sprite": "assets/animations/item.png",
+    "weapon": "sword",
+    "effects": [
+      { "target": "AttackDamage", "value": 40.0 },
+      { "target": "AttackSpeed", "value": -0.5 }
+    ]
+  },
+  {
+    "id": 2,
+    "pool": "Room",
+    "name": "Cogumelo Vermelho",
+    "description": "Um cogumelo vindo de outro reino, capaz de fazer você crescer.",
+    "quality": 1,
+    "type": "Passive",
+    "sprite": "assets/red_mushroom.png",
+    "effects": [
+      { "target": "PlayerSize", "value": 1.5 },
+      { "target": "PlayerSpeed", "value": 1.5 }
+    ]
+  },
+  {
+    "id": 3,
+    "pool": "Boss",
+    "name": "Power Within",
+    "description": "The furtive power within, so easily forgotten.",
+    "quality": 2,
+    "type": "Passive",
+    "sprite": "assets/power_within.png",
+    "effects": [
+      { "target": "AttackDamage", "value": 10.0 },
+      { "target": "AttackSpeed", "value": 2.0 }
+    ]
+  },
+  {
+    "id": 4,
+    "pool": "Room",
+    "name": "Cabeça da Gorgona",
+    "description": "Parte de uma criatura de uma lenda antiga.",
+    "quality": 3,
+    "type": "Active",
+    "sprite": "assets/gorgon_head.png",
+    "effects": [
+      { "target": "Health", "value": 20.0 }
+    ]
+  }
 ]
   

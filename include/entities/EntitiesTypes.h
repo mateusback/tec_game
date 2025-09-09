@@ -9,12 +9,14 @@ namespace Entities {
         Hidden,
         CoolingDown,
         Dead,
+        Dying,
         Jumping
     };
 
     enum class EEnemyBehavior {
         Shell,
-        Jumper
+        Jumper,
+        Chaser,
     };
     
 }

@@ -21,7 +21,9 @@ namespace Items {
 		FireRate,
 		Defense,
 		Health,
-		MaxHealth
+		MaxHealth,
+		PlayerSize,
+		PlayerSpeed
 	};
 
 
@@ -48,6 +50,8 @@ namespace Items {
 			{"Defense", EEffectTarget::Defense},
 			{"Health", EEffectTarget::Health},
 			{"MaxHealth", EEffectTarget::MaxHealth},
+			{"PlayerSize", EEffectTarget::PlayerSize},
+			{"PlayerSpeed", EEffectTarget::PlayerSpeed}
 		};
 	
 		auto it = map.find(str);

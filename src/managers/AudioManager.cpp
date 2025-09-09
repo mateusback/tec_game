@@ -32,6 +32,11 @@ namespace Manager {
         return true;
     }
 
+    bool AudioManager::loadMusicIfNotLoaded(const std::string_view id, const std::string& filePath) {
+        if (musics.contains(std::string(id))) return true;
+        return loadMusic(id, filePath);
+    }
+
     void AudioManager::playSoundEffect(const std::string_view id, int loops) {
         auto it = soundEffects.find(std::string(id));
         if (it != soundEffects.end()) {
@@ -46,12 +51,29 @@ namespace Manager {
         }
     }
 
+    void AudioManager::playMusicIfNotPlaying(const std::string_view id, int loops) {
+        if (Mix_PlayingMusic()) return;
+
+        auto it = musics.find(std::string(id));
+        if (it != musics.end()) {
+            Mix_PlayMusic(it->second, loops);
+        }
+    }
+
     void AudioManager::stopMusic() {
         Mix_HaltMusic();
     }
 
     void AudioManager::stopAllSounds() {
         Mix_HaltChannel(-1);
+    }
+
+    void AudioManager::setMusicVolume(int volume) {
+        Mix_VolumeMusic(volume);
+    }
+
+    void AudioManager::setSoundEffectsVolume(int volume) {
+        Mix_Volume(-1, volume);
     }
 
     void AudioManager::clear() {

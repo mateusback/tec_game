@@ -24,18 +24,20 @@ namespace Manager {
         return true;
     }
     
-    const Item* ItemManager::getRandomItemFromPool(EItemPool pool) const {
+    const Item* ItemManager::getRandomItemFromPool(EItemPool pool, std::mt19937& rng) const {
         std::vector<const Item*> poolItems;
-    
+
         for (const auto& [_, item] : itemMap) {
             if (item.getPool() == pool) {
                 poolItems.push_back(&item);
             }
         }
-    
+
         if (poolItems.empty()) return nullptr;
-    
-        int index = rand() % poolItems.size();
+
+        std::uniform_int_distribution<int> dist(0, static_cast<int>(poolItems.size() - 1));
+        int index = dist(rng);
+
         return poolItems[index];
     }
     

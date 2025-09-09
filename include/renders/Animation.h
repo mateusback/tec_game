@@ -6,6 +6,14 @@
 #include <functional>
 
 namespace Renderer {
+
+    struct AnimationInformation {
+        std::string name;
+        int startFrame;
+        int endFrame;
+        float frameDuration = 0.15f;
+    };
+
     class Animation {
     private:
         std::vector<Sprite> frames;

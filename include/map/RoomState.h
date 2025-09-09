@@ -15,13 +15,17 @@ namespace Map {
 
     struct TileState : public BaseEntityState {
         bool solid;
+        double angle;
+        SDL_RendererFlip flip;
 
-        TileState(int id, Vector2i pos, bool solid)
+        TileState(int id, Vector2i pos, bool solid, double angle = 0.0, SDL_RendererFlip flip = SDL_FLIP_NONE)
         {
             this->id = id;
             this->position = pos;
             this->solid = solid;
             this->isActive = true;
+            this->angle = angle;
+            this->flip = flip;
         }
     };
 

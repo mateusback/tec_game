@@ -1,11 +1,15 @@
 #include "../../include/generators/ProceduralFloorGenerator.h"
 #include "../../include/map/MapTypes.h"
 #include "../../include/serializers/FloorSerialization.h"
+#include "../../include/items/ItemTypes.h"
+#include "../../include/utils/Types.h"
+#include "../../include/items/Item.h"
 
 #include <fstream>
 #include <queue>
 #include <algorithm>
 #include <nlohmann/json.hpp>
+
 
 namespace Generator {
 
@@ -117,22 +121,23 @@ namespace Generator {
                             break;
                     }
                 } else if (neighborRoom.type == Map::ERoomType::Secret) {
+                    const int fakeWallId = 9; // FakeWall
                     switch (dir) {
                         case EDirection::Up:
-                            room.layout[0][midCol] = 1;
-                            if (evenCols) room.layout[0][midCol - 1] = 1;
+                            room.layout[0][midCol] = fakeWallId;
+                            if (evenCols) room.layout[0][midCol - 1] = fakeWallId;
                             break;
                         case EDirection::Down:
-                            room.layout[rows - 1][midCol] = 1;
-                            if (evenCols) room.layout[rows - 1][midCol - 1] = 1;
+                            room.layout[rows - 1][midCol] = fakeWallId;
+                            if (evenCols) room.layout[rows - 1][midCol - 1] = fakeWallId;
                             break;
                         case EDirection::Left:
-                            room.layout[midRow][0] = 1;
-                            if (evenRows) room.layout[midRow - 1][0] = 1;
+                            room.layout[midRow][0] = fakeWallId;
+                            if (evenRows) room.layout[midRow - 1][0] = fakeWallId;
                             break;
                         case EDirection::Right:
-                            room.layout[midRow][cols - 1] = 1;
-                            if (evenRows) room.layout[midRow - 1][cols - 1] = 1;
+                            room.layout[midRow][cols - 1] = fakeWallId;
+                            if (evenRows) room.layout[midRow - 1][cols - 1] = fakeWallId;
                             break;
                     }
                 }
@@ -160,6 +165,34 @@ namespace Generator {
                 newRoom.x = target.first.first;
                 newRoom.y = target.first.second;
                 *target.second = newRoom;
+
+                if (type == Map::ERoomType::Item || type == Map::ERoomType::Secret) {
+                    int rows = static_cast<int>(newRoom.layout.size());
+                    int cols = static_cast<int>(newRoom.layout[0].size());
+                    int centerX = cols / 2;
+                    int centerY = rows / 2;
+
+
+                    const Items::Item* randomItem = this->itemManager->getRandomItemFromPool(
+                        type == Map::ERoomType::Item ? Items::EItemPool::Room : Items::EItemPool::Boss,
+                        this->rng
+                    );
+
+                    std::cout << "Atribuindo item " << (randomItem ? randomItem->getName() : "nenhum")
+                              << " na sala " << newRoom.id << " (" << centerX << ", " << centerY << ")\n";
+
+                    if (randomItem != nullptr) {
+                        json itemEntity;
+                        itemEntity["type"] = "Item";
+                        itemEntity["id"] = randomItem->getId();
+                        itemEntity["x"] = centerX;
+                        itemEntity["y"] = centerY;
+
+                        newRoom.entities.push_back(itemEntity);
+                    }
+                }
+
+                *target.second = newRoom;
             };
 
             replace(Map::ERoomType::Boss,   candidates[0]);
@@ -186,8 +219,9 @@ namespace Generator {
         return std::min(baseRooms + extraRooms, 20);
     }
 
-    Map::Floor ProceduralFloorGenerator::generate(int floorIndex, int seed, const std::vector<json>& roomTemplates) {
+    Map::Floor ProceduralFloorGenerator::generate(int floorIndex, int seed, const std::vector<json>& roomTemplates, const Manager::ItemManager* itemManager) {
         reset(floorIndex, seed);
+        this->itemManager = itemManager;
 
         Map::Room start = chooseRoomByType(roomTemplates, Map::ERoomType::Start);
         start.id = nextRoomId++;

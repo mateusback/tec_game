@@ -6,7 +6,7 @@ namespace Manager
 
     void SceneManager::setScene(Core::Scene* newScene) 
     {
-        delete currentScene;
+        //delete currentScene;
         currentScene = newScene;
     }
 

@@ -15,31 +15,22 @@ namespace Entities
 
     void PlayerBody::handleInput(const Manager::PlayerInput& input)
     {
+
+        if (this->state == EntityState::Dying || this->state == EntityState::Dead)
+            return;
+
         Vector2f playerDirection = input.moveDirection;
 
-        if (input.moveDirection.x != 0.f || input.moveDirection.y != 0.f) {
-    
-            if (state != EntityState::Attacking) {
-                this->animationManager.setAnimation("walk");
-                this->setState(EntityState::Moving);
-            }
-    
-        }
-        else {
-            if (state == EntityState::Moving) {
-                this->animationManager.setAnimation("idle");
-                this->setState(EntityState::Idle);
-            }
-        }
+        this->updateAnimationByInput(playerDirection);
 
         if (input.shootDirection.x != 0.f || input.shootDirection.y != 0.f) {
             this->attack(input.shootDirection);
         }
 
-        if(input.putBomb) {
+        if (input.putBomb) {
             this->tryPlaceBomb();
         }
-        
+
         playerDirection *= this->getAcceleration();
         this->setSpeed(playerDirection);
     }
@@ -48,6 +39,10 @@ namespace Entities
     {
         this->animationManager.update(deltaTime);
         if(this->active == false) return;
+        if (this->state == EntityState::Dead) return;
+        if (this->state == EntityState::Dying) return;
+
+
         this->move(deltaTime);
 
         if (this->attackTimer > 0.0f)
@@ -59,12 +54,13 @@ namespace Entities
                 this->invencible = false;
             }
         }
-
-        if (this->health <= 0.0f) {
+        if (this->health <= 0.0f && this->state != EntityState::Dying) {
+            this->state = EntityState::Dying;
+            this->setSpeed({0.f, 0.f});
             this->animationManager.setAnimation("death", [this]() {
                 this->state = EntityState::Dead;
-                this->setActive(false);
             });
+            return;
         }
 
         if (this->bombCooldown > 0.0f) {
@@ -77,6 +73,7 @@ namespace Entities
         this->setState(EntityState::Attacking);
         this->animationManager.setAnimation("attack", [this]() {
             this->setState(EntityState::Idle);
+            this->animationManager.setAnimation("idle");
         });
         this->weaponHandler.attack(direction);
     }
@@ -88,7 +85,7 @@ namespace Entities
 
     void PlayerBody::takeDamage(float damage) {
         if (this->invencible) return;
-        this->health -= damage; //TODO - USAR DEFESA
+        this->health -= damage;
         this->invencible = true;
         this->invencibleTimer = 1.0f;
         audio()->playSoundEffect("hit-player", 0);
@@ -111,6 +108,7 @@ namespace Entities
             this->setWeapon(newWeapon, this->weaponHandler.getWeapon()->getEntityManager());
             return;
         }
+        //Todo - Colocar em um item manager, e verificar se dá pra fazer de uma forma melhor, tipo com um unordered_map
         for (const auto& effect : item->getItem().getEffects()) {
             switch (effect.target) {
 				using enum Items::EEffectTarget;
@@ -138,6 +136,12 @@ namespace Entities
                 case MaxHealth:
                     this->setMaxHealth(this->getMaxHealth() + effect.value);
                     break;
+                case PlayerSize:
+                    this->setScale(this->getScale() + Vector2f(effect.value, effect.value));
+                    break;
+                case PlayerSpeed:
+                    this->setAcceleration(this->getAcceleration() + effect.value);
+                    break;
             }
         }
         Manager::TextureManager::Clear("player");
@@ -149,11 +153,21 @@ namespace Entities
         this->is_animated = true;
 
         Manager::AnimationLoader::loadNamedAnimations(texture, {
-            {"idle",   4, 5},
-            {"walk",   3, 7},
-            {"attack", 8, 7, false},
-            {"death",  7, 7, false}
-        }, this->animationManager);
+            {"walk",   5, 4},
+            {"attack", 0, 5, false},
+            {"death",  4, 5, false},
+            {"walk-r", 1, 5, true},
+        }, this->animationManager, 0.15f, 32, 34);
+
+        Manager::AnimationLoader::loadNamedAnimations(texture, {
+            {"transition-l", 2, 5, false},
+            {"transition-r", 3, 5, false}
+        }, this->animationManager, 0.05f, 32, 34);
+
+        auto tex = textures()->Get("pf");
+        Manager::AnimationLoader::loadNamedAnimations(tex, {
+            {"idle",   0, 30},
+        }, this->animationManager, 0.03f, 32, 64);
 
         this->animationManager.setFrameTime("attack", 0.05f);
     
@@ -176,5 +190,65 @@ namespace Entities
             this->setBombCooldown(5.0f);
         }
     }
+
+void PlayerBody::updateAnimationByInput(const Vector2f& moveDirection) {
+    if (this->state == EntityState::Attacking)
+        return;
+
+    // evita sobrescrever transição
+    std::string currAnim = this->animationManager.getCurrentAnimationName();
+    if (currAnim == "transition-r" || currAnim == "transition-l")
+        return;
+
+    bool moved = false;
+
+    if (moveDirection.x > 0.f) {
+        this->currentDirection = EDirection::Right;
+        moved = true;
+
+        if (lastDirectionHorizontal != EDirection::Right) {
+            lastDirectionHorizontal = EDirection::Right;
+            this->animationManager.setAnimation("transition-r", [this]() {
+                if (this->state != EntityState::Attacking) {
+                    this->animationManager.setAnimation("walk-r");
+                    this->setState(EntityState::Moving);
+                }
+            });
+        } else if (currAnim != "walk-r") {
+            this->animationManager.setAnimation("walk-r");
+            this->setState(EntityState::Moving);
+        }
+    }
+    else if (moveDirection.x < 0.f) {
+        this->currentDirection = EDirection::Left;
+        moved = true;
+
+        if (lastDirectionHorizontal != EDirection::Left) {
+            lastDirectionHorizontal = EDirection::Left;
+            this->animationManager.setAnimation("transition-l", [this]() {
+                if (this->state != EntityState::Attacking) {
+                    this->animationManager.setAnimation("walk");
+                    this->setState(EntityState::Moving);
+                }
+            });
+        } else if (currAnim != "walk") {
+            this->animationManager.setAnimation("walk");
+            this->setState(EntityState::Moving);
+        }
+    }
+    else if (moveDirection.y != 0.f) {
+        moved = true;
+        if (currAnim != "walk") {
+            this->animationManager.setAnimation("walk");
+        }
+        this->setState(EntityState::Moving);
+    }
+
+    if (!moved && this->state == EntityState::Moving) {
+        this->animationManager.setAnimation("idle");
+        this->setState(EntityState::Idle);
+    }
+}
+
 
 }

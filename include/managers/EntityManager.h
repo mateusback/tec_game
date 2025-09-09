@@ -44,6 +44,19 @@ namespace Manager {
 			return filtered;
 		}
 
+		template<typename T>
+		std::vector<const T*> getEntitiesByType() const {
+			std::vector<const T*> filtered;
+
+			for (const auto& e : entities) {
+				if (const auto* casted = dynamic_cast<const T*>(e.get())) {
+					filtered.push_back(casted);
+				}
+			}
+
+			return filtered;
+		}
+
 		template <typename T>
 		void deactivateEntitiesOfType() {
 			for (const auto& entity : this->entities) {

@@ -5,6 +5,7 @@
 #include <vector>
 #include <my-lib/utils.h>
 #include <string>
+#include <random>
 
 using namespace Items;
 
@@ -22,7 +23,7 @@ namespace Manager {
 		}
 
 		const Item* getItemById(int id) const;
-		const Item* getRandomItemFromPool(EItemPool pool) const;
+		const Item* getRandomItemFromPool(EItemPool pool, std::mt19937& rng) const;
 
 		#pragma region Getters
 		const Mylib::unordered_map_string_key<Item>& getAllItems() const { return itemMap; }

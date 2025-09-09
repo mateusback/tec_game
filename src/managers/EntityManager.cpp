@@ -1,5 +1,6 @@
 #include "../include/managers/EntityManager.h"
 #include "../include/entities/EnemyBody.h"
+#include "../include/entities/BossBody.h"
 
 namespace Manager
 {
@@ -44,11 +45,18 @@ namespace Manager
     }
 
     bool EntityManager::hasAnyAliveEnemy() const {
-        for (const auto& e : this->entities) {
-            if (auto* enemy = dynamic_cast<Entities::EnemyBody*>(e.get())) {
-                if (!enemy->isDead()) return true;
-            }
+        auto enemies = this->getEntitiesByType<Entities::EnemyBody>();
+        auto bosses  = this->getEntitiesByType<Entities::BossBody>();
+        if (enemies.empty() && bosses.empty()) return false;
+
+        for (auto* e : enemies) {
+            if (!e->isDead()) return true;
         }
+
+        for (auto* b : bosses) {
+            if (!b->isDead()) return true;
+        }
+
         return false;
     }
 }

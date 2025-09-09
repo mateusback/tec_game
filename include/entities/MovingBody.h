@@ -12,14 +12,13 @@ namespace Entities
 	
 	public:
 		#pragma region Constructors
-		MovingBody(float x = 0, float y = 0, float w = 0, float h = 0, bool collision = false, bool visible = true, float acceleration = 100.0f)
-			: Body(x, y, w, h, collision, visible), speed(0.0f, 0.0f) {}
-		
-		MovingBody(Vector2f pos, Vector2f scl, bool collision = false, bool visible = true, float acceleration = 100.0f)
-			: Body(pos.x, pos.y, scl.x, scl.y, collision, visible), speed(0.0f, 0.0f) {}
+		MovingBody(Vector2f pos, Vector2f scl, bool collision = false, bool visible = true, float acceleration = GameConstants::Moving::DEFAULT_ACCELERATION)
+			: MovingBody(Vector4f(pos.x, pos.y, scl.x, scl.y), collision, visible, acceleration) {}
 
-		MovingBody(Vector4f collider, bool collision = false, bool visible = true, float acceleration = 100.0f)
-			: Body(collider.x, collider.y, collider.z, collider.w, collision, visible), speed(0.0f, 0.0f) {}
+		MovingBody(Vector4f collider, bool collision = false, bool visible = true, float acceleration = GameConstants::Moving::DEFAULT_ACCELERATION)
+			: Body(collider, collision, visible),
+			speed(0.0f, 0.0f),
+			acceleration(acceleration) {}
 		#pragma endregion
 
 		void move(float deltaTime) {

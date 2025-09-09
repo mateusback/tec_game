@@ -48,5 +48,6 @@ const Enemies::Enemy* EnemyManager::getEnemyById(int id) const {
 Entities::EEnemyBehavior EnemyManager::stringToEnemyBehavior(const std::string& str) {
     if (str == "shell") return Entities::EEnemyBehavior::Shell;
     if (str == "jumper") return Entities::EEnemyBehavior::Jumper;
+    if (str == "chaser") return Entities::EEnemyBehavior::Chaser;
     throw std::invalid_argument("Invalid enemy behavior string");
 }

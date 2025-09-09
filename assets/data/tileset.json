@@ -27,6 +27,12 @@
     "22": { "name": "Hole-Top", "index": 22, "solid": true },
     "23": { "name": "Hole-Dark", "index": 23, "solid": true },
     "25": { "name": "Hole-Bottom-Left", "index": 25, "solid": true },
-    "26": { "name": "Hole-Bottom-Right", "index": 26, "solid": true }
+    "26": { "name": "Hole-Bottom-Right", "index": 26, "solid": true },
+    "27": { "name": "WASD-Tutorial", "index": 27, "solid": false },
+    "28": { "name": "Arrow-Tutorial", "index": 28, "solid": false },
+    "29": { "name": "E-Tutorial", "index": 29, "solid": false },
+    "30": { "name": "Walk-Tutorial", "index": 30, "solid": false },
+    "31": { "name": "Shoot-Tutorial", "index": 31, "solid": false },
+    "32": { "name": "Bomb-Tutorial", "index": 32, "solid": false }
   }
 }

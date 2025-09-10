@@ -12,6 +12,30 @@
 
 
 namespace Generator {
+    const std::vector<int> floorVariants = {0, 36, 37, 38, 39};
+    const std::vector<int> rockVariants = {1, 40, 41, 42, 43, 44, 45, 46};
+
+    void applyTileVariants(Map::Room& room, std::mt19937& rng) {
+        for (auto& row : room.layout) {
+            for (auto& tile : row) {
+                if (tile == 0 && floorVariants.size() > 1) {
+                    if ((rng() % 100) < 7) {
+                        tile = floorVariants[1 + (rng() % (floorVariants.size() - 1))];
+                    } else {
+                        tile = floorVariants[0];
+                    }
+                }
+
+                else if (tile == 1 && rockVariants.size() > 1) {
+                    if ((rng() % 100) < 20) {
+                        tile = rockVariants[1 + (rng() % (rockVariants.size() - 1))];
+                    } else {
+                        tile = rockVariants[0]; 
+                    }
+                }
+            }
+        }
+    }
 
     using json = nlohmann::json;
 
@@ -231,6 +255,11 @@ namespace Generator {
 
         std::size_t targetRooms = calculateTargetRoomCount(floorIndex);
         expandRooms(roomTemplates, targetRooms);
+
+        for (auto& [_, room] : this->layout) {
+            applyTileVariants(room, this->rng);
+        }
+
         assignSpecialRooms(roomTemplates);
         connectRooms();
         return buildFloor();

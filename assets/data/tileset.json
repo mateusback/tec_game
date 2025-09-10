@@ -33,6 +33,17 @@
     "29": { "name": "E-Tutorial", "index": 29, "solid": false },
     "30": { "name": "Walk-Tutorial", "index": 30, "solid": false },
     "31": { "name": "Shoot-Tutorial", "index": 31, "solid": false },
-    "32": { "name": "Bomb-Tutorial", "index": 32, "solid": false }
+    "32": { "name": "Bomb-Tutorial", "index": 32, "solid": false },
+    "36": { "name": "Floor-Variant-1", "index": 36, "solid": false },
+    "37": { "name": "Floor-Variant-2", "index": 37, "solid": false },
+    "38": { "name": "Floor-Variant-3", "index": 38, "solid": false },
+    "39": { "name": "Floor-Variant-4", "index": 39, "solid": false },
+    "40": { "name": "Rock-Variant-1", "index": 40, "solid": true, "destructible": true, "destroyedId": 8 },
+    "41": { "name": "Rock-Variant-2", "index": 41, "solid": true, "destructible": true, "destroyedId": 8 },
+    "42": { "name": "Rock-Variant-3", "index": 42, "solid": true, "destructible": true, "destroyedId": 8 },
+    "43": { "name": "Rock-Variant-4", "index": 43, "solid": true, "destructible": true, "destroyedId": 8 },
+    "44": { "name": "Rock-Variant-5", "index": 44, "solid": true },
+    "45": { "name": "Rock-Variant-6", "index": 45, "solid": true },
+    "46": { "name": "Rock-Variant-7", "index": 46, "solid": true }
   }
 }

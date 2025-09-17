@@ -28,6 +28,7 @@ GameplayScene::GameplayScene(SDL_Renderer* renderer, int screenWidth, int screen
     this->generateFloorAndLoadStartRoom();
     this->player = this->roomManager->getPlayer();
     this->setupHandlersAndRenderers();
+    score()->reset();
 }
 
 

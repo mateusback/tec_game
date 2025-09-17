@@ -36,7 +36,7 @@ namespace Scenes {
         SDL_Color white = {255, 255, 255};
 
         Core::TextRenderer::render(renderer, font, "Créditos", width / 2 - 60, height / 2 - 100, white);
-        Core::TextRenderer::render(renderer, font, "Jogo desenvolvido por Mateus Back", width / 2 - 180, height / 2 - 50, white);
+        Core::TextRenderer::render(renderer, font, "Jogo desenvolvido por Mateus Back e Gustavo Lopes", width / 2 - 180, height / 2 - 50, white);
         Core::TextRenderer::render(renderer, font, "Feito com SDL2 e C++", width / 2 - 110, height / 2, white);
         Core::TextRenderer::render(renderer, font, "Pressione Enter ou ESC para voltar", width / 2 - 200, height / 2 + 80, white);
 

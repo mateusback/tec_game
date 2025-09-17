@@ -99,21 +99,37 @@ namespace Entities {
         // Movimento melhorado
         if (shouldMoveToCenter && moveTimer <= 0.f) {
             // Mover para uma posição estratégica
-            Vector2f centerOfArena = Vector2f(0, 0); // Ajuste conforme sua arena
+            const float tile = virtualRenderer()->getTileSize();
+            Vector2f centerOfArena(
+                std::floor(virtualRenderer()->getScreenWidth()  * 0.5f / tile) * tile,
+                std::floor(virtualRenderer()->getScreenHeight() * 0.5f / tile) * tile
+            );
             Vector2f toCenter = centerOfArena - this->getCenterPoint();
             
             if (toCenter.length() > 1.0f) {
-                this->speed = toCenter * originalSpeed * 1.5f;
+                // normalizar direção ao centro
+                Vector2f dirC(0, 0);
+                if (toCenter.length() > 0.001f) {
+                    dirC = toCenter;
+                    dirC.normalize();
+                }
+                const float tile = virtualRenderer()->getTileSize();
+                this->speed = dirC * (originalSpeed * 1.5f * tile);
                 this->move(deltaTime);
             } else {
                 shouldMoveToCenter = false;
             }
         } else if (distance > 1.0f && !shouldMoveToCenter) {
-            // Movimento normal em direção ao jogador (mais inteligente)
-            Vector2f direction = {toPlayer.x, toPlayer.y};
+            // Movimento normal em direção ao jogador
+            Vector2f direction(0, 0);
+            if (toPlayer.length() > 0.001f) {
+                direction = toPlayer;
+                direction.normalize();
+            }
             
             // Velocidade baseada na fase
-            float currentSpeed = originalSpeed;
+            const float tile = virtualRenderer()->getTileSize();
+            float currentSpeed = originalSpeed * tile;
             if (currentPhase == BossPhase::Enraged) {
                 currentSpeed *= 1.5f; // 50% mais rápido quando enfurecido
             }
@@ -127,7 +143,7 @@ namespace Entities {
         // Salvar posição do jogador para previsão
         lastPlayerPosition = target->getCenterPoint();
 
-        // Máquina de estados melhorada
+        // Máquina de estados
         switch (state) {
             case EntityState::Idle:
                 this->stateTimer -= deltaTime;
@@ -141,7 +157,6 @@ namespace Entities {
             case EntityState::Attacking:
                 this->stateTimer -= deltaTime;
                 
-                // Executar ataque baseado no padrão atual
                 if (this->stateTimer <= 0.f) {
                     switch (attackPattern) {
                         case 0:
@@ -157,7 +172,6 @@ namespace Entities {
                     
                     this->state = EntityState::CoolingDown;
                     
-                    // Cooldown baseado na fase
                     float cooldown = this->getAttackRate();
                     if (currentPhase == BossPhase::Enraged) {
                         cooldown *= 0.7f; // 30% mais rápido
@@ -189,34 +203,29 @@ namespace Entities {
     void BossBody::checkPhaseTransition() {
         float healthPercent = (float)getHealth() / (float)getMaxHealth();
         
-        // Transição para fase enfurecida quando vida < 50%
         if (healthPercent < 0.5f && currentPhase == BossPhase::Normal) {
             currentPhase = BossPhase::Enraged;
             
-            // Efeito visual simples usando sprites existentes
             auto effect = std::make_unique<EffectBody>(
                 getCenterPoint() - Vector2f(virtualRenderer()->getTileSize(), virtualRenderer()->getTileSize()),
                 Vector2f(virtualRenderer()->getTileSize() * 2, virtualRenderer()->getTileSize() * 2),
-                textures()->Get("portal_spawn"), // Reutilizar sprite existente
+                textures()->Get("portal_spawn"),
                 2.0f
             );
             effect->setAnimationInfo({ "spin", 0, 8 });
             effect->loadAnimations();
             entityManager.add(std::move(effect));
             
-            audio()->playSoundEffect("portal"); // Som existente
+            audio()->playSoundEffect("portal");
             
-            // Aumentar dano
             this->setAttackDamage(this->getAttackDamage() + 10);
         }
     }
 
     void BossBody::switchAttackPattern() {
         if (currentPhase == BossPhase::Normal) {
-            // Fase normal: apenas padrões 0 e 1
             attackPattern = rand() % 2;
         } else {
-            // Fase enfurecida: todos os padrões
             attackPattern = rand() % 3;
         }
         patternTimer = 0.f;
@@ -238,12 +247,10 @@ namespace Entities {
         }
     }
 
-    // Padrão original (melhorado)
     void BossBody::summonAttacksAroundPlayer() {
         Vector2f playerCenter = this->target->getCenterPoint();
         float tile = virtualRenderer()->getTileSize();
 
-        // Mais ataques na fase enfurecida
         int attackCount = (currentPhase == BossPhase::Enraged) ? 9 : 6;
         
         for (int i = 0; i < attackCount; ++i) { 
@@ -251,7 +258,6 @@ namespace Entities {
             float offsetY = ((rand() % 5) - 2) * tile;
             Vector2f centerPos = playerCenter + Vector2f(offsetX, offsetY);
 
-            // Efeito de spawn usando sprite existente
             auto effect = std::make_unique<EffectBody>(
                 centerPos - Vector2f(tile / 2.f, tile / 2.f),
                 Vector2f(tile, tile),
@@ -262,7 +268,6 @@ namespace Entities {
             effect->loadAnimations();
             entityManager.add(std::move(effect));
 
-            // Delay menor na fase enfurecida
             float delay = (currentPhase == BossPhase::Enraged) ? 0.3f : 0.5f;
             scheduledAttacks.push_back({ centerPos, delay });
         }
@@ -270,7 +275,6 @@ namespace Entities {
         audio()->playSoundEffect("portal");
     }
 
-    // Novo padrão: ataques em círculo
     void BossBody::summonCircularAttack() {
         Vector2f bossCenter = this->getCenterPoint();
         float tile = virtualRenderer()->getTileSize();
@@ -297,20 +301,18 @@ namespace Entities {
         audio()->playSoundEffect("portal");
     }
 
-    // Novo padrão: ataques que seguem o jogador
     void BossBody::summonFollowingAttacks() {
         Vector2f playerPos = target->getCenterPoint();
         Vector2f playerVelocity = playerPos - lastPlayerPosition;
         float tile = virtualRenderer()->getTileSize();
         
-        // Prever onde o jogador vai estar
-        Vector2f predictedPos = playerPos + playerVelocity * 30.0f; // Multiplicador de predição
+        Vector2f predictedPos = playerPos + playerVelocity * 30.0f;
 
         int attackCount = (currentPhase == BossPhase::Enraged) ? 5 : 3;
         
         for (int i = 0; i < attackCount; ++i) {
             Vector2f targetPos = predictedPos + Vector2f(
-                ((rand() % 3) - 1) * tile, // Pequena variação
+                ((rand() % 3) - 1) * tile,
                 ((rand() % 3) - 1) * tile
             );
 
@@ -335,7 +337,6 @@ namespace Entities {
 
         SDL_Texture* texture = Manager::TextureManager::Get(this->bossData.getSpritePath());
 
-        // Manter animações simples com suas sprites
         Manager::AnimationLoader::loadStaticAnimations(texture, {
             {"idle", 0, 0},
             {"attack", 0, 0},
@@ -352,17 +353,20 @@ namespace Entities {
         if (player) {
             int damage = this->getAttackDamage();
             
-            // Dano extra na fase enfurecida
             if (currentPhase == BossPhase::Enraged) {
                 damage = (int)(damage * 1.2f);
             }
             
             player->takeDamage(damage);
             
-            // Empurrar jogador para longe
             Vector2f direction = (player->getCenterPoint() - this->getCenterPoint());
+            Vector2f dirKb(0, 0);
+            if (direction.length() > 0.001f) {
+                dirKb = direction;
+                dirKb.normalize();
+            }
             float knockbackForce = (currentPhase == BossPhase::Enraged) ? 150.0f : 100.0f;
-            player->setSpeed(direction * knockbackForce);
+            player->setSpeed(dirKb * knockbackForce);
         }
     }
 }

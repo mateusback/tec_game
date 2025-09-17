@@ -1,28 +1,33 @@
-  {
-    "bosses": [
-      {
-        "id": 1,
-        "name": "Chefão!",
-        "spritePath": "assets/animations/boss.png",
-        "acceleration": 0.5,
-        "aggroRange": 10,
-        "health": 500,
-        "maxHealth": 500,
-        "attackDamage": 25,
-        "attackRate": 3,
-        "attackRange": 6,
-        "attackSpeed": 1.5,
-        "defense": 5,
-        "phases": [
-          { "threshold": 1.0, "attackType": "tentacle_slam" },
-          { "threshold": 0.6, "attackType": "chain_whip" },
-          { "threshold": 0.3, "attackType": "summon_minions" }
-        ],
-        "summonIds": [1, 2],
-        "specialTextures": {
-          "tentacle": "assets/animations/arm.png",
-          "chain": "assets/animations/chain.png"
-        }
+{
+  "bosses": [
+    {
+      "id": 1,
+      "name": "Chefão!",
+      "spritePath": "assets/animations/boss.png",
+      "moveSpeed": 3.0,
+      "dashSpeed": 8.0,
+      "dashDuration": 0.20,
+      "acceleration": 1.2,
+      "aggroRange": 10,
+      "health": 500,
+      "maxHealth": 500,
+      "attackDamage": 25,
+      "attackRate": 3,
+      "attackRange": 6,
+      "attackSpeed": 1.5,
+      "defense": 5,
+
+      "phases": [
+        { "threshold": 1.0, "attackType": "tentacle_slam", "speedMultiplier": 1.0 },
+        { "threshold": 0.6, "attackType": "chain_whip",    "speedMultiplier": 1.0, "dashChance": 0.15 },
+        { "threshold": 0.3, "attackType": "summon_minions","speedMultiplier": 1.5,  "dashChance": 0.35 }
+      ],
+
+      "summonIds": [1, 2],
+      "specialTextures": {
+        "tentacle": "assets/animations/arm.png",
+        "chain": "assets/animations/chain.png"
       }
-    ]
-  }
+    }
+  ]
+}

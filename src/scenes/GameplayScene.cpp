@@ -200,7 +200,8 @@ void GameplayScene::updateAttacks(float deltaTime) {
     for (auto* attack : attacks) {
         attack->update(deltaTime);
 
-        if (attack->getOrigin() != player && Physics::isColliding(attack, player)) {
+        if (attack->getOrigin() != player &&
+            Physics::CollisionManager::checkCollision(attack->getHitbox(), player->getHitbox())) {
             player->takeDamage(attack->getAttackDamage());
             addDestroyEffect(attack->getPosition(), attack->getScale());
             attack->setActive(false);

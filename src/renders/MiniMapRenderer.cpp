@@ -41,12 +41,19 @@ void MiniMapRenderer::render(SDL_Renderer* renderer) {
         rect.x = offset.x + (room.x * (roomSizePx + spacing));
         rect.y = offset.y + (room.y * (roomSizePx + spacing));
 
-        if (&room == current) {
-            SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255); // amarelo para atual
+        // Sala do boss em vermelho
+        bool isBossRoom = (room.type == Map::ERoomType::Boss);
+
+        if (isBossRoom) {
+            SDL_SetRenderDrawColor(renderer, 220, 30, 30, 255);
+        } else if (&room == current) {
+            SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
         } else if (visited) {
-            SDL_SetRenderDrawColor(renderer, 150, 150, 150, 255); // cinza claro
+            SDL_SetRenderDrawColor(renderer, 150, 150, 150, 255);
         } else if (isNeighborOfVisited) {
-            SDL_SetRenderDrawColor(renderer, 60, 60, 60, 255); // cinza escuro
+            SDL_SetRenderDrawColor(renderer, 60, 60, 60, 255);
+        } else {
+            SDL_SetRenderDrawColor(renderer, 30, 30, 30, 255);
         }
 
         SDL_RenderFillRect(renderer, &rect);

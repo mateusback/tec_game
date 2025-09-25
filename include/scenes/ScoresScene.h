@@ -19,7 +19,11 @@ namespace Scenes {
 
     private:
         int width, height;
-        TTF_Font* font = nullptr;
+        TTF_Font* titleFont = nullptr;
+        TTF_Font* textFont = nullptr;
+        TTF_Font* smallFont = nullptr;
         std::vector<Manager::ScoreEntry> scores;
+        
+        int getCenteredX(const char* text, TTF_Font* font);
     };
 }

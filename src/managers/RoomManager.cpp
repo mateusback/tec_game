@@ -411,7 +411,7 @@ void RoomManager::openDoorsOfCurrentRoom() {
     std::vector<Vector2i> portasFechadas;
 
     for (auto* tile : entityManager->getEntitiesByType<Entities::TileBody>()) {
-        if (tile->getTileId() == 7) {
+        if (tile->getTileId() == 7 || tile->getTileId() == 24) {
             portasFechadas.push_back(virtualRenderer()->screenToTilePosition(tile->getPosition()));
             tile->setActive(false);
         }

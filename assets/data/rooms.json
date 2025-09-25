@@ -302,7 +302,7 @@
     "type": "Boss",
     "connections": {
       "up": true,
-      "down": true,
+      "down": false,
       "right": true,
       "left": true
     },
@@ -639,12 +639,6 @@
           "id": 3,
           "x": 10,
           "y": 5
-        },
-        {
-          "type": "Enemy",
-          "id": 2,
-          "x": 10,
-          "y": 6
         }
       ]
     }

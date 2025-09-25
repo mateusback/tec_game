@@ -26,6 +26,7 @@
     "21": { "name": "Hole-Left", "index": 21, "solid": true },
     "22": { "name": "Hole-Top", "index": 22, "solid": true },
     "23": { "name": "Hole-Dark", "index": 23, "solid": true },
+    "24": { "name": "Boss-Door", "index": 24, "solid": true },
     "25": { "name": "Hole-Bottom-Left", "index": 25, "solid": true },
     "26": { "name": "Hole-Bottom-Right", "index": 26, "solid": true },
     "27": { "name": "WASD-Tutorial", "index": 27, "solid": false },

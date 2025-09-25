@@ -302,7 +302,7 @@
     "type": "Boss",
     "connections": {
       "up": true,
-      "down": true,
+      "down": false,
       "right": true,
       "left": true
     },

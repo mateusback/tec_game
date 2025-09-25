@@ -27,12 +27,16 @@ namespace Scenes {
         int width, height;
         int finalScore = 0;
 
-        TTF_Font* font = nullptr;
+        TTF_Font* titleFont = nullptr;
+        TTF_Font* textFont = nullptr;
+        TTF_Font* smallFont = nullptr;
         EndSceneState state = EndSceneState::ShowingCredits;
 
         std::string playerName;
         std::vector<Manager::ScoreEntry> scores;
         bool scoreSaved = false;
+        
+        int getCenteredX(const char* text, TTF_Font* font);
     };
 }
 

@@ -12,23 +12,24 @@
 
 
 namespace Generator {
-    const std::vector<int> floorVariants = {0, 36, 37, 38, 39};
-    const std::vector<int> rockVariants = {1, 40, 41, 42, 43, 44, 45, 46};
+    const std::array<int, 5> floorVariants = {0, 36, 37, 38, 39};
+    const std::array<int, 8> rockVariants = {1, 40, 41, 42, 43, 44, 45, 46};
 
     void applyTileVariants(Map::Room& room, std::mt19937& rng) {
+        std::uniform_int_distribution<int> dist(0, 100);
         for (auto& row : room.layout) {
             for (auto& tile : row) {
                 if (tile == 0 && floorVariants.size() > 1) {
-                    if ((rng() % 100) < 7) {
-                        tile = floorVariants[1 + (rng() % (floorVariants.size() - 1))];
+                    if (dist(rng) < 7) {
+                        tile = floorVariants[1 + (dist(rng) % (floorVariants.size() - 1))];
                     } else {
                         tile = floorVariants[0];
                     }
                 }
 
                 else if (tile == 1 && rockVariants.size() > 1) {
-                    if ((rng() % 100) < 20) {
-                        tile = rockVariants[1 + (rng() % (rockVariants.size() - 1))];
+                    if (dist(rng) < 20) {
+                        tile = rockVariants[1 + (dist(rng) % (rockVariants.size() - 1))];
                     } else {
                         tile = rockVariants[0]; 
                     }
@@ -105,14 +106,39 @@ namespace Generator {
     }
 
     void ProceduralFloorGenerator::connectRooms() {
-        for (auto& [pos, room] : this->layout) {
-            int rows = static_cast<int>(room.layout.size());
-            int cols = static_cast<int>(room.layout[0].size());
-            int midCol = cols / 2;
-            int midRow = rows / 2;
-            bool evenCols = (cols % 2 == 0);
-            bool evenRows = (rows % 2 == 0);
+        const int normalDoorId = 7;
+        const int fakeWallId   = 9;
+        const int bossDoorId   = 24;
 
+        auto placeEdge = [&](auto& grid, EDirection dir, int tileId) {
+            const int rows = static_cast<int>(grid.size());
+            const int cols = static_cast<int>(grid[0].size());
+            const int midCol = cols / 2;
+            const int midRow = rows / 2;
+            const bool evenCols = (cols % 2 == 0);
+            const bool evenRows = (rows % 2 == 0);
+
+            switch (dir) {
+                case EDirection::Up:
+                    grid[0][midCol] = tileId;
+                    if (evenCols) grid[0][midCol - 1] = tileId;
+                    break;
+                case EDirection::Down:
+                    grid[rows - 1][midCol] = tileId;
+                    if (evenCols) grid[rows - 1][midCol - 1] = tileId;
+                    break;
+                case EDirection::Left:
+                    grid[midRow][0] = tileId;
+                    if (evenRows) grid[midRow - 1][0] = tileId;
+                    break;
+                case EDirection::Right:
+                    grid[midRow][cols - 1] = tileId;
+                    if (evenRows) grid[midRow - 1][cols - 1] = tileId;
+                    break;
+            }
+        };
+
+        for (auto& [pos, room] : this->layout) {
             for (const auto& [dx, dy] : std::vector<Position>{{0,1},{1,0},{0,-1},{-1,0}}) {
                 Position neighbor{pos.first + dx, pos.second + dy};
                 if (!this->layout.contains(neighbor)) continue;
@@ -125,45 +151,18 @@ namespace Generator {
                 room.connections[dirStr] = true;
                 neighborRoom.connections[oppStr] = true;
 
-                if (neighborRoom.type != Map::ERoomType::Secret) {
-                    switch (dir) {
-                        case EDirection::Up:
-                            room.layout[0][midCol] = 7;
-                            if (evenCols) room.layout[0][midCol - 1] = 7;
-                            break;
-                        case EDirection::Down:
-                            room.layout[rows - 1][midCol] = 7;
-                            if (evenCols) room.layout[rows - 1][midCol - 1] = 7;
-                            break;
-                        case EDirection::Left:
-                            room.layout[midRow][0] = 7;
-                            if (evenRows) room.layout[midRow - 1][0] = 7;
-                            break;
-                        case EDirection::Right:
-                            room.layout[midRow][cols - 1] = 7;
-                            if (evenRows) room.layout[midRow - 1][cols - 1] = 7;
-                            break;
-                    }
-                } else if (neighborRoom.type == Map::ERoomType::Secret) {
-                    const int fakeWallId = 9; // FakeWall
-                    switch (dir) {
-                        case EDirection::Up:
-                            room.layout[0][midCol] = fakeWallId;
-                            if (evenCols) room.layout[0][midCol - 1] = fakeWallId;
-                            break;
-                        case EDirection::Down:
-                            room.layout[rows - 1][midCol] = fakeWallId;
-                            if (evenCols) room.layout[rows - 1][midCol - 1] = fakeWallId;
-                            break;
-                        case EDirection::Left:
-                            room.layout[midRow][0] = fakeWallId;
-                            if (evenRows) room.layout[midRow - 1][0] = fakeWallId;
-                            break;
-                        case EDirection::Right:
-                            room.layout[midRow][cols - 1] = fakeWallId;
-                            if (evenRows) room.layout[midRow - 1][cols - 1] = fakeWallId;
-                            break;
-                    }
+                switch (neighborRoom.type) {
+                    case Map::ERoomType::Secret:
+                        placeEdge(room.layout, dir, fakeWallId);
+                        break;
+
+                    case Map::ERoomType::Boss:
+                        placeEdge(room.layout, dir, bossDoorId);
+                        break;
+
+                    default:
+                        placeEdge(room.layout, dir, normalDoorId);
+                        break;
                 }
             }
         }

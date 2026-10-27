@@ -170,6 +170,8 @@ namespace Entities {
                 if (this->getEnemyData().getBehavior() == EEnemyBehavior::Shell) {
                     desiredAnimation = (this->stateTimer <= this->getAttackRate() / 2.f)
                                        ? "hidden" : "idle";
+                } else if (this->getEnemyData().getBehavior() == EEnemyBehavior::Jumper) {
+                    desiredAnimation = "land";
                 } else {
                     desiredAnimation = "idle";
                 }
@@ -178,6 +180,30 @@ namespace Entities {
                 desiredAnimation = "idle";
                 break;
         }
+
+        if (this->getEnemyData().getBehavior() == EEnemyBehavior::Shell) {
+            // passa por "hide"/"emerge" ao trocar entre escondido e exposto
+            const std::string current = this->animationManager.getCurrentAnimationName();
+            const bool inShell = current == "hidden" || current == "hide";
+
+            if (desiredAnimation == "hidden") {
+                if (!inShell) {
+                    this->animationManager.setAnimation("hide", [this]() {
+                        this->animationManager.setAnimation("hidden");
+                    });
+                }
+                return;
+            }
+            if (current == "emerge")
+                return;
+            if (inShell) {
+                this->animationManager.setAnimation("emerge", [this]() {
+                    this->animationManager.setAnimation("idle");
+                });
+                return;
+            }
+        }
+
         this->animationManager.setAnimation(desiredAnimation);
     }
 
@@ -218,11 +244,16 @@ namespace Entities {
         if (this->enemyData.getBehavior() == EEnemyBehavior::Jumper) {
             SDL_Texture* texture = Manager::TextureManager::Get(this->enemyData.getSpritePath());
 
-            Manager::AnimationLoader::loadStaticAnimations(texture, {
-                {"idle",   0, 0},
-                {"prep",   0, 1},
-                {"jump", 0, 2},
-            }, this->animationManager);
+            Manager::AnimationLoader::loadNamedAnimations(texture, {
+                {"idle", 1, 4, true},
+                {"prep", 2, 4, false},
+                {"jump", 3, 5, false},
+                {"land", 4, 4, false},
+            }, this->animationManager, 0.08f);
+
+            this->animationManager.setFrameTime("idle", 0.2f);
+            this->animationManager.setFrameTime("prep", 0.125f); // 4 frames = 0.5s de preparo
+            this->animationManager.setFrameTime("land", 0.07f);
 
             this->animationManager.setAnimation("idle");
             return;
@@ -235,6 +266,12 @@ namespace Entities {
                 {"attack", 0, 1},
                 {"idle",   0, 2},
             }, this->animationManager);
+
+            // transições de entrar/sair do casco (linhas 1 e 2 da sheet)
+            Manager::AnimationLoader::loadNamedAnimations(texture, {
+                {"hide",   1, 5, false},
+                {"emerge", 2, 5, false},
+            }, this->animationManager, 0.06f);
 
             this->animationManager.setAnimation("idle");
         }

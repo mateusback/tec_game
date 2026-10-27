@@ -8,10 +8,37 @@
 #include "../../include/entities/BossBody.h"
 #include "../../include/generators/ProceduralFloorGenerator.h"
 
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
 
+namespace {
+    // troca tiles base por variações decorativas; determinístico por sala/posição
+    int decorateTileId(int tileId, int roomId, int row, int col, int cols) {
+        uint32_t h = static_cast<uint32_t>(roomId) * 73856093u
+                   ^ static_cast<uint32_t>(row) * 19349663u
+                   ^ static_cast<uint32_t>(col) * 83492791u;
+        h ^= h >> 13; h *= 0x5bd1e995u; h ^= h >> 15;
+        int roll = static_cast<int>(h % 1000);
+
+        switch (tileId) {
+            case 0: // chão: pedrinhas, osso, rosas, cogumelos
+                if (roll < 45)  return 36;
+                if (roll < 80)  return 37;
+                if (roll < 105) return 38;
+                if (roll < 125) return 39;
+                return 0;
+            case 1: // pedra destrutível: variações de formato
+                if (roll < 400) return 40 + roll % 4;
+                return 1;
+            case 3: // muro de cima: tocha a cada 4 colunas
+                if (row == 0 && col % 4 == 2 && col < cols - 1) return 47;
+                return 3;
+        }
+        return tileId;
+    }
+}
 
 namespace Manager {
     RoomManager::RoomManager(SDL_Renderer* renderer,
@@ -125,11 +152,7 @@ void RoomManager::loadRoom(Map::Room* room) {
 
             auto tile = std::make_unique<Entities::TileBody>(screenVect, textures()->Get("tileset"), tileData->solid);
 
-            if (t.angle != 0.0 || t.flip != SDL_FLIP_NONE) {
-                tile->initFlippedStaticTile(textures()->Get("tileset"), tileData->index, t.angle, t.flip);
-            } else {
-                tile->initStaticTile(textures()->Get("tileset"), tileData->index);
-            }
+            tile->initTile(textures()->Get("tileset"), tileData, t.angle, t.flip);
 
             tile->setTileId(t.id);
             tile->setTileData(tileData);
@@ -182,7 +205,7 @@ void RoomManager::loadTiles(Map::Room* room) {
 
     for (int row = 0; row < rows; ++row) {
         for (int col = 0; col < cols; ++col) {
-            int tileId = room->layout[row][col];
+            int tileId = decorateTileId(room->layout[row][col], room->id, row, col, cols);
             const Tile* tile = this->tileSet->getTile(tileId);
             if (!tile) continue;
 
@@ -202,9 +225,9 @@ void RoomManager::loadTiles(Map::Room* room) {
                 else if (col == 0) angle = 270.0;
                 else if (col == cols - 1) angle = 90.0;
 
-                tileBody->initFlippedStaticTile(tileSheet, tile->index, angle, flip);
+                tileBody->initTile(tileSheet, tile, angle, flip);
             } else {
-                tileBody->initStaticTile(tileSheet, tile->index);
+                tileBody->initTile(tileSheet, tile);
             }
 
             tileBody->setTileId(tileId);
@@ -440,7 +463,7 @@ void RoomManager::openDoorsOfCurrentRoom() {
             angle = 90.0;
         }
 
-        tile->initFlippedStaticTile(textures()->Get("tileset"), tileData->index, angle, flip);
+        tile->initTile(textures()->Get("tileset"), tileData, angle, flip);
         tile->setTileId(11);
         tile->setTileData(tileData);
 

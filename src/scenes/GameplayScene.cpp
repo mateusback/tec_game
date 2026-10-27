@@ -50,7 +50,7 @@ void GameplayScene::update(float deltaTime, const Manager::PlayerInput& input) {
     this->player->update(deltaTime);
 
     this->updateBombs(deltaTime);
-    this->updateTilesAndHandlePlayerCollision();
+    this->updateTilesAndHandlePlayerCollision(deltaTime);
     this->updateItemsAndPickup(deltaTime);
     this->updateEnemies(deltaTime);
     this->updateBosses(deltaTime);
@@ -132,8 +132,11 @@ void GameplayScene::updateBombs(float deltaTime) {
     }
 }
 
-void GameplayScene::updateTilesAndHandlePlayerCollision() {
+void GameplayScene::updateTilesAndHandlePlayerCollision(float deltaTime) {
     auto tiles = entityManager.getEntitiesByType<Entities::TileBody>();
+    for (auto* tile : tiles)
+        tile->update(deltaTime);
+
     for (auto* tile : tiles) {
         if (Physics::isColliding(player, tile)) {
             Physics::CollisionManager::resolveCollision(player, tile);

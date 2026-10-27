@@ -40,7 +40,7 @@ private:
 
     bool checkIfPlayerIsDead();
     void updateBombs(float deltaTime);
-    void updateTilesAndHandlePlayerCollision();
+    void updateTilesAndHandlePlayerCollision(float deltaTime);
     void updateItemsAndPickup(float deltaTime);
     void updateEnemies(float deltaTime);
     void updateBosses(float deltaTime);

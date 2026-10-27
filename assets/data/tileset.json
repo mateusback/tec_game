@@ -26,7 +26,7 @@
     "21": { "name": "Hole-Left", "index": 21, "solid": true },
     "22": { "name": "Hole-Top", "index": 22, "solid": true },
     "23": { "name": "Hole-Dark", "index": 23, "solid": true },
-    "24": { "name": "Boss-Door", "index": 24, "solid": true },
+    "24": { "name": "Boss-Door", "index": 24, "solid": true, "frames": [24, 33, 34, 35, 48, 49], "frameTime": 0.12 },
     "25": { "name": "Hole-Bottom-Left", "index": 25, "solid": true },
     "26": { "name": "Hole-Bottom-Right", "index": 26, "solid": true },
     "27": { "name": "WASD-Tutorial", "index": 27, "solid": false },
@@ -37,14 +37,15 @@
     "32": { "name": "Bomb-Tutorial", "index": 32, "solid": false },
     "36": { "name": "Floor-Variant-1", "index": 36, "solid": false },
     "37": { "name": "Floor-Variant-2", "index": 37, "solid": false },
-    "38": { "name": "Floor-Variant-3", "index": 38, "solid": false },
-    "39": { "name": "Floor-Variant-4", "index": 39, "solid": false },
+    "38": { "name": "Floor-Variant-3", "index": 38, "solid": false, "frames": [38, 50, 51, 52], "frameTime": 0.3 },
+    "39": { "name": "Floor-Variant-4", "index": 39, "solid": false, "frames": [39, 53, 54, 55], "frameTime": 0.25 },
     "40": { "name": "Rock-Variant-1", "index": 40, "solid": true, "destructible": true, "destroyedId": 8 },
     "41": { "name": "Rock-Variant-2", "index": 41, "solid": true, "destructible": true, "destroyedId": 8 },
     "42": { "name": "Rock-Variant-3", "index": 42, "solid": true, "destructible": true, "destroyedId": 8 },
     "43": { "name": "Rock-Variant-4", "index": 43, "solid": true, "destructible": true, "destroyedId": 8 },
     "44": { "name": "Rock-Variant-5", "index": 44, "solid": true },
-    "45": { "name": "Rock-Variant-6", "index": 45, "solid": true },
-    "46": { "name": "Rock-Variant-7", "index": 46, "solid": true }
+    "45": { "name": "Rock-Variant-6", "index": 45, "solid": true, "frames": [45, 56, 57, 58, 59, 60], "frameTime": 0.14 },
+    "46": { "name": "Rock-Variant-7", "index": 46, "solid": true, "frames": [46, 61, 62, 63, 64, 65], "frameTime": 0.14 },
+    "47": { "name": "Wall-Top-Torch", "index": 47, "solid": true, "frames": [47, 66, 67, 68, 69, 70], "frameTime": 0.1 }
   }
 }

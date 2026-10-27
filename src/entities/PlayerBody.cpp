@@ -156,7 +156,7 @@ namespace Entities
             {"walk",   5, 4},
             {"attack", 0, 5, false},
             {"death",  4, 5, false},
-            {"walk-r", 1, 5, true},
+            {"walk-r", 1, 4, true},
         }, this->animationManager, 0.15f, 32, 34);
 
         Manager::AnimationLoader::loadNamedAnimations(texture, {

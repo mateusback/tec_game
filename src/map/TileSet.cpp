@@ -23,6 +23,8 @@ bool TileSet::loadFromFile(const std::string& path) {
         tile.solid = value.value("solid", false);
         tile.destructible = value.value("destructible", false);
         tile.destroyedId = value.value("destroyedId", -1);
+        tile.frames = value.value("frames", std::vector<int>{});
+        tile.frameTime = value.value("frameTime", 0.15f);
 
         tileMap[id] = tile;
     }

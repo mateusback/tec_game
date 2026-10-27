@@ -22,11 +22,10 @@ namespace Entities {
         #pragma endregion
 
 
-        void update(float deltaTime) override {}
+        void update(float deltaTime) override { Body::update(deltaTime); }
         void onCollision(Body* other) override {}
 
-        void initStaticTile(SDL_Texture* tileSheet, int tileIndex);
-        void initFlippedStaticTile(SDL_Texture* texture, int tileIndex, double angle = 0.0, SDL_RendererFlip flip = SDL_FLIP_NONE);
+        void initTile(SDL_Texture* tileSheet, const Tile* tile, double angle = 0.0, SDL_RendererFlip flip = SDL_FLIP_NONE);
         
 		#pragma region Getters
         int getTileId() const { return this->tileId; }
